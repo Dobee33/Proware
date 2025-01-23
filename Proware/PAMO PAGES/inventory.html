@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School IMS - Inventory</title>
+    <link rel="stylesheet" href="../PAMO CSS/styles.css">
+    <link rel="stylesheet" href="../PAMO CSS/inventory.css">
+    <link rel="stylesheet" href="../PAMO CSS/styles.css">
+    <script src="../PAMO JS/inventory.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar remains the same as index.html -->
+        <main class="main-content">
+            <header>
+                <h1>Inventory Management</h1>
+                <button class="add-item-btn" onclick="openModal()">
+                    <i class="material-icons">add</i> Add New Item
+                </button>
+            </header>
+
+            <div class="inventory-filters">
+                <div class="search-bar">
+                    <i class="material-icons">search</i>
+                    <input type="text" placeholder="Search items...">
+                </div>
+                <div class="filter-group">
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="stationery">Stationery</option>
+                        <option value="books">Books</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="sports">Sports Equipment</option>
+                    </select>
+                    <select id="stockFilter">
+                        <option value="">Stock Status</option>
+                        <option value="low">Low Stock</option>
+                        <option value="out">Out of Stock</option>
+                        <option value="available">In Stock</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="inventory-grid">
+                <!-- Items will be dynamically added here -->
+            </div>
+
+            <!-- Add/Edit Item Modal -->
+            <div id="itemModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Add New Item</h2>
+                    <form id="itemForm">
+                        <div class="form-group">
+                            <label>Item Name</label>
+                            <input type="text" name="itemName" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select name="category" required>
+                                    <option value="stationery">Stationery</option>
+                                    <option value="books">Books</option>
+                                    <option value="electronics">Electronics</option>
+                                    <option value="sports">Sports Equipment</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Quantity</label>
+                                <input type="number" name="quantity" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Unit Price</label>
+                                <input type="number" name="price" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Reorder Level</label>
+                                <input type="number" name="reorderLevel" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Supplier</label>
+                            <select name="supplier" required>
+                                <option value="supplier1">ABC Stationers</option>
+                                <option value="supplier2">XYZ Electronics</option>
+                                <option value="supplier3">Sports Gear Ltd</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button type="submit" class="btn-primary">Save Item</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="inventory.js"></script>
+</body>
+</html> 
