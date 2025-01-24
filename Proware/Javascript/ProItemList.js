@@ -161,6 +161,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Get all main category checkboxes
+    const mainCategories = document.querySelectorAll('.main-category');
+    const sizeFilter = document.querySelector('.size-filter');
+
+    // Add click event listeners to main categories
+    mainCategories.forEach(category => {
+        category.addEventListener('change', function() {
+            const categoryType = this.dataset.category;
+            
+            // Show/hide subcategories based on main category selection
+            const subcategoryGroup = document.getElementById(`${categoryType}-${categoryType === 'sti-shirt' ? 'options' : categoryType === 'uniform' ? 'courses' : 'options'}`);
+            if (subcategoryGroup) {
+                subcategoryGroup.classList.toggle('hidden', !this.checked);
+            }
+
+            // Show/hide size filter for uniform and STI shirt categories
+            if (categoryType === 'uniform' || categoryType === 'sti-shirt') {
+                sizeFilter.classList.toggle('hidden', !this.checked);
+            } else if (categoryType === 'accessories') {
+                sizeFilter.classList.add('hidden');
+            }
+
+            // Uncheck other main categories
+            mainCategories.forEach(otherCategory => {
+                if (otherCategory !== this && this.checked) {
+                    otherCategory.checked = false;
+                    const otherCategoryType = otherCategory.dataset.category;
+                    const otherSubcategoryGroup = document.getElementById(`${otherCategoryType}-${otherCategoryType === 'sti-shirt' ? 'options' : otherCategoryType === 'uniform' ? 'courses' : 'options'}`);
+                    if (otherSubcategoryGroup) {
+                        otherSubcategoryGroup.classList.add('hidden');
+                    }
+                }
+            });
+        });
+    });
+
     // Initialize
     filterProducts();
 });

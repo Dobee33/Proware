@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="../CSS/ProItemList.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>PAMO - Product List</title>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../CSS/header.css">
     <link rel="stylesheet" href="../CSS/ProItemList.css">
     <link rel="stylesheet" href="../CSS/global.css">
@@ -19,9 +20,9 @@
 </head>
 
 <body>
-<?php
-include("../Includes/Header.php");
-?>
+    <?php
+    include("../Includes/Header.php");
+    ?>
     <section class="header">
         <div class="header-content">
             <h1 data-aos="fade-up">All Products - PAMO</h1>
@@ -45,57 +46,80 @@ include("../Includes/Header.php");
             </div>
 
             <div class="filter-group">
-                <h3>Department</h3>
+                <h3>Categories</h3>
                 <label class="checkbox-container">
-                    <input type="checkbox" data-department="bsit"> Information Technology
+                    <input type="checkbox" data-category="uniform" class="main-category"> Uniform
                     <span class="checkmark"></span>
                 </label>
-                <label class="checkbox-container">
-                    <input type="checkbox" data-department="bstm"> Tourism Management
-                    <span class="checkmark"></span>
-                </label>
-                <label class="checkbox-container">
-                    <input type="checkbox" data-department="bscs"> Computer Science
-                    <span class="checkmark"></span>
-                </label>
-                <label class="checkbox-container">
-                    <input type="checkbox" data-department="culinary"> Culinary Arts
-                    <span class="checkmark"></span>
-                </label>
-            </div>
+                <div id="uniform-courses" class="subcategory-group hidden">
+                    <label class="checkbox-container">
+                        <input type="checkbox" data-department="shs"> SHS
+                        <span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" data-department="bsit"> BSIT
+                        <span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" data-department="bscs"> BSCS
+                        <span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" data-department="bscpe"> BSCPE
+                        <span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" data-department="bstm"> BSTM
+                        <span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" data-department="bscm"> BSCM
+                        <span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" data-department="bmma"> BMMA
+                        <span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" data-department="bsba"> BSBA
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
 
-            <div class="filter-group">
-                <h3>Category</h3>
                 <label class="checkbox-container">
-                    <input type="checkbox" data-category="uniform"> Uniforms
+                    <input type="checkbox" data-category="sti-shirt" class="main-category"> STI Shirt
                     <span class="checkmark"></span>
                 </label>
-                <label class="checkbox-container">
-                    <input type="checkbox" data-category="shirt"> Department Shirts
-                    <span class="checkmark"></span>
-                </label>
-                <label class="checkbox-container">
-                    <input type="checkbox" data-category="accessories"> Accessories
-                    <span class="checkmark"></span>
-                </label>
-            </div>
+                <div id="sti-shirt-options" class="subcategory-group hidden">
+                    <label class="checkbox-container">
+                        <input type="checkbox" data-shirt="40th"> 40th STI Anniversary Shirt
+                        <span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" data-shirt="41st"> 41st STI Anniversary Shirt
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
 
-            <div class="filter-group">
-                <h3>Price Range</h3>
-                <div class="price-range">
-                    <input type="number" id="min-price" placeholder="Min" min="0">
-                    <span>-</span>
-                    <input type="number" id="max-price" placeholder="Max" min="0">
+                <label class="checkbox-container">
+                    <input type="checkbox" data-category="accessories" class="main-category"> STI Accessories
+                    <span class="checkmark"></span>
+                </label>
+                <div id="accessories-options" class="subcategory-group hidden">
+                    <label class="checkbox-container">
+                        <input type="checkbox" data-accessory="pin"> STI Eminel Pin
+                        <span class="checkmark"></span>
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" data-accessory="lanyard"> STI ID Lanyard
+                        <span class="checkmark"></span>
+                    </label>
                 </div>
             </div>
 
-            <div class="filter-group">
-                <h3>Size</h3>
+            <div class="filter-group size-filter hidden">
+                <h3>Sizes</h3>
                 <div class="size-options">
-                    <label class="size-btn">
-                        <input type="checkbox" name="size" value="XS">
-                        <span>XS</span>
-                    </label>
                     <label class="size-btn">
                         <input type="checkbox" name="size" value="S">
                         <span>S</span>
@@ -112,19 +136,15 @@ include("../Includes/Header.php");
                         <input type="checkbox" name="size" value="XL">
                         <span>XL</span>
                     </label>
+                    <label class="size-btn">
+                        <input type="checkbox" name="size" value="XXL">
+                        <span>XXL</span>
+                    </label>
+                    <label class="size-btn">
+                        <input type="checkbox" name="size" value="XXXL">
+                        <span>XXXL</span>
+                    </label>
                 </div>
-            </div>
-
-            <div class="filter-group">
-                <h3>Availability</h3>
-                <label class="checkbox-container">
-                    <input type="checkbox" data-stock="in-stock"> In Stock
-                    <span class="checkmark"></span>
-                </label>
-                <label class="checkbox-container">
-                    <input type="checkbox" data-stock="pre-order"> Pre-order
-                    <span class="checkmark"></span>
-                </label>
             </div>
 
             <button class="apply-btn">
@@ -148,12 +168,8 @@ include("../Includes/Header.php");
 
             <div class="products-grid">
                 <!-- Product 1 - IT Department Shirt -->
-                <div class="product-card" data-aos="fade-up" data-aos-delay="100"
-                     data-department="bsit" 
-                     data-category="shirt" 
-                     data-price="350" 
-                     data-size="M,L,XL"
-                     data-stock="in-stock">
+                <div class="product-card" data-aos="fade-up" data-aos-delay="100" data-department="bsit"
+                    data-category="shirt" data-price="350" data-size="M,L,XL" data-stock="in-stock">
                     <div class="product-badge">New</div>
                     <div class="product-image">
                         <img src="../Images/STI-ICT.jpg" alt="IT Department Shirt">
@@ -195,12 +211,8 @@ include("../Includes/Header.php");
                 </div>
 
                 <!-- Product 2 - Tourism Management Uniform -->
-                <div class="product-card" data-aos="fade-up" data-aos-delay="200"
-                     data-department="bstm" 
-                     data-category="uniform" 
-                     data-price="1500" 
-                     data-size="S,M,L"
-                     data-stock="pre-order">
+                <div class="product-card" data-aos="fade-up" data-aos-delay="200" data-department="bstm"
+                    data-category="uniform" data-price="1500" data-size="S,M,L" data-stock="pre-order">
                     <div class="product-badge">Pre-order</div>
                     <div class="product-image">
                         <img src="../Images/STI-TM.jpg" alt="Tourism Management Uniform">
@@ -233,7 +245,8 @@ include("../Includes/Header.php");
                                 <input type="number" value="1" min="1" max="10">
                                 <button class="qty-btn plus"><i class="fas fa-plus"></i></button>
                             </div>
-                            <button class="pre-order-btn" onclick="window.location.href='preorder.php'" data-status="pre-order">
+                            <button class="pre-order-btn" onclick="window.location.href='preorder.php'"
+                                data-status="pre-order">
                                 <i class="fas fa-clipboard-list"></i>
                                 Pre-order
                             </button>
@@ -242,12 +255,8 @@ include("../Includes/Header.php");
                 </div>
 
                 <!-- Product 3 - Engineering Department Shirt -->
-                <div class="product-card" data-aos="fade-up" data-aos-delay="300"
-                     data-department="engineering" 
-                     data-category="shirt" 
-                     data-price="380" 
-                     data-size="S,M,L,XL"
-                     data-stock="in-stock">
+                <div class="product-card" data-aos="fade-up" data-aos-delay="300" data-department="engineering"
+                    data-category="shirt" data-price="380" data-size="S,M,L,XL" data-stock="in-stock">
                     <div class="product-image">
                         <img src="../Images/STI-BA.jpg" alt="Engineering Department Shirt">
                         <div class="product-overlay">
@@ -287,12 +296,8 @@ include("../Includes/Header.php");
                     </div>
                 </div>
                 <!-- Product 4 - CS Department Shirt -->
-                <div class="product-card" data-aos="fade-up" data-aos-delay="400"
-                     data-department="bscs" 
-                     data-category="shirt" 
-                     data-price="350" 
-                     data-size="S,M,L,XL"
-                     data-stock="in-stock">
+                <div class="product-card" data-aos="fade-up" data-aos-delay="400" data-department="bscs"
+                    data-category="shirt" data-price="350" data-size="S,M,L,XL" data-stock="in-stock">
                     <div class="product-image">
                         <img src="../Images/STI-BA.jpg" alt="CS Department Shirt">
                         <div class="product-overlay">
@@ -333,12 +338,8 @@ include("../Includes/Header.php");
                 </div>
 
                 <!-- Product 5 - Tourism Management PE Uniform -->
-                <div class="product-card" data-aos="fade-up" data-aos-delay="500"
-                     data-department="bstm" 
-                     data-category="uniform" 
-                     data-price="850" 
-                     data-size="XS,S,M,L"
-                     data-stock="in-stock">
+                <div class="product-card" data-aos="fade-up" data-aos-delay="500" data-department="bstm"
+                    data-category="uniform" data-price="850" data-size="XS,S,M,L" data-stock="in-stock">
                     <div class="product-badge">Bestseller</div>
                     <div class="product-image">
                         <img src="../Images/STI-MMA.jpg" alt="Tourism PE Uniform">
@@ -380,12 +381,8 @@ include("../Includes/Header.php");
                 </div>
 
                 <!-- Product 6 - Engineering Lab Coat -->
-                <div class="product-card" data-aos="fade-up" data-aos-delay="600"
-                     data-department="engineering" 
-                     data-category="uniform" 
-                     data-price="650" 
-                     data-size="S,M,L,XL"
-                     data-stock="pre-order">
+                <div class="product-card" data-aos="fade-up" data-aos-delay="600" data-department="engineering"
+                    data-category="uniform" data-price="650" data-size="S,M,L,XL" data-stock="pre-order">
                     <div class="product-badge">Essential</div>
                     <div class="product-image">
                         <img src="../Images/STI-SH.jpg" alt="Engineering Lab Coat">
@@ -427,12 +424,8 @@ include("../Includes/Header.php");
                 </div>
 
                 <!-- Product 7 - IT Department Varsity Jacket -->
-                <div class="product-card" data-aos="fade-up" data-aos-delay="700"
-                     data-department="bsit" 
-                     data-category="accessories" 
-                     data-price="1200" 
-                     data-size="S,M,L,XL"
-                     data-stock="in-stock">
+                <div class="product-card" data-aos="fade-up" data-aos-delay="700" data-department="bsit"
+                    data-category="accessories" data-price="1200" data-size="S,M,L,XL" data-stock="in-stock">
                     <div class="product-badge">Limited Edition</div>
                     <div class="product-image">
                         <img src="../Images/STI-ICT.jpg" alt="IT Varsity Jacket">
@@ -474,12 +467,8 @@ include("../Includes/Header.php");
                 </div>
 
                 <!-- Product 8 - CS Department Hoodie -->
-                <div class="product-card" data-aos="fade-up" data-aos-delay="800"
-                     data-department="bscs" 
-                     data-category="accessories" 
-                     data-price="980" 
-                     data-size="M,L,XL"
-                     data-stock="in-stock">
+                <div class="product-card" data-aos="fade-up" data-aos-delay="800" data-department="bscs"
+                    data-category="accessories" data-price="980" data-size="M,L,XL" data-stock="in-stock">
                     <div class="product-image">
                         <img src="../Images/STI-ICT.jpg" alt="CS Hoodie">
                         <div class="product-overlay">
@@ -520,12 +509,8 @@ include("../Includes/Header.php");
                 </div>
 
                 <!-- Product 9 - Tourism Management ID Lace -->
-                <div class="product-card" data-aos="fade-up" data-aos-delay="900"
-                     data-department="bstm" 
-                     data-category="accessories" 
-                     data-price="150" 
-                     data-size="ONE SIZE"
-                     data-stock="in-stock">
+                <div class="product-card" data-aos="fade-up" data-aos-delay="900" data-department="bstm"
+                    data-category="accessories" data-price="150" data-size="ONE SIZE" data-stock="in-stock">
                     <div class="product-badge">Essential</div>
                     <div class="product-image">
                         <img src="../Images/STI-TM.jpg" alt="Tourism ID Lace">
@@ -565,14 +550,9 @@ include("../Includes/Header.php");
                         </div>
                     </div>
                 </div>
-
                 <!-- Product 10 - Engineering Calculator -->
-                <div class="product-card" data-aos="fade-up" data-aos-delay="1000"
-                     data-department="engineering" 
-                     data-category="accessories" 
-                     data-price="2500" 
-                     data-size="ONE SIZE"
-                     data-stock="pre-order">
+                <div class="product-card" data-aos="fade-up" data-aos-delay="1000" data-department="engineering"
+                    data-category="accessories" data-price="2500" data-size="ONE SIZE" data-stock="pre-order">
                     <div class="product-badge">Required</div>
                     <div class="product-image">
                         <img src="../Images/STI-BA.jpg" alt="Engineering Calculator">

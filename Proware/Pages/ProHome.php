@@ -19,9 +19,15 @@
     ?>
     <section class="Hero">
         <div class="hero-slideshow">
-            <div class="hero-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../Images/STI-LOGIN.jpg')"></div>
-            <div class="hero-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../Images/ACS ALL.jpg')"></div>
-            <div class="hero-slide" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../Images/ACS TM.jpg')"></div>
+            <div class="hero-slide"
+                style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../Images/STI-LOGIN.jpg')">
+            </div>
+            <div class="hero-slide"
+                style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../Images/ACS ALL.jpg')">
+            </div>
+            <div class="hero-slide"
+                style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../Images/ACS TM.jpg')">
+            </div>
         </div>
         <div class="hero-content">
             <h1>Unlock your future <br> with Pre-Order <br> Savings</h1>

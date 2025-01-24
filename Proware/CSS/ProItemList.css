@@ -3,7 +3,6 @@
     --primary-color: #2563eb;
     --secondary-color: #1e40af;
     --accent-color: #3b82f6;
-    --background-color: #f8fafc;
     --card-background: #ffffff;
     --text-primary: #1e293b;
     --text-secondary: #64748b;
@@ -17,8 +16,26 @@
 
 /* Global Styles */
 body {
-    background-color: var(--background-color);
-    color: var(--text-primary);
+    background-image: url('your-background-image.jpg');  /* Make sure this exists */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(30deg, rgba(244, 235, 182, 0.05) 12%, transparent 12.5%, transparent 87%, rgba(244, 235, 182, 0.03) 87.5%, rgba(244, 235, 182, 0.03)),
+        linear-gradient(150deg, rgba(244, 235, 182, 0.03) 12%, transparent 12.5%, transparent 87%, rgba(244, 235, 182, 0.05) 87.5%, rgba(244, 235, 182, 0.05));
+    background-size: 80px 140px;
+    background-position: 0 0, 0 0;
+    z-index: 1;
+    pointer-events: none;
 }
 
 .container {
@@ -32,10 +49,13 @@ body {
 
 /* Header Styles */
 .header {
-    background: linear-gradient(135deg, #0040ff, #4677f1);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(../Images/ACS\ ALL.jpg);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     padding: 4rem 2rem;
     text-align: center;
-    color: white;
+    color: #FDF005;
 }
 
 .header-content h1 {
@@ -71,30 +91,14 @@ body {
 
 /* Sidebar Styles */
 .sidebar {
-    background: var(--card-background);
+    background: var(--primary-color);
     padding: 1.5rem;
     border-radius: 1rem;
     box-shadow: var(--shadow-md);
     height: fit-content;
     position: sticky;
     top: 2rem;
-}
-
-.filter-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.filter-group {
-    margin-bottom: 25px;
-}
-
-.filter-group h3 {
-    font-size: 16px;
-    margin-bottom: 15px;
-    color: #333;
+    color: var(--secondary-color);
 }
 
 /* Checkbox Styles */
@@ -200,19 +204,6 @@ body {
     margin-bottom: 15px;
     font-size: 14px;
     color: #666;
-}
-
-.product-price {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.price {
-    font-size: 20px;
-    font-weight: bold;
-    color: #003366;
 }
 
 /* Stock Status */
@@ -442,4 +433,17 @@ body {
     transition-delay: 0.6s;
     opacity: 1;
   }
+  
+.subcategory-group {
+    padding-left: 20px;
+    margin-top: 10px;
+    border-left: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+/* Indent subcategories */
+.subcategory-group .checkbox-container {
+    font-size: 0.9em;
+    margin-bottom: 8px;
+}
   
