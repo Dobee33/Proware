@@ -2,21 +2,17 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../CSS/ProItemList.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <title>PAMO - Product List</title>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../CSS/header.css">
     <link rel="stylesheet" href="../CSS/ProItemList.css">
     <link rel="stylesheet" href="../CSS/global.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anton+SC&family=Smooch+Sans:wght@100..900&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Smooch+Sans:wght@100..900&display=swap"
         rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <title>PAMO - Product List</title>
 </head>
 
 <body>
@@ -121,27 +117,27 @@
                 <h3>Sizes</h3>
                 <div class="size-options">
                     <label class="size-btn">
-                        <input type="checkbox" name="size" value="S">
+                        <input type="radio" name="size" value="S">
                         <span>S</span>
                     </label>
                     <label class="size-btn">
-                        <input type="checkbox" name="size" value="M">
+                        <input type="radio" name="size" value="M">
                         <span>M</span>
                     </label>
                     <label class="size-btn">
-                        <input type="checkbox" name="size" value="L">
+                        <input type="radio" name="size" value="L">
                         <span>L</span>
                     </label>
                     <label class="size-btn">
-                        <input type="checkbox" name="size" value="XL">
+                        <input type="radio" name="size" value="XL">
                         <span>XL</span>
                     </label>
                     <label class="size-btn">
-                        <input type="checkbox" name="size" value="XXL">
+                        <input type="radio" name="size" value="XXL">
                         <span>XXL</span>
                     </label>
                     <label class="size-btn">
-                        <input type="checkbox" name="size" value="XXXL">
+                        <input type="radio" name="size" value="XXXL">
                         <span>XXXL</span>
                     </label>
                 </div>

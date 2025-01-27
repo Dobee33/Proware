@@ -74,37 +74,131 @@ document.addEventListener('DOMContentLoaded', function() {
         quickViewModal.classList.remove('active');
     });
 
-    // Filter functionality
-    function filterProducts() {
-        const filters = {
-            department: Array.from(document.querySelectorAll('[data-department]:checked')).map(cb => cb.dataset.department),
-            category: Array.from(document.querySelectorAll('[data-category]:checked')).map(cb => cb.dataset.category),
-            stock: Array.from(document.querySelectorAll('[data-stock]:checked')).map(cb => cb.dataset.stock),
-            size: Array.from(document.querySelectorAll('[name="size"]:checked')).map(cb => cb.value),
-            price: {
-                min: parseFloat(document.getElementById('min-price').value) || 0,
-                max: parseFloat(document.getElementById('max-price').value) || Infinity
+    // Get all checkboxes
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    
+    // Handle main category toggles
+    const uniformCheckbox = document.querySelector('input[data-category="uniform"]');
+    const stiShirtCheckbox = document.querySelector('input[data-category="sti-shirt"]');
+    const accessoriesCheckbox = document.querySelector('input[data-category="accessories"]');
+    
+    if (uniformCheckbox) {
+        uniformCheckbox.addEventListener('change', function() {
+            const uniformCourses = document.getElementById('uniform-courses');
+            if (uniformCourses) {
+                uniformCourses.classList.toggle('hidden', !this.checked);
             }
+            applyFilters();
+        });
+    }
+
+    if (stiShirtCheckbox) {
+        stiShirtCheckbox.addEventListener('change', function() {
+            const stiShirtOptions = document.getElementById('sti-shirt-options');
+            if (stiShirtOptions) {
+                stiShirtOptions.classList.toggle('hidden', !this.checked);
+            }
+            applyFilters();
+        });
+    }
+
+    if (accessoriesCheckbox) {
+        accessoriesCheckbox.addEventListener('change', function() {
+            const accessoriesOptions = document.getElementById('accessories-options');
+            if (accessoriesOptions) {
+                accessoriesOptions.classList.toggle('hidden', !this.checked);
+            }
+            applyFilters();
+        });
+    }
+
+    // Add change event listener to each checkbox
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            // Show/hide size filter based on category selection
+            const sizeFilter = document.querySelector('.size-filter');
+            const hasSelectedCategory = document.querySelector('input[type="checkbox"]:checked');
+            if (sizeFilter) {
+                sizeFilter.classList.toggle('hidden', !hasSelectedCategory);
+            }
+            applyFilters();
+        });
+    });
+
+    // Reset button functionality
+    const resetButton = document.querySelector('.clear-filters');
+    if (resetButton) {
+        resetButton.addEventListener('click', function() {
+            // Reset all checkboxes
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Hide all subcategories
+            document.getElementById('uniform-courses')?.classList.add('hidden');
+            document.getElementById('sti-shirt-options')?.classList.add('hidden');
+            document.getElementById('accessories-options')?.classList.add('hidden');
+            document.querySelector('.size-filter')?.classList.add('hidden');
+            
+            applyFilters();
+        });
+    }
+
+    // Function to apply filters
+    function applyFilters() {
+        const selectedFilters = {
+            categories: Array.from(document.querySelectorAll('input[data-category]:checked')).map(cb => cb.dataset.category),
+            departments: Array.from(document.querySelectorAll('input[data-department]:checked')).map(cb => cb.dataset.department),
+            shirts: Array.from(document.querySelectorAll('input[data-shirt]:checked')).map(cb => cb.dataset.shirt),
+            accessories: Array.from(document.querySelectorAll('input[data-accessory]:checked')).map(cb => cb.dataset.accessory),
+            sizes: Array.from(document.querySelectorAll('input[name="size"]:checked')).map(cb => cb.value)
         };
 
-        const searchTerm = searchInput.value.toLowerCase();
-        let visibleCount = 0;
+        const productCards = document.querySelectorAll('.product-card');
 
-        document.querySelectorAll('.product-card').forEach(card => {
-            const price = parseFloat(card.dataset.price);
-            const matchesDepartment = filters.department.length === 0 || filters.department.includes(card.dataset.department);
-            const matchesCategory = filters.category.length === 0 || filters.category.includes(card.dataset.category);
-            const matchesStock = filters.stock.length === 0 || filters.stock.includes(card.dataset.stock);
-            const matchesSize = filters.size.length === 0 || card.dataset.size.split(',').some(size => filters.size.includes(size));
-            const matchesPrice = price >= filters.price.min && price <= filters.price.max;
-            const matchesSearch = card.querySelector('h3').textContent.toLowerCase().includes(searchTerm);
+        productCards.forEach(card => {
+            let shouldShow = true;
 
-            const isVisible = matchesDepartment && matchesCategory && matchesStock && matchesSize && matchesPrice && matchesSearch;
-            card.style.display = isVisible ? 'block' : 'none';
-            if (isVisible) visibleCount++;
+            // If any filters are selected, product must match at least one selected filter
+            if (Object.values(selectedFilters).some(arr => arr.length > 0)) {
+                shouldShow = false;
+
+                // Check category matches
+                if (selectedFilters.categories.length > 0) {
+                    shouldShow = shouldShow || selectedFilters.categories.includes(card.dataset.category);
+                }
+
+                // Check department matches
+                if (selectedFilters.departments.length > 0) {
+                    shouldShow = shouldShow || selectedFilters.departments.includes(card.dataset.department);
+                }
+
+                // Check shirt matches
+                if (selectedFilters.shirts.length > 0) {
+                    shouldShow = shouldShow || selectedFilters.shirts.includes(card.dataset.shirt);
+                }
+
+                // Check accessories matches
+                if (selectedFilters.accessories.length > 0) {
+                    shouldShow = shouldShow || selectedFilters.accessories.includes(card.dataset.accessory);
+                }
+
+                // Check size matches
+                if (selectedFilters.sizes.length > 0) {
+                    const cardSizes = card.dataset.size?.split(',') || [];
+                    shouldShow = shouldShow || selectedFilters.sizes.some(size => cardSizes.includes(size));
+                }
+            }
+
+            card.style.display = shouldShow ? 'block' : 'none';
         });
 
-        productCount.textContent = visibleCount;
+        // Update product count
+        const visibleProducts = document.querySelectorAll('.product-card[style="display: block"]').length;
+        const productCount = document.getElementById('product-count');
+        if (productCount) {
+            productCount.textContent = visibleProducts;
+        }
     }
 
     // Sort functionality
@@ -130,16 +224,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Event listeners
-    filterInputs.forEach(input => input.addEventListener('change', filterProducts));
-    clearFiltersBtn.addEventListener('click', () => {
-        filterInputs.forEach(input => input.checked = false);
-        document.getElementById('min-price').value = '';
-        document.getElementById('max-price').value = '';
-        filterProducts();
-    });
-    applyFiltersBtn.addEventListener('click', filterProducts);
+    filterInputs.forEach(input => input.addEventListener('change', applyFilters));
+    applyFiltersBtn.addEventListener('click', applyFilters);
     sortSelect.addEventListener('change', (e) => sortProducts(e.target.value));
-    searchInput.addEventListener('input', filterProducts);
+    searchInput.addEventListener('input', applyFilters);
 
     // Add to cart functionality
     document.querySelectorAll('.add-to-cart, .pre-order-btn').forEach(btn => {
@@ -197,6 +285,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Initialize
-    filterProducts();
+    // Initial filter application
+    applyFilters();
 });

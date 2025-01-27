@@ -5,9 +5,11 @@
     <link rel="stylesheet" href="../CSS/header.css">
     <link rel="stylesheet" href="../CSS/global.css">
     <link rel="stylesheet" href="../CSS/ProHome.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anton+SC&family=Smooch+Sans:wght@100..900&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Smooch+Sans:wght@100..900&display=swap"
         rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <title>Homepage</title>
@@ -30,7 +32,7 @@
             </div>
         </div>
         <div class="hero-content">
-            <h1>Unlock your future <br> with Pre-Order <br> Savings</h1>
+            <h1>UNLOCK YOUR FUTURE <br> WITH PRE-ORDER <br> SAVINGS</h1>
             <p>At PAMO, we streamline your Purchasing and Asset Management needs with ease. <br> Explore our inventory
                 and discover the resources available <br> right at your fingertips.</p>
             <a href="ProItemList.php"><button class="pre-order-button">Pre Order</button></a>
@@ -123,7 +125,7 @@
 
     <section class="about">
         <div class="last">
-            <h1>About</h1>
+            <h1>ABOUT</h1>
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
                 dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
                 ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu

@@ -4,8 +4,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 ?>
 
-
-
 <nav class="navbar" role="navigation" aria-label="Main navigation">
     <div class="logo">
         <a href="ProHome.php" aria-label="Home">
@@ -19,11 +17,11 @@ if (session_status() === PHP_SESSION_NONE) {
         <span class="bar"></span>
         <span class="bar"></span>
     </div>
-    
+
     <ul class="nav-links">
         <li><a href="ProHome.php">Homepage</a></li>
         <li><a href="ProItemList.php">Item List</a></li>
-        <li><a href="preorder.php">Pre Order</a></li>
+        <li><a href="ProPreOrder.php">Pre Order</a></li>
         <li class="dropdown">
             <a href="#" aria-expanded="false" aria-haspopup="true">More Options &#9662;</a>
             <ul class="dropdown-menu" aria-label="submenu">
@@ -32,11 +30,11 @@ if (session_status() === PHP_SESSION_NONE) {
             </ul>
         </li>
     </ul>
-    
+
     <div class="icons">
         <div class="icon cart-icon">
             <a href="javascript:void(0)" onclick="checkLoginStatus('cart.php')" class="fas fa-shopping-cart">
-                <?php if(isset($_SESSION['cart_count'])): ?>
+                <?php if (isset($_SESSION['cart_count'])): ?>
                     <span class="cart-count"><?php echo $_SESSION['cart_count']; ?></span>
                 <?php endif; ?>
             </a>
@@ -86,17 +84,17 @@ if (session_status() === PHP_SESSION_NONE) {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <script>
-function checkLoginStatus(destination) {
-    <?php if (!isset($_SESSION['user_id'])): ?>
-        window.location.href = `login.php?redirect=${encodeURIComponent(destination)}`;
-    <?php else: ?>
-        window.location.href = destination;
-    <?php endif; ?>
-}
+    function checkLoginStatus(destination) {
+        <?php if (!isset($_SESSION['user_id'])): ?>
+            window.location.href = `login.php?redirect=${encodeURIComponent(destination)}`;
+        <?php else: ?>
+            window.location.href = destination;
+        <?php endif; ?>
+    }
 
-// Add this JavaScript for mobile menu functionality
-document.querySelector('.hamburger').addEventListener('click', function() {
-    this.classList.toggle('active');
-    document.querySelector('.nav-links').classList.toggle('active');
-});
+    // Add this JavaScript for mobile menu functionality
+    document.querySelector('.hamburger').addEventListener('click', function () {
+        this.classList.toggle('active');
+        document.querySelector('.nav-links').classList.toggle('active');
+    });
 </script>

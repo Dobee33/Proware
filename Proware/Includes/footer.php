@@ -11,7 +11,7 @@
         </div>
 
         <div class="footer-section">
-            <h4>Quick Links</h4>
+            <h4 style="font-family: 'Anton', serif; letter-spacing: 2px;">QUICK LINKS</h4>
             <ul class="footer-links">
                 <li><a href="index.php">Home</a></li>
                 <li><a href="about.php">About Us</a></li>
@@ -21,7 +21,7 @@
         </div>
 
         <div class="footer-section">
-            <h4>Contact Info</h4>
+            <h4>CONTACT INFO</h4>
             <ul class="contact-info">
                 <li>
                     <i class="fas fa-map-marker-alt"></i>
@@ -39,7 +39,7 @@
         </div>
 
         <div class="footer-section">
-            <h4>Connect With Us</h4>
+            <h4>CONNECT WITH US</h4>
             <div class="social-links">
                 <a href="https://www.facebook.com/lucena.sti.edu" target="_blank" class="social-link">
                     <i class="fab fa-facebook-f"></i>
@@ -47,11 +47,11 @@
                 <a href="https://twitter.com/STI_Education" target="_blank" class="social-link">
                     <i class="fab fa-twitter"></i>
                 </a>
-                <a href="https://www.instagram.com/stieduc" target="_blank" class="social-link">
+                <a href="https://www.instagram.com/sti_college/" target="_blank" class="social-link">
                     <i class="fab fa-instagram"></i>
                 </a>
-                <a href="https://www.linkedin.com/school/sti-college" target="_blank" class="social-link">
-                    <i class="fab fa-linkedin-in"></i>
+                <a href="https://www.youtube.com/user/STIdotEdu" target="_blank" class="social-link">
+                    <i class="fab fa-youtube"></i>
                 </a>
             </div>
         </div>
@@ -74,7 +74,8 @@
 
 <style>
     .footer {
-        background-color: #003366; /* STI Blue */
+        background-color: #003366;
+        /* STI Blue */
         color: #ffffff;
         padding: 4rem 0 0 0;
         font-family: 'Montserrat', sans-serif;
@@ -104,7 +105,8 @@
     }
 
     .footer h3 {
-        color: #FEFBC7; /* STI Yellow */
+        color: #FEFBC7;
+        /* STI Yellow */
         font-size: 1.5rem;
         margin-bottom: 1rem;
         letter-spacing: 1px;
@@ -116,7 +118,7 @@
         margin-bottom: 1.2rem;
         position: relative;
         padding-bottom: 0.5rem;
-        letter-spacing: 1px;
+        letter-spacing: 2px;
 
     }
 
@@ -266,8 +268,13 @@
 
     /* Remove the old animation */
     @keyframes linkHover {
-        from { transform: translateX(0); }
-        to { transform: translateX(5px); }
+        from {
+            transform: translateX(0);
+        }
+
+        to {
+            transform: translateX(5px);
+        }
     }
 
     .footer-links a:hover {

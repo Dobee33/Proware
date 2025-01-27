@@ -5,6 +5,7 @@ session_start();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,12 +13,13 @@ session_start();
     <link rel="stylesheet" href="../CSS/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-image">
             <img src="../Images/STI-LOGO.png" alt="STI Logo" style="max-width: 200px; height: auto;">
         </div>
-        
+
         <div class="login-form-container">
             <!-- Removed action="auth.php" since we don't have backend yet -->
             <form id="loginForm" class="login-form">
@@ -33,7 +35,8 @@ session_start();
                     <label for="email">Email / Student ID</label>
                     <div class="input-group">
                         <i class="fas fa-user"></i>
-                        <input type="text" id="email" name="email" placeholder="Enter your email or student ID" required>
+                        <input type="text" id="email" name="email" placeholder="Enter your email or student ID"
+                            required>
                         <span class="validation-message"></span>
                     </div>
                 </div>
@@ -71,50 +74,51 @@ session_start();
 
     <!-- For frontend demo purposes, modify the login.js -->
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const loginForm = document.getElementById('loginForm');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const togglePassword = document.querySelector('.toggle-password');
-        const roleBtns = document.querySelectorAll('.role-btn');
-        const loginBtn = document.querySelector('.login-btn');
+        document.addEventListener('DOMContentLoaded', function () {
+            const loginForm = document.getElementById('loginForm');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const togglePassword = document.querySelector('.toggle-password');
+            const roleBtns = document.querySelectorAll('.role-btn');
+            const loginBtn = document.querySelector('.login-btn');
 
-        // Role selector
-        roleBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                roleBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                // Update placeholder based on role
-                if (btn.dataset.role === 'student') {
-                    emailInput.placeholder = 'Enter your student ID';
-                } else {
-                    emailInput.placeholder = 'Enter your email';
-                }
+            // Role selector
+            roleBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    roleBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    // Update placeholder based on role
+                    if (btn.dataset.role === 'student') {
+                        emailInput.placeholder = 'Enter your student ID';
+                    } else {
+                        emailInput.placeholder = 'Enter your email';
+                    }
+                });
+            });
+
+            // Toggle password visibility
+            togglePassword.addEventListener('click', function () {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+
+            // Form submission (for frontend demo)
+            loginForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                loginBtn.classList.add('loading');
+
+                // Simulate login delay
+                setTimeout(() => {
+                    loginBtn.classList.remove('loading');
+                    // For demo purposes, just redirect to index.php
+                    window.location.href = 'ProHome.php';
+                }, 1500);
             });
         });
-
-        // Toggle password visibility
-        togglePassword.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.classList.toggle('fa-eye');
-            this.classList.toggle('fa-eye-slash');
-        });
-
-        // Form submission (for frontend demo)
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            loginBtn.classList.add('loading');
-
-            // Simulate login delay
-            setTimeout(() => {
-                loginBtn.classList.remove('loading');
-                // For demo purposes, just redirect to index.php
-                window.location.href = 'ProHome.php';
-            }, 1500);
-        });
-    });
     </script>
 </body>
-</html> 
+
+</html>
