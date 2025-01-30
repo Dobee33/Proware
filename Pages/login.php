@@ -11,6 +11,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user) {
+        if ($user['status'] === 'inactive') {
+            header("Location: login.php?error=account_inactive");
+            exit();
+        }
         if (password_verify($password, $user['password'])) {
 
             session_start();
@@ -24,16 +28,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else if ($user['role'] === 'pamo') {
                 header("Location: ../PAMO PAGES/index.php");
                 exit();
+            } else if ($user['role'] === 'admin') {
+                header("Location: ../ADMIN/admin_page.php");
+                exit();
             }
         } else {
             header("Location: login.php?error=incorrect_password");
             exit();
         }
     } else {
-        header("Location: login.php?error=account_not_found");
+        header("Location: login.php?error=account_not_found ");
+        //header("Location: login.php?error=account_not_found " . password_hash($password, PASSWORD_DEFAULT));//
         exit();
     }
-
     // Close connection
     $stmt->close();
     $conn->close();
@@ -88,8 +95,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 case 'account_not_found':
                                     echo 'Account does not exist. Please check your email.';
                                     break;
-                                default:
-                                    echo 'An error occurred. Please try again.';
+                                case 'account_inactive':
+                                    echo 'Your account is currently inactive. Please contact the administrator.';
+                                    break;
                             }
                             ?>
                         </div>
@@ -149,22 +157,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         display: flex;
         align-items: center;
         gap: 3rem;
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(255, 255, 255, 0.68);
         padding: 3rem;
         border-radius: 20px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(1px);
     }
 
     .logo-section {
         flex: 0 0 350px;
-        padding: 2rem;
         background: rgba(246, 236, 189, 0.3);
         border-radius: 15px;
         transition: transform 0.3s ease;
-    }
-
-    .logo-section:hover {
-        transform: scale(1.02);
     }
 
     .logo-container {
@@ -174,8 +178,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .logo-container img {
         width: 100%;
         height: auto;
-        margin-bottom: 1.5rem;
-        filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.1));
+        border-radius: 20px;
+
     }
 
     .location {
