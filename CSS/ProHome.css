@@ -6,7 +6,7 @@
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    padding-bottom: 50px;/* Parallax effect */
+    padding-bottom: 50px;
 }
 
 .hero-slideshow {
@@ -38,7 +38,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.1); /* Dark overlay for better text readability */
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .hero-slide.active {
@@ -53,8 +53,8 @@
 
 .hero-content h1 {
     font-family: var(--primary-font-family);
-    font-size: 90px;
-    color: #FFD700; /* Bright yellow color */
+    font-size: 70px;
+    color: #FFD700;
     letter-spacing: 2px;
     margin-bottom: 30px;
 }
@@ -65,6 +65,49 @@
     color: var(--secondary-color);
     margin-bottom: 40px;
     line-height: 1.4;
+}
+
+@media screen and (max-width: 1200px) {
+    .hero-content h1 {
+        font-size: 60px;
+    }
+
+    .hero-content p {
+        font-size: 24px;
+    }
+}
+
+@media screen and (max-width: 992px) {
+    .hero-content h1 {
+        font-size: 50px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 40px;
+    }
+
+    .hero-content p {
+        font-size: 18px;
+        padding: 0 20px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .hero-content h1 {
+        font-size: 32px;
+    }
+}
+
+@media screen and (max-width: 320px) {
+    .hero-content h1 {
+        font-size: 28px;
+    }
+
+    .hero-content p {
+        font-size: 14px;
+    }
 }
 
 .Hero h1 {
@@ -111,54 +154,72 @@
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    padding: 80px 100px;
-    position: relative;
-    overflow: hidden;
-}
-
-.featured-description h1 {
-    font-size: 75px;
-    color: var(--primary-color);
-    letter-spacing: 2px;
-}
-
-.featured-description p {
-    font-size: 32px;
-}
-
-.Featured {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 100px 20px 100px;
+    padding: 80px 100px;
+    position: relative;
+    overflow: hidden;
+    gap: 40px;
 }
 
 .featured-description {
+    flex: 1;
     max-width: 50%;
 }
 
 .featured-description h1 {
     font-size: 70px;
     color: var(--primary-color);
+    margin-bottom: 30px;
 }
 
 .featured-description p {
     font-size: 32px;
+    margin-bottom: 30px;
 }
 
-.featured-description button {
-    margin-top: 40px;
+@media screen and (max-width: 1200px) {
+    .Featured {
+        padding: 60px 50px;
+        gap: 30px;
+    }
+    
+    .featured-description {
+        max-width: 45%;
+    }
+    
+    .featured-description h1 {
+        font-size: 50px;
+    }
+    
+    .featured-description p {
+        font-size: 24px;
+    }
+}
+
+@media screen and (max-width: 968px) {
+    .Featured {
+        flex-direction: column;
+        padding: 40px 30px;
+    }
+    
+    .featured-description {
+        max-width: 100%;
+        text-align: center;
+        margin-bottom: 40px;
+    }
 }
 
 .slideshow {
-    width: 600px;
-    height: 600px;
+    flex: 1;
+    max-width: 600px;
+    aspect-ratio: 1/1;
     position: relative;
     overflow: hidden;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
-
 
 .slideshow img {
     width: 100%;
@@ -176,7 +237,7 @@
 
 .tag {
     background-image: linear-gradient(rgba(0, 114, 188, 0.9), rgba(0, 114, 188, 0.9)), 
-    url('Images/ACS TM.jpg'); /* Using your project image with blue overlay */
+    url('Images/ACS TM.jpg');
     background-size: cover;
     background-position: center;
     color: var(--white);
@@ -243,14 +304,14 @@
 }
 
 .last {
-    height: 100vh;
+    min-height: 100vh;
     background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
                       url('../Images/ACS ALL.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
     margin: 0;
-    padding: 1px 15%; /* Increased horizontal padding for better text container width */
+    padding: 60px 15%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -262,7 +323,8 @@
     font-family: var(--primary-font-family);
     color: #6baedb;
     text-align: center;
-    margin-bottom: 30px; /* Added spacing between h1 and p */
+    margin-bottom: 30px;
+    padding: 0 20px;
 }
 
 .last p {
@@ -270,9 +332,10 @@
     font-family: var(--secondary-font-family);
     color: var(--secondary-color);
     text-align: justify;
-    max-width: 1200px; /* Added max-width for better readability */
-    margin: 0 auto; /* Centers the paragraph block */
-    line-height: 1.6; /* Improved line height for better readability */
+    max-width: 1200px;
+    margin: 0 auto;
+    line-height: 1.6;
+    padding: 0 20px;
 }
 
 .last::before {
@@ -290,7 +353,37 @@
     z-index: 2;
 }
 
-/* Modern Explore section styles */
+@media screen and (max-width: 1200px) {
+    .last {
+        padding: 60px 10%;
+    }
+    
+    .last h1 {
+        font-size: 60px;
+    }
+    
+    .last p {
+        font-size: 28px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .last {
+        padding: 40px 5%;
+    }
+    
+    .last h1 {
+        font-size: 40px;
+        margin-bottom: 20px;
+    }
+    
+    .last p {
+        font-size: 20px;
+        text-align: left;
+        line-height: 1.5;
+    }
+}
+
 .Explore {
     position: relative;
     padding: 80px 0;
@@ -304,7 +397,6 @@
     overflow: hidden;
 }
 
-/* Modern geometric overlay */
 .Explore::before {
     content: '';
     position: absolute;
@@ -340,7 +432,6 @@
     display: inline-block;
 }
 
-/* Modern accent line */
 .Explore-description h1::after {
     content: '';
     position: absolute;
@@ -360,6 +451,22 @@
     margin: 0 auto;
     color: #333;
     line-height: 1.6;
+}
+
+/* Explore Section Media Queries */
+@media screen and (max-width: 768px) {
+    .Explore {
+        padding: 60px 0;
+        background-attachment: scroll;
+    }
+
+    .Explore-description h1 {
+        font-size: 48px;
+    }
+
+    .Explore-description p {
+        font-size: 24px;
+    }
 }
 
 /* Container layout */
@@ -395,7 +502,7 @@
     font-weight: 600;
     font-family: var(--primary-font-family);
     margin-bottom: 2rem;
-    color: #FFD700; /* Yellow color for headings */
+    color: #FFD700;
 }
 
 .card p {
@@ -404,7 +511,7 @@
     font-family: var(--secondary-font-family);
     line-height: 1.4;
     margin-bottom: 2rem;
-    color: #FFD700; /* Yellow color for paragraphs */
+    color: #FFD700;
 }
 
 .card:hover {
@@ -487,19 +594,6 @@
 }
 
 @media screen and (max-width: 768px) {
-    .Explore {
-        padding: 60px 0;
-        background-attachment: scroll;
-    }
-
-    .Explore-description h1 {
-        font-size: 48px;
-    }
-
-    .Explore-description p {
-        font-size: 24px;
-    }
-
     .card {
         width: 100%;
     }
@@ -509,20 +603,205 @@
     }
 }
 
-@keyframes moveBackground {
-    from {
-        background-position: 0 0;
-    }
-    to {
-        background-position: 100% 100%;
+/* Global Media Queries */
+@media screen and (max-width: 768px) {
+    .Hero,
+    .Featured,
+    .Explore,
+    .Categories,
+    .last {
+        background-attachment: scroll;
     }
 }
 
+/* Animations */
+@keyframes moveBackground {
+    from { background-position: 0 0; }
+    to { background-position: 100% 100%; }
+}
+
 @keyframes slidePattern {
-    0% {
-        background-position: 0 0;
+    0% { background-position: 0 0; }
+    100% { background-position: 60px 60px; }
+}
+
+/* Additional fixes for very small devices */
+@media screen and (max-width: 320px) {
+    .hero-content h1 {
+        font-size: 28px;
     }
-    100% {
-        background-position: 60px 60px;
+
+    .hero-content p {
+        font-size: 14px;
+    }
+
+    .pre-order-button {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+}
+
+/* Updated responsive styles for the last section */
+@media screen and (max-width: 1200px) {
+    .last {
+        padding: 60px 10%;
+    }
+    
+    .last h1 {
+        font-size: 60px;
+    }
+    
+    .last p {
+        font-size: 28px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .last {
+        padding: 40px 5%;
+    }
+    
+    .last h1 {
+        font-size: 40px;
+        margin-bottom: 20px;
+    }
+    
+    .last p {
+        font-size: 20px;
+        text-align: left;
+        line-height: 1.5;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .last {
+        padding: 30px 20px;
+    }
+    
+    .last h1 {
+        font-size: 32px;
+        margin-bottom: 15px;
+    }
+    
+    .last p {
+        font-size: 18px;
+        line-height: 1.4;
+    }
+}
+
+/* Slideshow Media Queries */
+@media screen and (max-width: 968px) {
+    .slideshow {
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .slideshow {
+        max-width: 100%;
+    }
+}
+
+/* Button Media Queries */
+@media screen and (max-width: 768px) {
+    .pre-order-button {
+        font-size: 24px;
+        padding: 15px 30px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .pre-order-button {
+        font-size: 18px;
+        padding: 12px 24px;
+    }
+}
+
+/* Categories Media Queries */
+@media screen and (max-width: 768px) {
+    .Categories h1 {
+        font-size: 36px;
+    }
+    
+    .Categories p {
+        font-size: 18px;
+    }
+    
+    .image-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .image-container img {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+    }
+}
+
+/* Card Media Queries */
+@media screen and (max-width: 768px) {
+    .card {
+        padding: 1.5rem;
+    }
+
+    .card h2 {
+        font-size: 1.8rem;
+    }
+
+    .card p {
+        font-size: 16px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .card {
+        padding: 1rem;
+    }
+}
+
+/* Container Media Queries */
+@media screen and (max-width: 1200px) {
+    .container {
+        flex-wrap: wrap;
+        gap: 3rem;
+    }
+    
+    .card {
+        width: calc(50% - 2rem);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        gap: 2rem;
+    }
+
+    .card {
+        width: 100%;
+    }
+}
+
+/* Product Media Queries */
+@media screen and (max-width: 768px) {
+    .product-image {
+        height: 200px;
+    }
+
+    .card:hover .product-image {
+        transform: translate(-0.5rem, -3rem) rotate(-10deg);
+    }
+}
+
+/* Tag Media Queries */
+@media screen and (max-width: 768px) {
+    .tagline h1 {
+        font-size: 36px;
+    }
+    
+    .tagline p {
+        font-size: 18px;
     }
 }

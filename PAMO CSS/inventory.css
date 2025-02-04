@@ -109,18 +109,60 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
     z-index: 1000;
 }
 
 .modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
     position: relative;
-    background-color: white;
-    margin: 50px auto;
-    padding: 30px;
     width: 90%;
-    max-width: 600px;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    margin: auto;
+}
+
+.modal-content h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.modal-content input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.modal-buttons button:first-child {
+    background-color: #28a745;
+    color: white;
+}
+
+.modal-buttons button:last-child {
+    background-color: #dc3545;
+    color: white;
+}
+
+.modal-buttons button:hover {
+    opacity: 0.9;
 }
 
 .close {
@@ -202,4 +244,228 @@
 .status-available {
     background-color: #d4edda;
     color: #155724;
+}
+
+.action-btn {
+    padding: 5px 10px;
+    margin: 2px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.edit-btn {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.add-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.action-btn i {
+    font-size: 16px;
+}
+
+.action-buttons button {
+    margin: 2px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Table Styles */
+.inventory-table {
+    margin: 20px;
+    overflow-x: auto;
+}
+
+.inventory-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.inventory-table th, 
+.inventory-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.inventory-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    color: #333;
+}
+
+.inventory-table tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
+
+.inventory-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Status Colors */
+.inventory-table td:nth-child(7) {
+    font-weight: bold;
+}
+
+.status-in-stock {
+    color: #28a745;
+}
+
+.status-low-stock {
+    color: #ffc107;
+}
+
+.status-out-of-stock {
+    color: #dc3545;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.edit-btn, 
+.add-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+}
+
+.edit-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.add-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.edit-btn:hover {
+    background-color: #0056b3;
+}
+
+.add-btn:hover {
+    background-color: #218838;
+}
+
+/* Make table responsive */
+@media screen and (max-width: 1024px) {
+    .inventory-table {
+        margin: 10px;
+    }
+    
+    .inventory-table th, 
+    .inventory-table td {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+}
+
+/* Add or update these styles */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.save-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.cancel-btn {
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.save-btn:hover, .cancel-btn:hover {
+    opacity: 0.8;
+}
+
+/* Add New Item Button Styles */
+.add-item-container {
+    margin: 20px;
+    text-align: right;
+}
+
+.add-item-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.add-item-btn:hover {
+    background-color: #218838;
+}
+
+/* Form Styles */
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.input-group select {
+    background-color: white;
 } 
+

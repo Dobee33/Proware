@@ -74,9 +74,18 @@ if (session_status() === PHP_SESSION_NONE) {
             </div>
         </div>
 
-        <div class="icon">
-            <a href="#" class="fas fa-user"></a>
-        </div>
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <div class="icon">
+                <a href="#" class="fas fa-user"></a>
+            </div>
+            <div class="icon">
+                <a href="login.php" class="fas fa-sign-out-alt" title="Sign Out" onclick="signOut(event)"></a>
+            </div>
+        <?php else: ?>
+            <div class="icon">
+                <a href="login.php" class="fas fa-sign-in-alt" title="Sign In"></a>
+            </div>
+        <?php endif; ?>
     </div>
 </nav>
 
@@ -92,9 +101,55 @@ if (session_status() === PHP_SESSION_NONE) {
         <?php endif; ?>
     }
 
-    // Add this JavaScript for mobile menu functionality
-    document.querySelector('.hamburger').addEventListener('click', function () {
-        this.classList.toggle('active');
-        document.querySelector('.nav-links').classList.toggle('active');
+    // Add sign out function
+    function signOut(event) {
+        event.preventDefault();
+        fetch('logout.php')
+            .then(response => {
+                window.location.href = 'login.php';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    // Enhanced mobile menu functionality
+    document.addEventListener('DOMContentLoaded', function () {
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        const dropdowns = document.querySelectorAll('.dropdown');
+
+        hamburger.addEventListener('click', function () {
+            this.classList.toggle('active');
+            navLinks.classList.toggle('active');
+
+            // Toggle aria-expanded
+            const isExpanded = this.classList.contains('active');
+            this.setAttribute('aria-expanded', isExpanded);
+        });
+
+        // Handle dropdowns in mobile view
+        dropdowns.forEach(dropdown => {
+            dropdown.addEventListener('click', function (e) {
+                if (window.innerWidth <= 768) {
+                    e.preventDefault();
+                    this.classList.toggle('active');
+
+                    // Toggle aria-expanded for dropdown
+                    const dropdownLink = this.querySelector('a');
+                    const isExpanded = this.classList.contains('active');
+                    dropdownLink.setAttribute('aria-expanded', isExpanded);
+                }
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function (e) {
+            if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
+                navLinks.classList.remove('active');
+                hamburger.classList.remove('active');
+                hamburger.setAttribute('aria-expanded', 'false');
+            }
+        });
     });
 </script>

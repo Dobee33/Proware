@@ -2,15 +2,16 @@
 <div class="filters-section">
     <div class="filters">
         <label>Filter By:</label>
-        <select class="category-dropdown">
+        <select class="category-dropdown" id="roleFilter" onchange="filterUsers()">
             <option value="all">All Users</option>
-            <option value="students">Students</option>
+            <option value="student">Students</option>
             <option value="pamo">PAMO</option>
+            <option value="admin">Admin</option>
         </select>
     </div>
 
     <div class="search-container">
-        <input type="text" class="search-bar" placeholder="Search..." id="searchInput">
+        <input type="text" class="search-bar" placeholder="Search..." id="searchInput" onkeyup="filterUsers()">
         <i class="fas fa-search search-icon"></i>
     </div>
 
@@ -117,14 +118,35 @@
         }
     }
 
-    document.getElementById('searchInput').addEventListener('input', function (e) {
-        const searchTerm = e.target.value.toLowerCase();
-        const tableRows = document.querySelectorAll('table tbody tr');
+    function filterUsers() {
+        const roleFilter = document.getElementById('roleFilter').value.toLowerCase();
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const tableRows = document.querySelectorAll('.table tbody tr');
 
         tableRows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchTerm) ? '' : 'none';
+            const firstName = row.cells[0].textContent.toLowerCase();
+            const lastName = row.cells[1].textContent.toLowerCase();
+            const role = row.cells[5].textContent.toLowerCase(); // Role column
+
+            const matchesRole = roleFilter === 'all' || role === roleFilter;
+            const matchesSearch = firstName.includes(searchTerm) ||
+                lastName.includes(searchTerm);
+
+            if (matchesRole && matchesSearch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
         });
+    }
+
+    // Add event listeners
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initial filter
+        filterUsers();
+
+        // Add event listener for search input
+        document.getElementById('searchInput').addEventListener('input', filterUsers);
     });
 
     let selectedUserId = null;
@@ -320,9 +342,35 @@
     }
 
     .category-dropdown {
-        padding: 8px;
-        border-radius: 4px;
+        padding: 8px 12px;
         border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        min-width: 150px;
+        background-color: white;
+        cursor: pointer;
+        transition: border-color 0.3s ease;
+    }
+
+    .category-dropdown:hover {
+        border-color: #4CAF50;
+    }
+
+    .category-dropdown:focus {
+        outline: none;
+        border-color: #4CAF50;
+        box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+    }
+
+    .filters {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .filters label {
+        font-weight: 500;
+        color: #333;
     }
 
     .action-buttons button {

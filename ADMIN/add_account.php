@@ -162,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         function closeModal() {
             document.getElementById('successModal').style.display = 'none';
             document.getElementById('modalBackdrop').style.display = 'none';
-            window.location.href = 'admin_page.php'; // Redirect to admin page after closing modal
+            window.location.href = 'admin_page.php';
         }
 
         // Function to generate email preview

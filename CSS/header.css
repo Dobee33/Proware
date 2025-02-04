@@ -87,7 +87,7 @@
 .icons {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 1rem; /* Increased gap for better spacing */
     margin-right: 15px;
 }
 
@@ -159,11 +159,12 @@
         left: 0;
         width: 100%;
         background-color: white;
-        padding: 1rem;
+        padding: 0.8rem;
         justify-content: space-around;
         box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
         margin: 0;
         z-index: 1000;
+        gap: 0.5rem; /* Reduced gap for mobile */
     }
 
     .icon {
@@ -179,6 +180,47 @@
 
     .icon:hover {
         transform: translateY(-2px);
+    }
+
+    .nav-links {
+        position: fixed;
+        left: -100%;
+        top: 70px;
+        gap: 0;
+        flex-direction: column;
+        background-color: white;
+        width: 100%;
+        text-align: center;
+        transition: 0.3s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 999;
+        height: calc(100vh - 70px);
+        overflow-y: auto;
+    }
+
+    .nav-links.active {
+        left: 0;
+    }
+
+    .nav-links li {
+        margin: 1rem 0;
+    }
+
+    .dropdown-menu {
+        position: static;
+        width: 100%;
+        background-color: #f9f9f9;
+        box-shadow: none;
+        display: none;
+    }
+
+    .dropdown.active .dropdown-menu {
+        display: block;
+    }
+
+    /* Adjust bottom padding for content to account for fixed bottom icons */
+    body {
+        padding-bottom: 70px;
     }
 }
 
@@ -196,6 +238,11 @@
 .hamburger {
     display: none;
     cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin-right: 1rem;
+    z-index: 1001;
 }
 
 .bar {
@@ -213,8 +260,10 @@
         display: block;
     }
 
+    /* Hamburger Animation */
     .hamburger.active .bar:nth-child(2) {
         opacity: 0;
+        transform: translateX(-10px);
     }
 
     .hamburger.active .bar:nth-child(1) {
@@ -234,29 +283,83 @@
         background-color: white;
         width: 100%;
         text-align: center;
-        transition: 0.3s;
+        transition: 0.3s ease-in-out;
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 999;
+        height: calc(100vh - 70px);
+        overflow-y: auto;
+        padding-top: 20px;
     }
 
     .nav-links.active {
         left: 0;
+        display: flex;
     }
 
     .nav-links li {
         margin: 16px 0;
+        opacity: 0;
+        transform: translateX(-20px);
+        transition: all 0.3s ease;
+    }
+
+    .nav-links.active li {
+        opacity: 1;
+        transform: translateX(0);
+        transition-delay: 0.2s;
+    }
+
+    .nav-links > li:hover:not(.nav-links > li:last-child) {
+        transform: scale(1.05);
     }
 
     .dropdown-menu {
         position: static;
         width: 100%;
         background-color: #f9f9f9;
-        display: none;
+        box-shadow: none;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
     }
 
     .dropdown.active .dropdown-menu {
         display: block;
+        max-height: 500px;
+    }
+
+    .dropdown-menu li {
+        margin: 8px 0;
+        opacity: 0.8;
+    }
+
+    .dropdown-menu a {
+        padding: 8px 16px;
+        font-size: 0.95em;
     }
 }
+
+/* Animation for menu items */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.nav-links.active li {
+    animation: slideIn 0.3s ease forwards;
+}
+
+/* Stagger animation delay for menu items */
+.nav-links.active li:nth-child(1) { animation-delay: 0.1s; }
+.nav-links.active li:nth-child(2) { animation-delay: 0.2s; }
+.nav-links.active li:nth-child(3) { animation-delay: 0.3s; }
+.nav-links.active li:nth-child(4) { animation-delay: 0.4s; }
 
 /* Cart Icon and Popup */
 .cart-icon {
