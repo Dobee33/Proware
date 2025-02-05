@@ -42,6 +42,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Commit transaction
         mysqli_commit($conn);
 
+        // After your existing quantity update query succeeds
+        $description = "Quantity updated for item {$item_code} to {$quantity_to_add}";
+        $sql = "INSERT INTO activities (action_type, description, item_code) VALUES ('quantity_update', ?, ?)";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "ss", $description, $item_code);
+        mysqli_stmt_execute($stmt);
+
         echo json_encode(['success' => true]);
     } catch (Exception $e) {
         mysqli_rollback($conn);

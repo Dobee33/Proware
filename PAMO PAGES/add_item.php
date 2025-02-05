@@ -1,17 +1,4 @@
 <?php
-// Prevent any output before our JSON response
-ob_clean();
-
-// Set proper JSON headers
-header('Content-Type: application/json');
-header('Cache-Control: no-cache');
-
-// Enable error reporting but log to file instead of output
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-ini_set('error_log', 'php_errors.log');
-
 try {
     $conn = mysqli_connect("localhost", "root", "", "proware");
 
@@ -51,14 +38,14 @@ try {
     $sizes = mysqli_real_escape_string($conn, $data['sizes']);
     $price = floatval($data['price']);
     $quantity = intval($data['quantity']);
+    $damage = intval($data['damage']);
 
     // Set initial values
-    $actual_quantity = $quantity;
+    $actual_quantity = $quantity - $damage;
     $new_delivery = $quantity;
     $beginning_quantity = $quantity;
-    $damage = 0;
     $sold_quantity = 0;
-    $status = ($quantity <= 0) ? 'Out of Stock' : (($quantity <= 10) ? 'Low Stock' : 'In Stock');
+    $status = ($actual_quantity <= 0) ? 'Out of Stock' : (($actual_quantity <= 10) ? 'Low Stock' : 'In Stock');
 
     $sql = "INSERT INTO inventory (
         item_code, category, item_name, sizes, price, 
@@ -92,6 +79,15 @@ try {
     }
 
     mysqli_stmt_close($stmt);
+
+    // After your existing insert item query succeeds
+    $description = "New item added: {$item_name} ({$item_code})";
+    $sql = "INSERT INTO activities (action_type, description, item_code) VALUES ('new_item', ?, ?)";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "ss", $description, $item_code);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+
     mysqli_close($conn);
 
     // Success response

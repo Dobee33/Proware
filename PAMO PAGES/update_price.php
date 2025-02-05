@@ -16,12 +16,20 @@ if (isset($_POST['item_code']) && isset($_POST['price'])) {
     mysqli_stmt_bind_param($stmt, "ds", $price, $item_code);
 
     if (mysqli_stmt_execute($stmt)) {
+        $description = "Price updated for item {$item_code} to ₱{$price}";
+        mysqli_stmt_close($stmt);
+
+        $sql = "INSERT INTO activities (action_type, description, item_code) VALUES ('price_update', ?, ?)";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "ss", $description, $item_code);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
         echo json_encode(['success' => true]);
     } else {
+        mysqli_stmt_close($stmt);
         echo json_encode(['success' => false, 'message' => 'Database update failed']);
     }
 
-    mysqli_stmt_close($stmt);
 } else {
     echo json_encode(['success' => false, 'message' => 'Missing required parameters']);
 }

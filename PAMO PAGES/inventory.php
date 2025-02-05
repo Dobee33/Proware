@@ -64,7 +64,6 @@ session_start();
                         <option value="Low Stock">Low Stock</option>
                         <option value="Out of Stock">Out of Stock</option>
                     </select>
-
                 </div>
 
                 <div class="inventory-table">
@@ -86,14 +85,12 @@ session_start();
                         </thead>
                         <tbody>
                             <?php
-                            // Database connection
                             $conn = mysqli_connect("localhost", "root", "", "proware");
 
                             if (!$conn) {
                                 die("Connection failed: " . mysqli_connect_error());
                             }
 
-                            // Fetch inventory items
                             $sql = "SELECT * FROM inventory";
                             $result = mysqli_query($conn, $sql);
 
@@ -125,7 +122,6 @@ session_start();
                                 echo "<td class='" . $statusClass . "'>" . $row['status'] . "</td>";
                                 echo "</tr>";
                             }
-
                             mysqli_close($conn);
                             ?>
                         </tbody>
@@ -214,6 +210,11 @@ session_start();
                 <div class="input-group">
                     <label for="newItemQuantity">Quantity:</label>
                     <input type="number" id="newItemQuantity" name="newItemQuantity" min="0" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="newItemDamage">Damage:</label>
+                    <input type="number" id="newItemDamage" name="newItemDamage" min="0" value="0" required>
                 </div>
 
                 <div class="modal-buttons">
@@ -348,6 +349,73 @@ session_start();
             font-size: 20px;
             color: white;
         }
+
+        /* Filter Section Styling */
+        .filters {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filters h3 {
+            margin: 0;
+            color: #333;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .filters select {
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            color: #333;
+            font-size: 0.9rem;
+            min-width: 160px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .filters select:hover {
+            border-color: #4CAF50;
+            background-color: #ffffff;
+        }
+
+        .filters select:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            background-color: #ffffff;
+        }
+
+        .filters select option {
+            padding: 8px;
+            background-color: #ffffff;
+        }
+
+        /* Add hover effect for options */
+        .filters select option:hover {
+            background-color: #4CAF50;
+            color: #ffffff;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filters select {
+                width: 100%;
+            }
+        }
     </style>
 
     <script>
@@ -355,32 +423,25 @@ session_start();
         let selectedPrice = null;
 
         function selectRow(row, itemCode, price) {
-            // Check if clicking the same row (unselect)
             if (selectedItemCode === itemCode) {
-                // Unselect the row
                 row.classList.remove('selected');
                 selectedItemCode = null;
                 selectedPrice = null;
 
-                // Disable buttons
                 document.getElementById('editPriceBtn').disabled = true;
                 document.getElementById('addQuantityBtn').disabled = true;
                 return;
             }
 
-            // Remove selected class from all rows
             document.querySelectorAll('.inventory-table tbody tr').forEach(tr => {
                 tr.classList.remove('selected');
             });
 
-            // Add selected class to clicked row
             row.classList.add('selected');
 
-            // Store selected item details
             selectedItemCode = itemCode;
             selectedPrice = price;
 
-            // Enable buttons
             document.getElementById('editPriceBtn').disabled = false;
             document.getElementById('addQuantityBtn').disabled = false;
         }
@@ -429,7 +490,6 @@ session_start();
                 return;
             }
 
-            // Send AJAX request to update price
             fetch('update_price.php', {
                 method: 'POST',
                 headers: {
@@ -499,6 +559,9 @@ session_start();
         function submitNewItem(event) {
             event.preventDefault();
 
+            const quantity = parseInt(document.getElementById('newItemQuantity').value);
+            const damage = parseInt(document.getElementById('newItemDamage').value) || 0;
+
             // Get form values and validate
             const formData = {
                 item_code: document.getElementById('newItemCode').value.trim(),
@@ -506,12 +569,12 @@ session_start();
                 item_name: document.getElementById('newItemName').value.trim(),
                 sizes: document.getElementById('newSize').value.trim(),
                 price: parseFloat(document.getElementById('newItemPrice').value),
-                quantity: parseInt(document.getElementById('newItemQuantity').value),
-                actual_quantity: parseInt(document.getElementById('newItemQuantity').value), // Set initial actual quantity
-                beginning_quantity: parseInt(document.getElementById('newItemQuantity').value), // Set initial beginning quantity
-                new_delivery: 0, // Initialize new delivery as 0
-                damage: 0, // Initialize damage as 0
-                status: 'In Stock' // Set initial status
+                quantity: quantity,
+                actual_quantity: quantity - damage,
+                beginning_quantity: quantity,
+                new_delivery: 0,
+                damage: damage,
+                status: 'In Stock'
             };
 
             // Debug log
