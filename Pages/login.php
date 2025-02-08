@@ -16,19 +16,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
         if (password_verify($password, $user['password'])) {
-
             session_start();
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['email'] = $user['email'];
-            $_SESSION['role'] = $user['role'];
+            $_SESSION['role_category'] = $user['role_category'];
 
-            if ($user['role'] === 'student') {
+            if ($user['role_category'] === 'COLLEGE STUDENT' || $user['role_category'] === 'SHS') {
                 header("Location: ProHome.php");
                 exit();
-            } else if ($user['role'] === 'pamo') {
-                header("Location: ../PAMO PAGES/index.php");
+            } else if ($user['program_or_position'] === 'PAMO') {
+                header("Location: ../PAMO PAGES/dashboard.php");
                 exit();
-            } else if ($user['role'] === 'admin') {
+            } else if ($user['program_or_position'] === 'ADMIN') {
                 header("Location: ../ADMIN/admin_page.php");
                 exit();
             }
@@ -37,13 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
     } else {
-        header("Location: login.php?error=account_not_found ");
-        //header("Location: login.php?error=account_not_found " . password_hash($password, PASSWORD_DEFAULT));//
+        header("Location: login.php?error=account_not_found");
         exit();
     }
-    // Close connection
-    $stmt->close();
-    $conn->close();
 }
 ?>
 

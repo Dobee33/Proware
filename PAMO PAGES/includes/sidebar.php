@@ -4,10 +4,11 @@
         <h2>PAMO</h2>
     </div>
     <ul class="nav-links">
-        <li <?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'class="active"' : ''; ?>
-            onclick="window.location.href='index.php'">
+        <li <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'class="active"' : ''; ?>
+            onclick="window.location.href='dashboard.php'">
             <i class="material-icons">dashboard</i>Dashboard
         </li>
+
         <li <?php echo basename($_SERVER['PHP_SELF']) == 'inventory.php' ? 'class="active"' : ''; ?>
             onclick="window.location.href='inventory.php'">
             <i class="material-icons">inventory_2</i>Inventory
@@ -28,8 +29,37 @@
     <div class="user-info">
         <img src="avatar.png" alt="User Avatar">
         <div class="user-details">
-            <h4><?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Jason Amparo'; ?></h4>
-            <p><?php echo isset($_SESSION['user_role']) ? $_SESSION['user_role'] : 'Purchasing Officer'; ?></p>
+            <h4>
+                <?php
+                include '../includes/connection.php';
+                if (isset($_SESSION['user_id'])) {
+                    $user_id = $_SESSION['user_id'];
+                    $query = "SELECT first_name, last_name, role_category, program_or_position FROM account WHERE id = :user_id";
+                    $stmt = $conn->prepare($query);
+                    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+                    $stmt->execute();
+
+                    if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        echo $row['first_name'] . ' ' . $row['last_name'];
+                        $_SESSION['role_category'] = $row['role_category'];
+                        $_SESSION['program_or_position'] = $row['program_or_position'];
+                    } else {
+                        echo 'Guest User';
+                    }
+                } else {
+                    echo 'Guest User';
+                }
+                ?>
+            </h4>
+            <p>
+                <?php
+                if (isset($_SESSION['program_or_position']) && $_SESSION['program_or_position'] === 'PAMO') {
+                    echo 'PAMO';
+                } else {
+                    echo isset($_SESSION['role_category']) ? $_SESSION['role_category'] : 'No Role Assigned';
+                }
+                ?>
+            </p>
         </div>
     </div>
 </nav>

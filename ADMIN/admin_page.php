@@ -1,17 +1,53 @@
 <!-- Top section with filters and actions -->
 <div class="filters-section">
     <div class="filters">
-        <label>Filter By:</label>
-        <select class="category-dropdown" id="roleFilter" onchange="filterUsers()">
-            <option value="all">All Users</option>
-            <option value="student">Students</option>
-            <option value="pamo">PAMO</option>
-            <option value="admin">Admin</option>
-        </select>
+        <div class="filter-group">
+            <label>Role:</label>
+            <select class="filter-dropdown" id="roleFilter" onchange="filterUsers()">
+                <option value="all">All Roles</option>
+                <option value="shs">SHS</option>
+                <option value="college student">College Student</option>
+                <option value="employee">Employee</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Program/Position:</label>
+            <select class="filter-dropdown" id="programFilter" onchange="filterUsers()">
+                <option value="all">All Programs/Positions</option>
+                <option value="stem">STEM</option>
+                <option value="humms">HUMMS</option>
+                <option value="abm">ABM</option>
+                <option value="mawd">MAWD</option>
+                <option value="da">DA</option>
+                <option value="toper">Toper</option>
+                <option value="ca">CA</option>
+                <option value="bscs">BSCS</option>
+                <option value="bsit">BSIT</option>
+                <option value="bscpe">BSCPE</option>
+                <option value="bscm">BSCM</option>
+                <option value="bstm">BSTM</option>
+                <option value="bsba">BSBA</option>
+                <option value="bmma">BMMA</option>
+                <option value="teacher">Teacher</option>
+                <option value="pamo">PAMO</option>
+                <option value="admin">Admin</option>
+                <option value="staff">Staff</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Status:</label>
+            <select class="filter-dropdown" id="statusFilter" onchange="filterUsers()">
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+        </div>
     </div>
 
     <div class="search-container">
-        <input type="text" class="search-bar" placeholder="Search..." id="searchInput" onkeyup="filterUsers()">
+        <input type="text" class="search-bar" placeholder="Search by name..." id="searchInput">
         <i class="fas fa-search search-icon"></i>
     </div>
 
@@ -41,14 +77,15 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>ID Number</th>
-                <th>Email</th>
+                <th onclick="sortTable(0)">First Name</th>
+                <th onclick="sortTable(1)">Last Name</th>
+                <th onclick="sortTable(2)">ID Number</th>
+                <th onclick="sortTable(3)">Role</th>
+                <th onclick="sortTable(4)">Program/Position</th>
+                <th onclick="sortTable(5)">Email</th>
                 <th>Password</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Date Created</th>
+                <th onclick="sortTable(7)">Status</th>
+                <th onclick="sortTable(8)">Date Created</th>
             </tr>
         </thead>
         <tbody>
@@ -65,11 +102,13 @@
                 echo "<td>" . htmlspecialchars($account['first_name']) . "</td>";
                 echo "<td>" . htmlspecialchars($account['last_name']) . "</td>";
                 echo "<td>" . htmlspecialchars($account['id_number']) . "</td>";
+                echo "<td>" . htmlspecialchars($account['role_category']) . "</td>";
+                echo "<td>" . htmlspecialchars($account['program_or_position']) . "</td>";
                 echo "<td>" . htmlspecialchars($account['email']) . "</td>";
-                echo "<td>********</td>"; // Hide actual password
-                echo "<td>" . htmlspecialchars($account['role']) . "</td>";
+                echo "<td>********</td>";
                 echo "<td>" . htmlspecialchars($account['status']) . "</td>";
                 echo "<td>" . htmlspecialchars($account['date_created']) . "</td>";
+
                 echo "</tr>";
             }
             ?>
@@ -77,7 +116,6 @@
     </table>
 </div>
 
-<!-- Update Status Modal -->
 <div class="modal" id="updateStatusModal">
     <div class="modal-content">
         <h3>Update Status</h3>
@@ -99,7 +137,6 @@
     </div>
 </div>
 
-<!-- Add this success modal -->
 <div class="modal" id="successModal">
     <div class="modal-content">
         <div class="text-center">
@@ -120,19 +157,24 @@
 
     function filterUsers() {
         const roleFilter = document.getElementById('roleFilter').value.toLowerCase();
+        const programFilter = document.getElementById('programFilter').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value.toLowerCase();
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         const tableRows = document.querySelectorAll('.table tbody tr');
 
         tableRows.forEach(row => {
             const firstName = row.cells[0].textContent.toLowerCase();
             const lastName = row.cells[1].textContent.toLowerCase();
-            const role = row.cells[5].textContent.toLowerCase(); // Role column
+            const role = row.cells[3].textContent.toLowerCase();
+            const program = row.cells[4].textContent.toLowerCase();
+            const status = row.cells[7].textContent.toLowerCase();
 
             const matchesRole = roleFilter === 'all' || role === roleFilter;
-            const matchesSearch = firstName.includes(searchTerm) ||
-                lastName.includes(searchTerm);
+            const matchesProgram = programFilter === 'all' || program === programFilter;
+            const matchesStatus = statusFilter === 'all' || status === statusFilter;
+            const matchesSearch = firstName.includes(searchTerm) || lastName.includes(searchTerm);
 
-            if (matchesRole && matchesSearch) {
+            if (matchesRole && matchesProgram && matchesStatus && matchesSearch) {
                 row.style.display = '';
             } else {
                 row.style.display = 'none';
@@ -140,45 +182,94 @@
         });
     }
 
-    // Add event listeners
+    function sortTable(columnIndex) {
+        const table = document.querySelector('.table');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const currentOrder = tbody.dataset.order || 'asc';
+
+        rows.sort((a, b) => {
+            const aValue = a.cells[columnIndex].textContent.toLowerCase();
+            const bValue = b.cells[columnIndex].textContent.toLowerCase();
+
+            if (currentOrder === 'asc') {
+                return aValue.localeCompare(bValue);
+            } else {
+                return bValue.localeCompare(aValue);
+            }
+        });
+
+        // Toggle sort order for next click
+        tbody.dataset.order = currentOrder === 'asc' ? 'desc' : 'asc';
+
+        // Clear tbody and append sorted rows
+        tbody.innerHTML = '';
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    // Add this to your existing DOMContentLoaded event listener
     document.addEventListener('DOMContentLoaded', function () {
         // Initial filter
         filterUsers();
 
-        // Add event listener for search input
+        // Add event listeners for all filters
         document.getElementById('searchInput').addEventListener('input', filterUsers);
+        document.getElementById('roleFilter').addEventListener('change', filterUsers);
+        document.getElementById('programFilter').addEventListener('change', filterUsers);
+        document.getElementById('statusFilter').addEventListener('change', filterUsers);
     });
 
     let selectedUserId = null;
 
     document.querySelectorAll('.account-row').forEach(row => {
         row.addEventListener('click', function () {
-            // Remove previous selection
+            // Check if this row is already selected
+            const isSelected = this.classList.contains('selected');
+
+            // Remove selection from all rows
             document.querySelectorAll('.account-row').forEach(r => r.classList.remove('selected'));
 
-            // Add selection to clicked row
-            this.classList.add('selected');
-            selectedUserId = this.dataset.id;
-
-            // Enable buttons
-            document.getElementById('changePasswordBtn').disabled = false;
-            document.getElementById('updateStatusBtn').disabled = false;
+            if (isSelected) {
+                // If row was already selected, deselect it
+                this.classList.remove('selected');
+                selectedUserId = null;
+                // Disable buttons
+                document.getElementById('changePasswordBtn').disabled = true;
+                document.getElementById('updateStatusBtn').disabled = true;
+            } else {
+                // If row wasn't selected, select it
+                this.classList.add('selected');
+                selectedUserId = this.dataset.id;
+                // Enable buttons
+                document.getElementById('changePasswordBtn').disabled = false;
+                document.getElementById('updateStatusBtn').disabled = false;
+            }
         });
     });
 
     function changePassword() {
-        if (!selectedUserId) return;
+        if (!selectedUserId) {
+            alert('Please select an account first.');
+            return;
+        }
         window.location.href = `change_password.php?id=${selectedUserId}`;
     }
 
     function updateStatus() {
-        if (!selectedUserId) return;
+        if (!selectedUserId) {
+            alert('Please select an account first.');
+            return;
+        }
         document.getElementById('selectedUserId').value = selectedUserId;
         document.getElementById('updateStatusModal').style.display = 'block';
     }
 
     function closeModal(modalId) {
         document.getElementById(modalId).style.display = 'none';
+    }
+
+    function closeSuccessModal() {
+        document.getElementById('successModal').style.display = 'none';
     }
 
     document.getElementById('updateStatusForm').addEventListener('submit', function (e) {
@@ -199,11 +290,17 @@
                     // Show success modal
                     document.getElementById('successModal').style.display = 'block';
 
-                    // Update the status in the table
+                    // Update the status in the table immediately without reload
                     const row = document.querySelector(`tr[data-id="${formData.get('userId')}"]`);
                     if (row) {
-                        row.cells[6].textContent = formData.get('status');
+                        row.cells[7].textContent = formData.get('status'); // Make sure the index matches your status column
                     }
+
+                    // Clear selection
+                    selectedUserId = null;
+                    document.querySelectorAll('.account-row').forEach(r => r.classList.remove('selected'));
+                    document.getElementById('changePasswordBtn').disabled = true;
+                    document.getElementById('updateStatusBtn').disabled = true;
                 } else {
                     alert('Error updating status: ' + data.message);
                 }
@@ -213,11 +310,6 @@
                 alert('Error updating status. Please try again.');
             });
     });
-
-    function closeSuccessModal() {
-        document.getElementById('successModal').style.display = 'none';
-        location.reload(); // Refresh the page to show updated data
-    }
 
     // Add this to your existing styles
     document.head.insertAdjacentHTML('beforeend', `
@@ -241,9 +333,6 @@
                 height: 100%;
                 background-color: rgba(0,0,0,0.5);
                 z-index: 1000;
-                display: flex;
-                justify-content: center;
-                align-items: center;
             }
             .modal-content {
                 background: white;
@@ -253,17 +342,7 @@
                 width: 90%;
                 max-width: 400px;
                 position: relative;
-                animation: modalFadeIn 0.3s ease-out;
-            }
-            @keyframes modalFadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(-20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+                margin: 15% auto;
             }
             .success-icon {
                 color: #28a745;
@@ -341,106 +420,45 @@
         margin-bottom: 20px;
     }
 
-    .category-dropdown {
-        padding: 8px 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 14px;
-        min-width: 150px;
-        background-color: white;
-        cursor: pointer;
-        transition: border-color 0.3s ease;
-    }
-
-    .category-dropdown:hover {
-        border-color: #4CAF50;
-    }
-
-    .category-dropdown:focus {
-        outline: none;
-        border-color: #4CAF50;
-        box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
-    }
-
     .filters {
+        display: flex;
+        gap: 20px;
+    }
+
+    .filter-group {
         display: flex;
         align-items: center;
         gap: 10px;
     }
 
-    .filters label {
-        font-weight: 500;
-        color: #333;
-    }
-
-    .action-buttons button {
-        margin-left: 10px;
-    }
-
-    .table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .table th,
-    .table td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-    }
-
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-    }
-
-    .modal-content {
-        background-color: white;
-        width: 500px;
-        margin: 100px auto;
-        padding: 20px;
-        border-radius: 5px;
-    }
-
-    #addAccountForm {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    #addAccountForm input,
-    #addAccountForm select {
+    .filter-dropdown {
         padding: 8px;
         border: 1px solid #ddd;
         border-radius: 4px;
+        min-width: 150px;
     }
 
-    .search-container {
+    .sort-icon {
+        font-size: 18px;
+        vertical-align: middle;
+        margin-left: 5px;
+        cursor: pointer;
+    }
+
+    th {
+        cursor: pointer;
         position: relative;
-        width: 400px;
-        margin: 0 auto;
+        padding: 12px;
+        transition: background-color 0.2s;
     }
 
-    .search-bar {
-        width: 100%;
-        padding: 12px 40px 12px 20px;
-        border: 1px solid #ddd;
-        border-radius: 25px;
-        font-size: 15px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    th:hover {
+        background-color: #f5f5f5;
     }
 
-    .search-icon {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #666;
+    /* Remove any existing sort icon styles */
+    .sort-icon {
+        display: none;
     }
 
     .logout-container {
@@ -503,3 +521,4 @@
         border-bottom: 1px solid #dee2e6;
     }
 </style>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">

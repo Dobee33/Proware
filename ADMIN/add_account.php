@@ -5,7 +5,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $firstName = $_POST['firstName'];
     $lastName = $_POST['lastName'];
     $idNumber = $_POST['idNumber'];
-    $role = $_POST['role'];
+    $role_category = $_POST['role_category'];
+    $program_or_position = $_POST['program_position'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
     // Validate ID number
@@ -18,21 +19,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lastSixDigits = substr($idNumber, -6);
     $email = strtolower($lastName . '.' . $lastSixDigits . '@lucena.sti.edu.ph');
 
-    // Insert into database
-    $sql = "INSERT INTO account (first_name, last_name, id_number, email, password, role, status) 
-            VALUES (?, ?, ?, ?, ?, ?, 'active')";
-    $stmt = $conn->prepare($sql);
+    // Start session before using it
+    session_start();
+
+    $sql = "INSERT INTO account (first_name, last_name, id_number, email, password, role_category, program_or_position, status, date_created) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'active', CURRENT_TIMESTAMP)";
 
     try {
-        $stmt->execute([$firstName, $lastName, $idNumber, $email, $password, $role]);
-        // Store success message in session
-        session_start();
-        $_SESSION['success_message'] = "Account successfully created!";
-        $_SESSION['generated_email'] = $email;
-        header("Location: add_account.php");
-        exit();
+        $stmt = $conn->prepare($sql);
+
+        $result = $stmt->execute([
+            $firstName,
+            $lastName,
+            $idNumber,
+            $email,
+            $password,
+            $role_category,
+            $program_or_position
+        ]);
+
+        if ($result) {
+            $_SESSION['success_message'] = "Account successfully created!";
+            $_SESSION['generated_email'] = $email;
+            header("Location: add_account.php");
+            exit();
+        } else {
+            $_SESSION['error_message'] = "Error creating account. Please try again.";
+            header("Location: add_account.php");
+            exit();
+        }
     } catch (PDOException $e) {
-        $_SESSION['error_message'] = "Error creating account. Please try again.";
+        $_SESSION['error_message'] = "Database error: " . $e->getMessage();
         header("Location: add_account.php");
         exit();
     }
@@ -46,47 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Add Account</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .success-modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            max-width: 500px;
-            width: 90%;
-        }
-
-        .modal-backdrop {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-
-        .success-icon {
-            color: #28a745;
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-
-        .email-display {
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 10px 0;
-            word-break: break-all;
-        }
-    </style>
+    <link rel="stylesheet" href="../ADMIN CSS/add_account.css">
 </head>
 
 <body>
@@ -109,36 +86,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2>Add New Account</h2>
         <form id="addAccountForm" method="POST">
             <div class="form-group">
-                <label>First Name</label>
-                <input type="text" name="firstName" id="firstName" class="form-control" pattern="[A-Za-z\s]+"
-                    title="Only letters and spaces allowed" required>
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" name="firstName" class="form-control" required>
             </div>
             <div class="form-group">
-                <label>Last Name</label>
-                <input type="text" name="lastName" id="lastName" class="form-control" pattern="[A-Za-z\s]+"
-                    title="Only letters and spaces allowed" required>
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" name="lastName" class="form-control" required>
             </div>
             <div class="form-group">
-                <label>ID Number (11 digits)</label>
-                <input type="text" name="idNumber" id="idNumber" class="form-control" pattern="\d{11}" required>
+                <label for="idNumber">ID Number (11 digits)</label>
+                <input type="text" id="idNumber" name="idNumber" class="form-control" pattern="\d{11}" required>
             </div>
             <div class="form-group">
-                <label>Generated Email</label>
+                <label for="generatedEmailPreview">Generated Email</label>
                 <input type="text" id="generatedEmailPreview" class="form-control" readonly
                     style="background-color: #f8f9fa; color: #495057;">
             </div>
             <div class="form-group">
-                <label>Role</label>
-                <select name="role" class="form-control" required>
-                    <option value="">Select Role</option>
-                    <option value="admin">Admin</option>
-                    <option value="pamo">PAMO</option>
-                    <option value="student">Student</option>
+                <label for="roleCategory">Role Category</label>
+                <select id="roleCategory" name="role_category" class="form-control" required
+                    onchange="updateProgramPositions()">
+                    <option value="">Select Role Category</option>
+                    <option value="SHS">SHS</option>
+                    <option value="COLLEGE STUDENT">COLLEGE STUDENT</option>
+                    <option value="EMPLOYEE">EMPLOYEE</option>
                 </select>
             </div>
             <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control" required>
+                <label for="programPosition">Program/Position</label>
+                <select id="programPosition" name="program_position" class="form-control" required>
+                    <option value="">Select Program/Position</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" required>
             </div>
             <button type="submit" class="btn btn-primary">Create Account</button>
             <a href="admin_page.php" class="btn btn-secondary">Cancel</a>
@@ -218,6 +200,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             updateEmailPreview();
         });
+
+        function updateProgramPositions() {
+            const roleCategory = document.getElementById('roleCategory').value;
+            const programPositionSelect = document.getElementById('programPosition');
+
+            // Clear existing options
+            programPositionSelect.innerHTML = '<option value="">Select Program/Position</option>';
+
+            // Define options for each role category
+            const options = {
+                'SHS': ['STEM', 'HUMMS', 'ABM', 'MAWD', 'DA', 'Toper', 'CA'],
+                'COLLEGE STUDENT': ['BSCS', 'BSIT', 'BSCPE', 'BSCM', 'BSTM', 'BSBA', 'BMMA'],
+                'EMPLOYEE': ['TEACHER', 'PAMO', 'ADMIN', 'STAFF']
+            };
+
+            // Add new options based on selected role
+            if (roleCategory in options) {
+                options[roleCategory].forEach(option => {
+                    const newOption = document.createElement('option');
+                    newOption.value = option;
+                    newOption.textContent = option;
+                    programPositionSelect.appendChild(newOption);
+                });
+            }
+        }
+
+        // Make sure this is called when the page loads
+        document.addEventListener('DOMContentLoaded', updateProgramPositions);
     </script>
 </body>
 
