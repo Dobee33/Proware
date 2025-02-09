@@ -210,8 +210,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Define options for each role category
             const options = {
-                'SHS': ['STEM', 'HUMMS', 'ABM', 'MAWD', 'DA', 'Toper', 'CA'],
-                'COLLEGE STUDENT': ['BSCS', 'BSIT', 'BSCPE', 'BSCM', 'BSTM', 'BSBA', 'BMMA'],
+                'SHS': ['Science, Technology, Engineering, and Mathematics (STEM)', 'Humanities and Social Sciences (HUMMS)', 'Accountancy, Business, and Management (ABM)', 'Mobile App and Web Development (MAWD)', 'Digital Arts (DA)', 'Tourism Operations (TOPER)', 'Culinary Arts (CA)'],
+                'COLLEGE STUDENT': ['Bachelor of Science in Computer Science (BSCS)', 'Bachelor of Science in Information Technology (BSIT)', 'Bachelor of Science in Computer Engineering (BSCPE)', 'Bachelor of Science in Culinary Management (BSCM)', 'Bachelor of Science in Tourism Management (BSTM)', 'Bachelor of Science in Business Administration (BSBA)', 'Bachelor of Science in Multimedia Arts (BMMA)'],
                 'EMPLOYEE': ['TEACHER', 'PAMO', 'ADMIN', 'STAFF']
             };
 

@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 ?>
 
 <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <!-- Left side - Logo -->
     <div class="logo">
         <a href="ProHome.php" aria-label="Home">
             <img src="../Images/STI-LOGO.png" alt="STI Logo">
@@ -18,19 +19,16 @@ if (session_status() === PHP_SESSION_NONE) {
         <span class="bar"></span>
     </div>
 
+    <!-- Middle - Navigation Links -->
     <ul class="nav-links">
         <li><a href="ProHome.php">Homepage</a></li>
         <li><a href="ProItemList.php">Item List</a></li>
         <li><a href="ProPreOrder.php">Pre Order</a></li>
-        <li class="dropdown">
-            <a href="#" aria-expanded="false" aria-haspopup="true">More Options &#9662;</a>
-            <ul class="dropdown-menu" aria-label="submenu">
-                <li><a href="contact.html">Contact</a></li>
-                <li><a href="about.html">About Us</a></li>
-            </ul>
-        </li>
+        <li><a href="about.php">About</a></li>
+        <li><a href="faq.php">FAQ</a></li>
     </ul>
 
+    <!-- Right side - Icons -->
     <div class="icons">
         <div class="icon cart-icon">
             <a href="#" class="fas fa-shopping-cart">
@@ -117,30 +115,10 @@ if (session_status() === PHP_SESSION_NONE) {
     document.addEventListener('DOMContentLoaded', function () {
         const hamburger = document.querySelector('.hamburger');
         const navLinks = document.querySelector('.nav-links');
-        const dropdowns = document.querySelectorAll('.dropdown');
 
         hamburger.addEventListener('click', function () {
             this.classList.toggle('active');
             navLinks.classList.toggle('active');
-
-            // Toggle aria-expanded
-            const isExpanded = this.classList.contains('active');
-            this.setAttribute('aria-expanded', isExpanded);
-        });
-
-        // Handle dropdowns in mobile view
-        dropdowns.forEach(dropdown => {
-            dropdown.addEventListener('click', function (e) {
-                if (window.innerWidth <= 768) {
-                    e.preventDefault();
-                    this.classList.toggle('active');
-
-                    // Toggle aria-expanded for dropdown
-                    const dropdownLink = this.querySelector('a');
-                    const isExpanded = this.classList.contains('active');
-                    dropdownLink.setAttribute('aria-expanded', isExpanded);
-                }
-            });
         });
 
         // Close mobile menu when clicking outside
@@ -148,8 +126,18 @@ if (session_status() === PHP_SESSION_NONE) {
             if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
                 navLinks.classList.remove('active');
                 hamburger.classList.remove('active');
-                hamburger.setAttribute('aria-expanded', 'false');
             }
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+    });
+
 </script>

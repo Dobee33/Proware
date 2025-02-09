@@ -15,24 +15,24 @@
             <label>Program/Position:</label>
             <select class="filter-dropdown" id="programFilter" onchange="filterUsers()">
                 <option value="all">All Programs/Positions</option>
-                <option value="stem">STEM</option>
-                <option value="humms">HUMMS</option>
-                <option value="abm">ABM</option>
-                <option value="mawd">MAWD</option>
-                <option value="da">DA</option>
-                <option value="toper">Toper</option>
-                <option value="ca">CA</option>
-                <option value="bscs">BSCS</option>
-                <option value="bsit">BSIT</option>
-                <option value="bscpe">BSCPE</option>
-                <option value="bscm">BSCM</option>
-                <option value="bstm">BSTM</option>
-                <option value="bsba">BSBA</option>
-                <option value="bmma">BMMA</option>
-                <option value="teacher">Teacher</option>
-                <option value="pamo">PAMO</option>
-                <option value="admin">Admin</option>
-                <option value="staff">Staff</option>
+                <option value="Science, Technology, Engineering, and Mathematics">STEM</option>
+                <option value="Humanities and Social Sciences">HUMMS</option>
+                <option value="Accountancy, Business, and Management">ABM</option>
+                <option value="Mobile App and Web Development">MAWD</option>
+                <option value="Digital Arts">DA</option>
+                <option value="Tourism Operations">TOPER</option>
+                <option value="Culinary Arts">CA</option>
+                <option value="Bachelor of Science in Computer Science">BSCS</option>
+                <option value="Bachelor of Science in Information Technology">BSIT</option>
+                <option value="Bachelor of Science in Computer Engineering">BSCPE</option>
+                <option value="Bachelor of Science in Culinary Management">BSCM</option>
+                <option value="Bachelor of Science in Tourism Management">BSTM</option>
+                <option value="Bachelor of Science in Business Administration">BSBA</option>
+                <option value="Bachelor of Science in Multimedia Arts">BMMA</option>
+                <option value="TEACHER">TEACHER</option>
+                <option value="PAMO">PAMO</option>
+                <option value="ADMIN">ADMIN</option>
+                <option value="STAFF">STAFF</option>
             </select>
         </div>
 
@@ -169,8 +169,12 @@
             const program = row.cells[4].textContent.toLowerCase();
             const status = row.cells[7].textContent.toLowerCase();
 
+            // Updated program matching logic to handle both full names and abbreviations
+            const matchesProgram = programFilter === 'all' ||
+                program.includes(programFilter) ||
+                getAbbreviation(program).toLowerCase() === programFilter;
+
             const matchesRole = roleFilter === 'all' || role === roleFilter;
-            const matchesProgram = programFilter === 'all' || program === programFilter;
             const matchesStatus = statusFilter === 'all' || status === statusFilter;
             const matchesSearch = firstName.includes(searchTerm) || lastName.includes(searchTerm);
 
@@ -180,6 +184,31 @@
                 row.style.display = 'none';
             }
         });
+    }
+
+    // Helper function to get abbreviation from full program name
+    function getAbbreviation(fullName) {
+        const abbreviations = {
+            'Science, Technology, Engineering, and Mathematics': 'STEM',
+            'Humanities and Social Sciences': 'HUMMS',
+            'Accountancy, Business, and Management': 'ABM',
+            'Mobile App and Web Development': 'MAWD',
+            'Digital Arts': 'DA',
+            'Tourism Operations': 'TOPER',
+            'Culinary Arts': 'CA',
+            'Bachelor of Science in Computer Science': 'BSCS',
+            'Bachelor of Science in Information Technology': 'BSIT',
+            'Bachelor of Science in Computer Engineering': 'BSCPE',
+            'Bachelor of Science in Culinary Management': 'BSCM',
+            'Bachelor of Science in Tourism Management': 'BSTM',
+            'Bachelor of Science in Business Administration': 'BSBA',
+            'Bachelor of Science in Multimedia Arts': 'BMMA'
+        };
+
+        for (const [full, abbr] of Object.entries(abbreviations)) {
+            if (fullName.includes(full)) return abbr;
+        }
+        return fullName; // Return original if no abbreviation found
     }
 
     function sortTable(columnIndex) {
@@ -438,13 +467,6 @@
         min-width: 150px;
     }
 
-    .sort-icon {
-        font-size: 18px;
-        vertical-align: middle;
-        margin-left: 5px;
-        cursor: pointer;
-    }
-
     th {
         cursor: pointer;
         position: relative;
@@ -454,11 +476,6 @@
 
     th:hover {
         background-color: #f5f5f5;
-    }
-
-    /* Remove any existing sort icon styles */
-    .sort-icon {
-        display: none;
     }
 
     .logout-container {

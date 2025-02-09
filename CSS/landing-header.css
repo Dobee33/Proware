@@ -43,11 +43,11 @@
     transition: .3s ease-out;
 }
 
-.nav-links > li:hover:not(.nav-links > li:last-child) {
+.nav-links > li:hover {
     transform: scale(1.1);
 }
 
-.nav-links li:hover:not(.nav-links > li:last-child) a {
+.nav-links li:hover a {
     color: rgb(0, 0, 0);
 }
 

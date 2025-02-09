@@ -14,15 +14,10 @@
 
     <ul class="nav-links">
         <li><a href="landing-home.php">Homepage</a></li>
-        <li><a href="login.php">Item List</a></li>
+        <li><a href="ProItemList.php">Item List</a></li>
         <li><a href="login.php">Pre Order</a></li>
-        <li class="dropdown">
-            <a href="#" aria-expanded="false" aria-haspopup="true">More Options &#9662;</a>
-            <ul class="dropdown-menu" aria-label="submenu">
-                <li><a href="contact.html">Contact</a></li>
-                <li><a href="about.html">About Us</a></li>
-            </ul>
-        </li>
+        <li><a href="about.php">About</a></li>
+        <li><a href="faq.php">FAQ</a></li>
     </ul>
 
     <div class="login">
