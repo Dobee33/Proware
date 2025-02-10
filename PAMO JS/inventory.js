@@ -287,12 +287,22 @@ function applyFilters() {
 function populateFilters() {
     const sizeFilter = document.getElementById('sizeFilter');
     const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL'];
+    
+    // Get all unique sizes from the table
+    const tableRows = document.querySelectorAll('.inventory-table tbody tr');
+    const uniqueSizes = new Set();
+    tableRows.forEach(row => {
+        const size = row.querySelector('td:nth-child(8)').textContent.trim();
+        if (size) uniqueSizes.add(size);
+    });
 
-    // Clear existing options except the first one
-    sizeFilter.innerHTML = '<option value="">All Sizes</option>';
+    // Keep the "All Sizes" option
+    const allSizesOption = sizeFilter.querySelector('option[value=""]');
+    sizeFilter.innerHTML = '';
+    sizeFilter.appendChild(allSizesOption);
 
-    // Add size options
-    sizes.forEach(size => {
+    // Add unique sizes from the table
+    Array.from(uniqueSizes).sort().forEach(size => {
         const option = document.createElement('option');
         option.value = size;
         option.textContent = size;
@@ -318,4 +328,3 @@ function logout() {
     // Redirect to logout.php
     window.location.href = '../Pages/login.php';
 }
-

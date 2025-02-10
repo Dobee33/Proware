@@ -56,8 +56,19 @@ session_start();
                         <option value="STI-Shirts">STI-Shirts</option>
                         <option value="STI-Accessories">STI-Accessories</option>
                     </select>
-                    <select id="sizeFilter">
+                    <select id="sizeFilter" onchange="applyFilters()">
                         <option value="">All Sizes</option>
+                        <option value="S">S</option>
+                        <option value="M">M</option>
+                        <option value="L">L</option>
+                        <option value="XL">XL</option>
+                        <option value="XXL">XXL</option>
+                        <option value="3XL">3XL</option>
+                        <option value="4XL">4XL</option>
+                        <option value="5XL">5XL</option>
+                        <option value="6XL">6XL</option>
+                        <option value="7XL">7XL</option>
+                        
                     </select>
                     <select id="statusFilter" onchange="applyFilters()">
                         <option value="">All Status</option>
