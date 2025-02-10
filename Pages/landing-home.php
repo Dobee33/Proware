@@ -17,7 +17,7 @@
 
 <body>
     <?php
-    include("../Includes/landing-header.php");
+    include("../Includes/header.php");
     ?>
     <section class="Hero">
         <div class="hero-slideshow">
