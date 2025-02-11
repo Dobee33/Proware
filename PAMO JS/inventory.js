@@ -389,9 +389,14 @@ function clearAllFilters() {
     // Clear date inputs
     const startDateInput = document.getElementById('startDate');
     const endDateInput = document.getElementById('endDate');
+    
+    // Reset start date
     startDateInput.value = '';
+    
+    // Reset and disable end date
     endDateInput.value = '';
     endDateInput.disabled = true;
+    endDateInput.min = ''; // Clear the min date constraint
     
     // Clear dropdown filters
     document.getElementById('categoryFilter').value = '';
@@ -413,6 +418,24 @@ function clearAllFilters() {
     
     // Apply the cleared filters
     applyFilters();
+    
+    // Re-initialize date event listeners
+    startDateInput.addEventListener('change', function() {
+        endDateInput.disabled = false;
+        endDateInput.min = this.value;
+        if (endDateInput.value && endDateInput.value < this.value) {
+            endDateInput.value = '';
+        }
+        applyFilters();
+    });
+
+    endDateInput.addEventListener('change', function() {
+        if (this.value && this.value < startDateInput.value) {
+            alert('End date cannot be earlier than start date');
+            this.value = '';
+        }
+        applyFilters();
+    });
 }
 
 // Populate size filter dropdown dynamically
