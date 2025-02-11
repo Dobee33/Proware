@@ -28,7 +28,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     </div>
 
     <!-- Welcome Message -->
-    <?php if (isset($_SESSION['user_id'])): ?>
+    <?php if (isset($_SESSION['user_id']) && $current_page == 'ProHome.php'): ?>
         <div class="welcome-message" id="welcomeMessage">
             Welcome, <?php echo htmlspecialchars($_SESSION['last_name']); ?>
             (<?php echo htmlspecialchars($_SESSION['role_category']); ?>)
