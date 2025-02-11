@@ -20,7 +20,6 @@ function selectRow(row, itemCode, price) {
 
     selectedItemCode = itemCode;
     selectedPrice = price;
-
     document.getElementById('editPriceBtn').disabled = false;
     document.getElementById('addQuantityBtn').disabled = false;
 }
@@ -256,31 +255,164 @@ function updateStockStatus(row) {
 
 function applyFilters() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const categoryFilter = document.getElementById('categoryFilter').value.toLowerCase();
+    const categoryFilter = document.getElementById('categoryFilter').value;
     const sizeFilter = document.getElementById('sizeFilter').value;
     const statusFilter = document.getElementById('statusFilter').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
 
-    const tableRows = document.querySelectorAll('.inventory-table tbody tr');
+    // Get all table rows
+    const rows = document.querySelectorAll('.inventory-table tbody tr');
+    
+    // Get the size column header
+    const sizeHeader = document.querySelector('.inventory-table thead th:nth-child(8)');
+    
+    // Show/hide size column based on category
+    if (categoryFilter === 'STI-Accessories') {
+        if (sizeHeader) sizeHeader.style.display = 'none';
+        rows.forEach(row => {
+            const sizeCell = row.querySelector('td:nth-child(8)');
+            if (sizeCell) sizeCell.style.display = 'none';
+        });
+    } else {
+        if (sizeHeader) sizeHeader.style.display = '';
+        rows.forEach(row => {
+            const sizeCell = row.querySelector('td:nth-child(8)');
+            if (sizeCell) sizeCell.style.display = '';
+        });
+    }
 
-    tableRows.forEach(row => {
+    // Apply filters
+    rows.forEach(row => {
         const itemName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-        const category = row.querySelector('td:nth-child(3)').textContent.toLowerCase(); // Category column
+        const category = row.querySelector('td:nth-child(3)').textContent;
         const size = row.querySelector('td:nth-child(8)').textContent;
         const status = row.querySelector('td:nth-child(11)').textContent.trim();
+        const dateCreated = row.getAttribute('data-created-at');
 
-        const matchesSearch = searchTerm === '' ||
-            itemName.includes(searchTerm) ||
-            category.includes(searchTerm);
+        const matchesSearch = searchTerm === '' || 
+            itemName.includes(searchTerm) || 
+            category.toLowerCase().includes(searchTerm);
         const matchesCategory = categoryFilter === '' || category === categoryFilter;
         const matchesSize = sizeFilter === '' || size === sizeFilter;
-        const matchesStatus = statusFilter.toLowerCase() === '' || status.toLowerCase() === statusFilter.toLowerCase();
+        const matchesStatus = statusFilter === '' || status.toLowerCase() === statusFilter.toLowerCase();
+        const matchesDate = isWithinDateRange(dateCreated, startDate, endDate);
 
-        if (matchesSearch && matchesCategory && matchesSize && matchesStatus) {
+        if (matchesSearch && matchesCategory && matchesSize && matchesStatus && matchesDate) {
             row.style.display = '';
         } else {
             row.style.display = 'none';
         }
     });
+}
+
+function isWithinDateRange(dateStr, startDate, endDate) {
+    // If no dates are selected, show all records
+    if (!startDate && !endDate) return true;
+    
+    const recordDate = new Date(dateStr);
+    
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        // Set end date to end of day
+        end.setHours(23, 59, 59, 999);
+        return recordDate >= start && recordDate <= end;
+    } else if (startDate) {
+        const start = new Date(startDate);
+        return recordDate >= start;
+    } else if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        return recordDate <= end;
+    }
+    
+    return true;
+}
+
+// Update the DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the date input elements
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+
+    // Initially disable end date input
+    endDateInput.disabled = true;
+
+    // Add event listener to start date
+    startDateInput.addEventListener('change', function() {
+        // Enable end date input when start date is selected
+        endDateInput.disabled = false;
+        
+        // Set the minimum date for the end date input
+        endDateInput.min = this.value;
+        
+        // If end date is earlier than start date, clear it
+        if (endDateInput.value && endDateInput.value < this.value) {
+            endDateInput.value = '';
+        }
+        
+        applyFilters();
+    });
+
+    // Add event listener to end date
+    endDateInput.addEventListener('change', function() {
+        if (this.value && this.value < startDateInput.value) {
+            alert('End date cannot be earlier than start date');
+            this.value = '';
+        }
+        applyFilters();
+    });
+
+    // Check if we should apply low stock filter
+    if (sessionStorage.getItem('applyLowStockFilter')) {
+        // Clear the flag
+        sessionStorage.removeItem('applyLowStockFilter');
+        
+        // Set the status filter to "Low Stock"
+        const statusFilter = document.getElementById('statusFilter');
+        if (statusFilter) {
+            statusFilter.value = 'Low Stock';
+            // Force trigger the change event
+            const event = new Event('change');
+            statusFilter.dispatchEvent(event);
+            applyFilters();
+        }
+    }
+
+    // Initialize size column visibility
+    initializeSizeColumnVisibility();
+});
+
+// Update the clear filters function to ensure size column is shown when filters are cleared
+function clearAllFilters() {
+    // Clear date inputs
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    startDateInput.value = '';
+    endDateInput.value = '';
+    endDateInput.disabled = true;
+    
+    // Clear dropdown filters
+    document.getElementById('categoryFilter').value = '';
+    document.getElementById('sizeFilter').value = '';
+    document.getElementById('statusFilter').value = '';
+    
+    // Clear search input
+    document.getElementById('searchInput').value = '';
+    
+    // Show size column when clearing filters
+    const sizeHeader = document.querySelector('.inventory-table thead th:nth-child(8)');
+    if (sizeHeader) sizeHeader.style.display = '';
+    
+    const rows = document.querySelectorAll('.inventory-table tbody tr');
+    rows.forEach(row => {
+        const sizeCell = row.querySelector('td:nth-child(8)');
+        if (sizeCell) sizeCell.style.display = '';
+    });
+    
+    // Apply the cleared filters
+    applyFilters();
 }
 
 // Populate size filter dropdown dynamically
@@ -323,6 +455,14 @@ document.getElementById('statusFilter').addEventListener('change', applyFilters)
 document.addEventListener('DOMContentLoaded', function () {
     applyFilters();
 });
+
+// Add this function to initialize the size column visibility
+function initializeSizeColumnVisibility() {
+    const categoryFilter = document.getElementById('categoryFilter').value;
+    if (categoryFilter === 'STI-Accessories') {
+        applyFilters();
+    }
+}
 
 function logout() {
     // Redirect to logout.php

@@ -14,8 +14,11 @@ $pending_orders_query = "SELECT COUNT(*) as pending FROM orders WHERE status = '
 $pending_result = $conn->query($pending_orders_query);
 $pending_orders = $pending_result->fetch(PDO::FETCH_ASSOC)['pending'] ?? 0;
 
-// Get low stock items count (items with actual_quantity <= 20)
-$low_stock_query = "SELECT COUNT(*) as low_stock FROM inventory WHERE actual_quantity <= 20 AND actual_quantity > 0";
+// Updated low stock query to match inventory.php logic
+$low_stock_query = "SELECT COUNT(*) as low_stock 
+                    FROM inventory 
+                    WHERE actual_quantity <= 20 
+                    AND actual_quantity > 0";
 $low_stock_result = $conn->query($low_stock_query);
 $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
 ?>
@@ -59,7 +62,7 @@ $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
 
             <div class="dashboard">
                 <div class="stats-cards">
-                    <div class="card">
+                    <div class="card" onclick="window.location.href='inventory.php'">
                         <div class="card-content">
                             <h3>Total Items</h3>
                             <h2><?php echo number_format($total_items); ?></h2>
@@ -67,7 +70,7 @@ $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
                         </div>
                         <i class="material-icons">inventory</i>
                     </div>
-                    <div class="card">
+                    <div class="card" onclick="window.location.href='preorders.php'">
                         <div class="card-content">
                             <h3>Pending Orders</h3>
                             <h2><?php echo number_format($pending_orders); ?></h2>
@@ -75,7 +78,7 @@ $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
                         </div>
                         <i class="material-icons">shopping_cart</i>
                     </div>
-                    <div class="card">
+                    <div class="card" onclick="redirectToLowStock()">
                         <div class="card-content">
                             <h3>Low Stock Items</h3>
                             <h2><?php echo number_format($low_stock_items); ?></h2>
@@ -143,6 +146,18 @@ $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
             </div>
         </main>
     </div>
+
+    <style>
+    .card {
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    </style>
 </body>
 
 </html>

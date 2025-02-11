@@ -49,6 +49,7 @@ session_start();
 
                 <div class="filters">
                     <h3>Filters</h3>
+                    
                     <select id="categoryFilter" onchange="applyFilters()">
                         <option value="">All Categories</option>
                         <option value="Tertiary-Uniform">Tertiary-Uniform</option>
@@ -76,6 +77,19 @@ session_start();
                         <option value="Low Stock">Low Stock</option>
                         <option value="Out of Stock">Out of Stock</option>
                     </select>
+                    <div class="date-filters">
+                        <div class="date-input">
+                            <label for="startDate">From:</label>
+                            <input type="date" id="startDate" onchange="applyFilters()">
+                        </div>
+                        <div class="date-input">
+                            <label for="endDate">To:</label>
+                            <input type="date" id="endDate" onchange="applyFilters()">
+                        </div>
+                        <button onclick="clearAllFilters()" class="clear-filters-btn">
+                            <i class="material-icons">clear</i> Clear Filters
+                        </button>
+                    </div>
                 </div>
 
                 <div class="inventory-table">
@@ -93,6 +107,7 @@ session_start();
                                 <th>Price</th>
                                 <th>Sold Quantity</th>
                                 <th>Status</th>
+                                <th>Date Created</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -103,12 +118,7 @@ session_start();
                                 die("Connection failed: " . mysqli_connect_error());
                             }
 
-                            // Pagination settings
-                            $records_per_page = 10;
-                            $page = isset($_GET['page']) ? $_GET['page'] : 1;
-                            $offset = ($page - 1) * $records_per_page;
-
-                            // Search functionality
+                            // Remove pagination-related variables and just get all records
                             $search = isset($_POST['search']) ? mysqli_real_escape_string($conn, $_POST['search']) : '';
                             $where_clause = '';
 
@@ -116,31 +126,24 @@ session_start();
                                 $where_clause = "WHERE item_name LIKE '%$search%' OR item_code LIKE '%$search%'";
                             }
 
-                            // Get total number of records with search
-                            $total_records_query = "SELECT COUNT(*) as count FROM inventory $where_clause";
-                            $total_records_result = mysqli_query($conn, $total_records_query);
-                            $total_records = mysqli_fetch_assoc($total_records_result)['count'];
-                            $total_pages = ceil($total_records / $records_per_page);
-
-                            // Modified query with search, LIMIT and OFFSET
-                            $sql = "SELECT * FROM inventory $where_clause ORDER BY created_at DESC LIMIT $offset, $records_per_page";
+                            // Modified query to get all records
+                            $sql = "SELECT * FROM inventory $where_clause ORDER BY created_at DESC";
                             $result = mysqli_query($conn, $sql);
 
                             while ($row = mysqli_fetch_assoc($result)) {
                                 $statusClass = '';
-                                switch (strtolower($row['status'])) {
-                                    case 'in stock':
-                                        $statusClass = 'status-in-stock';
-                                        break;
-                                    case 'low stock':
-                                        $statusClass = 'status-low-stock';
-                                        break;
-                                    case 'out of stock':
-                                        $statusClass = 'status-out-of-stock';
-                                        break;
+                                if ($row['actual_quantity'] <= 0) {
+                                    $status = 'Out of Stock';
+                                    $statusClass = 'status-out-of-stock';
+                                } else if ($row['actual_quantity'] <= 20) {
+                                    $status = 'Low Stock';
+                                    $statusClass = 'status-low-stock';
+                                } else {
+                                    $status = 'In Stock';
+                                    $statusClass = 'status-in-stock';
                                 }
 
-                                echo "<tr onclick='selectRow(this, \"" . $row['item_code'] . "\", " . $row['price'] . ")'>";
+                                echo "<tr data-created-at='" . $row['created_at'] . "' data-category='" . strtolower($row['category']) . "' onclick='selectRow(this, \"" . $row['item_code'] . "\", " . $row['price'] . ")'>";
                                 echo "<td>" . $row['item_code'] . "</td>";
                                 echo "<td>" . $row['item_name'] . "</td>";
                                 echo "<td>" . $row['category'] . "</td>";
@@ -151,23 +154,14 @@ session_start();
                                 echo "<td>" . $row['sizes'] . "</td>";
                                 echo "<td>₱" . number_format($row['price'], 2) . "</td>";
                                 echo "<td>" . (isset($row['sold_quantity']) ? $row['sold_quantity'] : '0') . "</td>";
-                                echo "<td class='" . $statusClass . "'>" . $row['status'] . "</td>";
+                                echo "<td class='" . $statusClass . "'>" . $status . "</td>";
+                                echo "<td>" . $row['created_at'] . "</td>";
                                 echo "</tr>";
                             }
                             mysqli_close($conn);
                             ?>
                         </tbody>
                     </table>
-
-                    <div class="pagination">
-                        <?php if ($total_pages > 1): ?>
-                            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                                <a href="?page=<?php echo $i; ?>" class="<?php echo $page == $i ? 'active' : ''; ?>">
-                                    <?php echo $i; ?>
-                                </a>
-                            <?php endfor; ?>
-                        <?php endif; ?>
-                    </div>
                 </div>
             </div>
         </main>
@@ -312,32 +306,6 @@ session_start();
             border-collapse: collapse;
         }
 
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            margin-top: 20px;
-        }
-
-        .pagination a {
-            padding: 8px 12px;
-            text-decoration: none;
-            border: 1px solid #ddd;
-            color: #333;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-
-        .pagination a:hover {
-            background-color: #f5f5f5;
-        }
-
-        .pagination a.active {
-            background-color: #4CAF50;
-            color: white;
-            border-color: #4CAF50;
-        }
-
         .status-in-stock {
             color: #4CAF50;
             font-weight: bold;
@@ -455,6 +423,69 @@ session_start();
             .filters select {
                 width: 100%;
             }
+        }
+
+        .date-filters {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .date-input {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .date-input label {
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .date-input input[type="date"] {
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            color: #333;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .date-input input[type="date"]:hover {
+            border-color: #4CAF50;
+            background-color: #ffffff;
+        }
+
+        .date-input input[type="date"]:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            background-color: #ffffff;
+        }
+
+        .clear-filters-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: auto;
+        }
+
+        .clear-filters-btn:hover {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+
+        .clear-filters-btn i {
+            font-size: 18px;
         }
     </style>
 </body>

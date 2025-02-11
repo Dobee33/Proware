@@ -23,7 +23,7 @@
         </li>
         <li <?php echo basename($_SERVER['PHP_SELF']) == 'content-edit.php' ? 'class="active"' : ''; ?>
             onclick="window.location.href='content-edit.php'">
-            <i class="material-icons">inventory_2</i>Edit Content
+            <i class="material-icons">inventory_2</i>Content Management
         </li>
     </ul>
     <div class="user-info">

@@ -27,3 +27,10 @@ function clearActivities() {
             });
     }
 }
+
+function redirectToLowStock() {
+    // Store the filter state in sessionStorage
+    sessionStorage.setItem('applyLowStockFilter', 'true');
+    // Redirect to inventory page
+    window.location.href = 'inventory.php';
+}
