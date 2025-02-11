@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['role_category'] = $user['role_category'];
+            $_SESSION['last_name'] = $user['last_name'];
 
             if ($user['role_category'] === 'COLLEGE STUDENT' || $user['role_category'] === 'SHS') {
                 header("Location: ProHome.php");
@@ -111,30 +112,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </body>
 
 <style>
-.back-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 20px;
-    padding: 10px 20px;
-    background: lightblue;
-    border: 2px solid lightblue;
-    color: #002347;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
+    .back-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background: lightblue;
+        border: 2px solid lightblue;
+        color: #002347;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
 
-.back-btn:hover {
-    background: #002347;
-    color: white;
-}
+    .back-btn:hover {
+        background: #002347;
+        color: white;
+    }
 
-.back-btn i {
-    font-size: 16px;
-}
+    .back-btn i {
+        font-size: 16px;
+    }
 </style>
 
 </html>
