@@ -3,7 +3,6 @@ session_start();
 include '../includes/connection.php';
 
 try {
-    // Delete all activities from today
     $query = "DELETE FROM activities WHERE DATE(timestamp) = CURDATE()";
     $stmt = $conn->prepare($query);
     $stmt->execute();

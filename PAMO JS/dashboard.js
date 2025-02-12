@@ -34,3 +34,4 @@ function redirectToLowStock() {
     // Redirect to inventory page
     window.location.href = 'inventory.php';
 }
+

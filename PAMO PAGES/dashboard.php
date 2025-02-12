@@ -1,27 +1,26 @@
 <?php
 session_start();
 
-// Database connection
-include '../includes/connection.php';  // Using existing PDO connection
+include '../includes/connection.php';
 
-// Get total items (sum of actual_quantity)
 $total_items_query = "SELECT SUM(actual_quantity) as total FROM inventory";
 $total_result = $conn->query($total_items_query);
 $total_items = $total_result->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
 
-// Get pending orders count
 $pending_orders_query = "SELECT COUNT(*) as pending FROM orders WHERE status = 'Pending'";
 $pending_result = $conn->query($pending_orders_query);
 $pending_orders = $pending_result->fetch(PDO::FETCH_ASSOC)['pending'] ?? 0;
 
-// Updated low stock query to match inventory.php logic
 $low_stock_query = "SELECT COUNT(*) as low_stock 
                     FROM inventory 
                     WHERE actual_quantity <= 20 
                     AND actual_quantity > 0";
 $low_stock_result = $conn->query($low_stock_query);
 $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
+
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -99,8 +98,8 @@ $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
                     <div class="activity-list">
                         <?php
                         $activities_query = "SELECT * FROM activities 
-                                           WHERE DATE(timestamp) = CURDATE()
-                                           ORDER BY timestamp DESC";
+                        WHERE DATE(timestamp) = CURDATE()
+                        ORDER BY timestamp DESC";
                         $activities_result = $conn->query($activities_query);
 
                         if ($activities_result->rowCount() > 0) {
@@ -121,6 +120,9 @@ $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
                                         break;
                                     case 'order_accepted':
                                         $icon = 'check_circle';
+                                        break;
+                                    case 'edit_image':
+                                        $icon = 'image';
                                         break;
                                     default:
                                         $icon = 'info';
@@ -148,15 +150,15 @@ $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
     </div>
 
     <style>
-    .card {
-        cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+        .card {
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
 
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </body>
 

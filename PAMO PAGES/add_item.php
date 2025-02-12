@@ -6,7 +6,6 @@ try {
         throw new Exception('Connection failed: ' . mysqli_connect_error());
     }
 
-    // Get and decode the raw POST data
     $rawData = file_get_contents('php://input');
     error_log("Raw data received: " . $rawData);
 
@@ -17,7 +16,6 @@ try {
         throw new Exception('Invalid JSON data received');
     }
 
-    // Validate required fields
     $required_fields = ['item_code', 'category', 'item_name', 'sizes', 'price', 'quantity'];
     $missing_fields = [];
 
@@ -31,7 +29,6 @@ try {
         throw new Exception('Missing required fields: ' . implode(', ', $missing_fields));
     }
 
-    // Sanitize and prepare data
     $item_code = mysqli_real_escape_string($conn, $data['item_code']);
     $category = mysqli_real_escape_string($conn, $data['category']);
     $item_name = mysqli_real_escape_string($conn, $data['item_name']);
@@ -40,7 +37,6 @@ try {
     $quantity = intval($data['quantity']);
     $damage = intval($data['damage']);
 
-    // Set initial values
     $actual_quantity = $quantity - $damage;
     $new_delivery = $quantity;
     $beginning_quantity = $quantity;
@@ -80,7 +76,6 @@ try {
 
     mysqli_stmt_close($stmt);
 
-    // After your existing insert item query succeeds
     $description = "New item added: {$item_name} ({$item_code})";
     $sql = "INSERT INTO activities (action_type, description, item_code) VALUES ('new_item', ?, ?)";
     $stmt = mysqli_prepare($conn, $sql);
@@ -90,7 +85,6 @@ try {
 
     mysqli_close($conn);
 
-    // Success response
     echo json_encode(['success' => true]);
 
 } catch (Exception $e) {

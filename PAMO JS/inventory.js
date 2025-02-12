@@ -6,9 +6,7 @@ function selectRow(row, itemCode, price) {
         row.classList.remove('selected');
         selectedItemCode = null;
         selectedPrice = null;
-
-        document.getElementById('editPriceBtn').disabled = true;
-        document.getElementById('addQuantityBtn').disabled = true;
+        document.getElementById('editBtn').disabled = true;
         return;
     }
 
@@ -17,19 +15,35 @@ function selectRow(row, itemCode, price) {
     });
 
     row.classList.add('selected');
-
     selectedItemCode = itemCode;
     selectedPrice = price;
-    document.getElementById('editPriceBtn').disabled = false;
-    document.getElementById('addQuantityBtn').disabled = false;
+    document.getElementById('editBtn').disabled = false;
 }
 
-function handleEditPrice() {
+function handleEdit() {
+    console.log('Edit button clicked');
+    console.log('Selected Item Code:', selectedItemCode);
+
     if (!selectedItemCode) {
         alert('Please select an item first');
         return;
     }
-    editPrice(selectedItemCode, selectedPrice);
+
+    const row = document.querySelector(`tr[data-item-code="${selectedItemCode}"]`);
+    
+    if (!row) {
+        alert('Selected item not found in the table.');
+        return;
+    }
+
+    document.getElementById('editItemId').value = selectedItemCode;
+    document.getElementById('editItemCode').value = row.cells[0].textContent;
+    document.getElementById('editItemName').value = row.cells[1].textContent;
+    document.getElementById('editCategory').value = row.cells[2].textContent;
+    document.getElementById('editActualQuantity').value = row.cells[3].textContent;
+    document.getElementById('editSize').value = row.cells[7].textContent;
+    document.getElementById('editPrice').value = row.cells[9].textContent;
+    document.getElementById('editItemModal').style.display = 'block';
 }
 
 function handleAddQuantity() {
@@ -41,7 +55,7 @@ function handleAddQuantity() {
 }
 
 function editPrice(itemCode, currentPrice) {
-    console.log('Edit Price clicked:', itemCode, currentPrice); // Debug log
+    console.log('Edit Price clicked:', itemCode, currentPrice);
     document.getElementById('itemId').value = itemCode;
     document.getElementById('newPrice').value = currentPrice;
     document.getElementById('editPriceModal').style.display = 'block';
@@ -61,7 +75,7 @@ function updatePrice() {
     const itemCode = document.getElementById('itemId').value;
     const newPrice = document.getElementById('newPrice').value;
 
-    console.log('Updating price:', itemCode, newPrice); // Debug log
+    console.log('Updating price:', itemCode, newPrice);
 
     if (!newPrice || newPrice <= 0) {
         alert('Please enter a valid price');
@@ -76,11 +90,11 @@ function updatePrice() {
         body: `item_code=${encodeURIComponent(itemCode)}&price=${encodeURIComponent(newPrice)}`
     })
         .then(response => {
-            console.log('Response received'); // Debug log
+            console.log('Response received');
             return response.json();
         })
         .then(data => {
-            console.log('Data:', data); // Debug log
+            console.log('Data:', data);
             if (data.success) {
                 alert('Price updated successfully!');
                 location.reload();
@@ -89,7 +103,7 @@ function updatePrice() {
             }
         })
         .catch(error => {
-            console.error('Error:', error); // Debug log
+            console.error('Error:', error);
             alert('Error updating price: ' + error);
         });
 
@@ -100,7 +114,6 @@ function updateQuantity() {
     const itemCode = document.getElementById('quantityItemId').value;
     const quantityToAdd = document.getElementById('quantityToAdd').value;
 
-    // Send AJAX request to update quantity
     fetch('update_quantity.php', {
         method: 'POST',
         headers: {
@@ -112,12 +125,11 @@ function updateQuantity() {
         .then(data => {
             if (data.success) {
                 alert('Quantity updated successfully!');
-                // Update the status immediately without reloading
                 const row = document.querySelector(`tr[data-item-code="${itemCode}"]`);
                 if (row) {
                     updateStockStatus(row);
                 }
-                location.reload(); // Keep this for now to ensure all data is fresh
+                location.reload();
             } else {
                 alert('Error updating quantity: ' + data.message);
             }
@@ -140,7 +152,6 @@ function submitNewItem(event) {
     const quantity = parseInt(document.getElementById('newItemQuantity').value);
     const damage = parseInt(document.getElementById('newItemDamage').value) || 0;
 
-    // Get form values and validate
     const formData = {
         item_code: document.getElementById('newItemCode').value.trim(),
         category: document.getElementById('newCategory').value.trim(),
@@ -155,10 +166,8 @@ function submitNewItem(event) {
         status: 'In Stock'
     };
 
-    // Debug log
     console.log('Sending data:', formData);
 
-    // Validation
     if (!formData.item_code || !formData.category || !formData.item_name ||
         !formData.sizes || isNaN(formData.price) || isNaN(formData.quantity)) {
         alert('Please fill in all required fields with valid values');
@@ -177,7 +186,6 @@ function submitNewItem(event) {
             console.log('Raw server response:', text);
 
             try {
-                // Try to parse the response as JSON
                 const data = JSON.parse(text);
                 if (data.success) {
                     alert('Item added successfully!');
@@ -195,9 +203,10 @@ function submitNewItem(event) {
             console.error('Error:', error);
             alert('Error: ' + error.message);
         });
+
+    document.getElementById('addItemForm').reset();
 }
 
-// Add this new function to handle size field visibility
 document.getElementById('newCategory').addEventListener('change', function () {
     const sizeGroup = document.querySelector('.input-group:has(#newSize)');
     if (this.value === 'STI-Accessories') {
@@ -216,11 +225,10 @@ function searchItems() {
     const tableRows = document.querySelectorAll('.inventory-table tbody tr');
 
     tableRows.forEach(row => {
-        const itemName = row.querySelector('td:nth-child(2)').textContent.toLowerCase(); // Item Name
-        const category = row.querySelector('td:nth-child(3)').textContent.toLowerCase(); // Category
-        const itemCode = row.querySelector('td:nth-child(1)').textContent.toLowerCase(); // Item Code
+        const itemName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+        const category = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+        const itemCode = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
 
-        // Check if search term matches either item name or category
         if (itemName.includes(searchTerm) || category.includes(searchTerm) || itemCode.includes(searchTerm)) {
             row.style.display = '';
         } else {
@@ -382,6 +390,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize size column visibility
     initializeSizeColumnVisibility();
+
+    // Add event listener for the Edit button
+    document.getElementById('editBtn').addEventListener('click', handleEdit);
 });
 
 // Update the clear filters function to ensure size column is shown when filters are cleared
@@ -490,4 +501,214 @@ function initializeSizeColumnVisibility() {
 function logout() {
     // Redirect to logout.php
     window.location.href = '../Pages/login.php';
+}
+
+function saveEdit() {
+    const itemCode = document.getElementById('editItemId').value;
+    const newPrice = document.getElementById('editPrice').value;
+
+    // Add logic to save the edited item details
+    // You can send the updated data to the server using fetch or AJAX
+
+    closeModal('editItemModal');
+}
+
+function addQuantity() {
+    const itemCode = document.getElementById('editItemId').value;
+    const quantityToAdd = prompt("Enter quantity to add:");
+    if (quantityToAdd) {
+        // Logic to add quantity
+        console.log(`Adding ${quantityToAdd} to item ${itemCode}`);
+        // You can implement the AJAX call to update the quantity in the database
+    }
+}
+
+function deductQuantity() {
+    const itemCode = document.getElementById('editItemId').value;
+    const quantityToDeduct = prompt("Enter quantity to deduct:");
+    if (quantityToDeduct) {
+        // Logic to deduct quantity
+        console.log(`Deducting ${quantityToDeduct} from item ${itemCode}`);
+        // You can implement the AJAX call to update the quantity in the database
+    }
+}
+
+function editPrice() {
+    const newPrice = prompt("Enter new price:");
+    if (newPrice) {
+        document.getElementById('editPrice').value = newPrice;
+        console.log(`New price set to ${newPrice}`);
+        // You can implement the AJAX call to update the price in the database
+    }
+}
+
+function editImage() {
+    // Logic to edit image (e.g., open a file input or modal)
+    console.log("Edit image functionality to be implemented.");
+}
+
+function showAddQuantityModal() {
+    document.getElementById('addItemId').value = document.getElementById('editItemId').value; // Set the item ID
+    document.getElementById('addQuantityModal').style.display = 'block'; // Show the modal
+}
+
+function showDeductQuantityModal() {
+    document.getElementById('deductItemId').value = document.getElementById('editItemId').value; // Set the item ID
+    document.getElementById('deductQuantityModal').style.display = 'block'; // Show the modal
+}
+
+function showEditPriceModal() {
+    document.getElementById('priceItemId').value = document.getElementById('editItemId').value; // Set the item ID
+    document.getElementById('newPrice').value = document.getElementById('editPrice').value; // Set current price
+    document.getElementById('editPriceModal').style.display = 'block'; // Show the modal
+}
+
+function showEditImageModal() {
+    document.getElementById('imageItemId').value = document.getElementById('editItemId').value; // Set the item ID
+    document.getElementById('editImageModal').style.display = 'block'; // Show the modal
+}
+
+function submitAddQuantity() {
+    const itemId = document.getElementById('addItemId').value;
+    const quantityToAdd = document.getElementById('quantityToAdd').value;
+
+    fetch('add_quantity.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ itemId, quantityToAdd }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the UI
+            updateInventoryDisplay(itemId, quantityToAdd, 'add');
+            showMessage(`Added ${quantityToAdd} to item ${itemId}.`);
+            closeModal('addQuantityModal');
+            // Clear input field
+            document.getElementById('quantityToAdd').value = '';
+        } else {
+            alert('Error adding quantity');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function submitDeductQuantity() {
+    const itemId = document.getElementById('deductItemId').value;
+    const quantityToDeduct = document.getElementById('quantityToDeduct').value;
+
+    fetch('deduct_quantity.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ itemId, quantityToDeduct }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the UI
+            updateInventoryDisplay(itemId, quantityToDeduct, 'deduct');
+            showMessage(`Deducted ${quantityToDeduct} from item ${itemId}.`);
+            closeModal('deductQuantityModal');
+            // Clear input field
+            document.getElementById('quantityToDeduct').value = '';
+        } else {
+            alert('Error deducting quantity');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function submitEditPrice() {
+    const itemId = document.getElementById('priceItemId').value;
+    const newPrice = document.getElementById('newPrice').value;
+
+    fetch('edit_price.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ itemId, newPrice }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the UI
+            updatePriceDisplay(itemId, newPrice);
+            showMessage(`Updated price for item ${itemId} to ${newPrice}.`);
+            closeModal('editPriceModal');
+            // Clear input field
+            document.getElementById('newPrice').value = '';
+        } else {
+            alert('Error updating price');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function submitEditImage() {
+    const itemId = document.getElementById('imageItemId').value;
+    const newImage = document.getElementById('newImage').files[0];
+
+    const formData = new FormData();
+    formData.append('itemId', itemId);
+    formData.append('newImage', newImage);
+
+    fetch('edit_image.php', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showMessage(`Updated image for item ${itemId}.`);
+            closeModal('editImageModal');
+            // Clear input field
+            document.getElementById('newImage').value = '';
+        } else {
+            alert('Error updating image');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Function to show a message
+function showMessage(message) {
+    const messageBox = document.createElement('div');
+    messageBox.className = 'message-box';
+    messageBox.innerText = message;
+    document.body.appendChild(messageBox);
+
+    // Automatically remove the message after a few seconds
+    setTimeout(() => {
+        messageBox.remove();
+    }, 3000);
+}
+
+// Function to update inventory display
+function updateInventoryDisplay(itemId, quantity, action) {
+    const row = document.querySelector(`tr[data-item-code="${itemId}"]`);
+    if (row) {
+        const quantityCell = row.cells[3]; // Assuming the quantity is in the 4th cell
+        let currentQuantity = parseInt(quantityCell.textContent);
+        if (action === 'add') {
+            quantityCell.textContent = currentQuantity + parseInt(quantity);
+        } else if (action === 'deduct') {
+            quantityCell.textContent = currentQuantity - parseInt(quantity);
+        }
+        // Update the stock status immediately after changing the quantity
+        updateStockStatus(row);
+    }
+}
+
+// Function to update price display
+function updatePriceDisplay(itemId, newPrice) {
+    const row = document.querySelector(`tr[data-item-code="${itemId}"]`);
+    if (row) {
+        const priceCell = row.cells[8]; // Assuming the price is in the 9th cell
+        priceCell.textContent = `₱${parseFloat(newPrice).toFixed(2)}`; // Format the price
+    }
 }

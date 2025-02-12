@@ -1,4 +1,3 @@
-/* Inventory specific styles */
 .inventory-filters {
     display: flex;
     justify-content: space-between;
@@ -469,3 +468,251 @@
     background-color: white;
 } 
 
+.price-display {
+    display: inline-block;
+    padding: 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.message-box {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    /* Green */
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    z-index: 1000;
+    transition: opacity 0.5s ease;
+}
+
+.action-buttons-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+
+.action-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.action-btn i {
+    font-size: 20px;
+}
+
+.inventory-table tbody tr {
+    cursor: pointer;
+}
+
+.inventory-table tbody tr.selected {
+    background-color: #e3f2fd;
+}
+
+.inventory-table {
+    margin-bottom: 20px;
+}
+
+.inventory-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.status-in-stock {
+    color: #4CAF50;
+    font-weight: bold;
+    background-color: rgba(76, 175, 80, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.status-low-stock {
+    color: #FFA500;
+    font-weight: bold;
+    background-color: rgba(255, 165, 0, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.status-out-of-stock {
+    color: #FF0000;
+    font-weight: bold;
+    background-color: rgba(255, 0, 0, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: var(--border-radius);
+    background-color: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: #0072BC;
+}
+
+.logout-btn i {
+    font-size: 20px;
+    color: white;
+}
+
+/* Filter Section Styling */
+.filters {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.filters h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.filters select {
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    color: #333;
+    font-size: 0.9rem;
+    min-width: 160px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.filters select:hover {
+    border-color: #4CAF50;
+    background-color: #ffffff;
+}
+
+.filters select:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+    background-color: #ffffff;
+}
+
+.filters select option {
+    padding: 8px;
+    background-color: #ffffff;
+}
+
+/* Add hover effect for options */
+.filters select option:hover {
+    background-color: #4CAF50;
+    color: #ffffff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filters select {
+        width: 100%;
+    }
+}
+
+.date-filters {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.date-input {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.date-input label {
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.date-input input[type="date"] {
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    color: #333;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.date-input input[type="date"]:hover {
+    border-color: #4CAF50;
+    background-color: #ffffff;
+}
+
+.date-input input[type="date"]:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+    background-color: #ffffff;
+}
+
+.clear-filters-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: auto;
+}
+
+.clear-filters-btn:hover {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.clear-filters-btn i {
+    font-size: 18px;
+}

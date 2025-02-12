@@ -39,17 +39,14 @@ session_start();
                     <button onclick="showAddItemModal()" class="action-btn">
                         <i class="material-icons">add_circle</i> Add New Item
                     </button>
-                    <button onclick="handleEditPrice()" class="action-btn" id="editPriceBtn" disabled>
-                        <i class="material-icons">edit</i> Edit Price
-                    </button>
-                    <button onclick="handleAddQuantity()" class="action-btn" id="addQuantityBtn" disabled>
-                        <i class="material-icons">add_circle</i> Add Quantity
+                    <button onclick="handleEdit()" class="action-btn" id="editBtn" disabled>
+                        <i class="material-icons">edit</i> Edit
                     </button>
                 </div>
 
                 <div class="filters">
                     <h3>Filters</h3>
-                    
+
                     <select id="categoryFilter" onchange="applyFilters()">
                         <option value="">All Categories</option>
                         <option value="Tertiary-Uniform">Tertiary-Uniform</option>
@@ -69,7 +66,7 @@ session_start();
                         <option value="5XL">5XL</option>
                         <option value="6XL">6XL</option>
                         <option value="7XL">7XL</option>
-                        
+
                     </select>
                     <select id="statusFilter" onchange="applyFilters()">
                         <option value="">All Status</option>
@@ -118,7 +115,6 @@ session_start();
                                 die("Connection failed: " . mysqli_connect_error());
                             }
 
-                            // Remove pagination-related variables and just get all records
                             $search = isset($_POST['search']) ? mysqli_real_escape_string($conn, $_POST['search']) : '';
                             $where_clause = '';
 
@@ -126,7 +122,6 @@ session_start();
                                 $where_clause = "WHERE item_name LIKE '%$search%' OR item_code LIKE '%$search%'";
                             }
 
-                            // Modified query to get all records
                             $sql = "SELECT * FROM inventory $where_clause ORDER BY created_at DESC";
                             $result = mysqli_query($conn, $sql);
 
@@ -143,7 +138,7 @@ session_start();
                                     $statusClass = 'status-in-stock';
                                 }
 
-                                echo "<tr data-created-at='" . $row['created_at'] . "' data-category='" . strtolower($row['category']) . "' onclick='selectRow(this, \"" . $row['item_code'] . "\", " . $row['price'] . ")'>";
+                                echo "<tr data-item-code='" . $row['item_code'] . "' data-created-at='" . $row['created_at'] . "' data-category='" . strtolower($row['category']) . "' onclick='selectRow(this, \"" . $row['item_code'] . "\", " . $row['price'] . ")'>";
                                 echo "<td>" . $row['item_code'] . "</td>";
                                 echo "<td>" . $row['item_name'] . "</td>";
                                 echo "<td>" . $row['category'] . "</td>";
@@ -156,6 +151,7 @@ session_start();
                                 echo "<td>" . (isset($row['sold_quantity']) ? $row['sold_quantity'] : '0') . "</td>";
                                 echo "<td class='" . $statusClass . "'>" . $status . "</td>";
                                 echo "<td>" . $row['created_at'] . "</td>";
+                                echo "<!-- Item Code: " . $row['item_code'] . " -->";
                                 echo "</tr>";
                             }
                             mysqli_close($conn);
@@ -167,29 +163,42 @@ session_start();
         </main>
     </div>
 
-    <div id="editPriceModal" class="modal">
+    <div id="editItemModal" class="modal">
         <div class="modal-content">
-            <h2>Edit Price</h2>
-            <input type="hidden" id="itemId">
-            <div class="input-group">
-                <label for="newPrice">New Price:</label>
-                <input type="number" id="newPrice" step="0.01" min="0" placeholder="Enter new price">
-            </div>
-            <div class="modal-buttons">
-                <button onclick="updatePrice()" class="save-btn">Save</button>
-                <button onclick="closeModal('editPriceModal')" class="cancel-btn">Cancel</button>
-            </div>
-        </div>
-    </div>
+            <h2>Edit Item</h2>
+            <input type="hidden" id="editItemId">
 
-    <div id="addQuantityModal" class="modal">
-        <div class="modal-content">
-            <h2>Add Quantity</h2>
-            <input type="hidden" id="quantityItemId">
-            <input type="number" id="quantityToAdd" placeholder="Enter quantity to add">
+            <div class="input-group">
+                <label for="editItemCode">Item Code:</label>
+                <input type="text" id="editItemCode" disabled>
+            </div>
+            <div class="input-group">
+                <label for="editItemName">Item Name:</label>
+                <input type="text" id="editItemName" disabled>
+            </div>
+            <div class="input-group">
+                <label for="editCategory">Category:</label>
+                <input type="text" id="editCategory" disabled>
+            </div>
+            <div class="input-group">
+                <label for="editActualQuantity">Actual Quantity:</label>
+                <input type="number" id="editActualQuantity" disabled>
+            </div>
+            <div class="input-group">
+                <label for="editSize">Size:</label>
+                <input type="text" id="editSize" disabled>
+            </div>
+            <div class="input-group">
+                <label for="editPrice">Price:</label>
+                <input type="number" id="editPrice" disabled>
+            </div>
+
             <div class="modal-buttons">
-                <button onclick="updateQuantity()">Save</button>
-                <button onclick="closeModal('addQuantityModal')">Cancel</button>
+                <button onclick="showAddQuantityModal()" class="action-btn">Add Quantity</button>
+                <button onclick="showDeductQuantityModal()" class="action-btn">Deduct Quantity</button>
+                <button onclick="showEditPriceModal()" class="action-btn">Edit Price</button>
+                <button onclick="showEditImageModal()" class="action-btn">Edit Image</button>
+                <button onclick="closeModal('editItemModal')" class="cancel-btn">Cancel</button>
             </div>
         </div>
     </div>
@@ -261,232 +270,68 @@ session_start();
         </div>
     </div>
 
+    <div id="addQuantityModal" class="modal">
+        <div class="modal-content">
+            <h2>Add Quantity</h2>
+            <input type="hidden" id="addItemId">
+            <div class="input-group">
+                <label for="quantityToAdd">Quantity to Add:</label>
+                <input type="number" id="quantityToAdd" min="1" required>
+            </div>
+            <div class="modal-buttons">
+                <button onclick="submitAddQuantity()" class="save-btn">Save</button>
+                <button onclick="closeModal('addQuantityModal')" class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deductQuantityModal" class="modal">
+        <div class="modal-content">
+            <h2>Deduct Quantity</h2>
+            <input type="hidden" id="deductItemId">
+            <div class="input-group">
+                <label for="quantityToDeduct">Quantity to Deduct:</label>
+                <input type="number" id="quantityToDeduct" min="1" required>
+            </div>
+            <div class="modal-buttons">
+                <button onclick="submitDeductQuantity()" class="save-btn">Save</button>
+                <button onclick="closeModal('deductQuantityModal')" class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editPriceModal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Price</h2>
+            <input type="hidden" id="priceItemId">
+            <div class="input-group">
+                <label for="newPrice">New Price:</label>
+                <input type="number" id="newPrice" step="0.01" min="0" required>
+            </div>
+            <div class="modal-buttons">
+                <button onclick="submitEditPrice()" class="save-btn">Save</button>
+                <button onclick="closeModal('editPriceModal')" class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editImageModal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Image</h2>
+            <input type="hidden" id="imageItemId">
+            <div class="input-group">
+                <label for="newImage">Upload New Image:</label>
+                <input type="file" id="newImage" accept="image/*" required>
+            </div>
+            <div class="modal-buttons">
+                <button onclick="submitEditImage()" class="save-btn">Save</button>
+                <button onclick="closeModal('editImageModal')" class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <style>
-        .action-buttons-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
 
-        .action-btn {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-        }
-
-        .action-btn:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-
-        .action-btn i {
-            font-size: 20px;
-        }
-
-        .inventory-table tbody tr {
-            cursor: pointer;
-        }
-
-        .inventory-table tbody tr.selected {
-            background-color: #e3f2fd;
-        }
-
-        .inventory-table {
-            margin-bottom: 20px;
-        }
-
-        .inventory-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .status-in-stock {
-            color: #4CAF50;
-            font-weight: bold;
-            background-color: rgba(76, 175, 80, 0.1);
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-
-        .status-low-stock {
-            color: #FFA500;
-            font-weight: bold;
-            background-color: rgba(255, 165, 0, 0.1);
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-
-        .status-out-of-stock {
-            color: #FF0000;
-            font-weight: bold;
-            background-color: rgba(255, 0, 0, 0.1);
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logout-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: var(--border-radius);
-            background-color: var(--primary-color);
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background-color: #0072BC;
-        }
-
-        .logout-btn i {
-            font-size: 20px;
-            color: white;
-        }
-
-        /* Filter Section Styling */
-        .filters {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .filters h3 {
-            margin: 0;
-            color: #333;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        .filters select {
-            padding: 8px 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            background-color: #f8f9fa;
-            color: #333;
-            font-size: 0.9rem;
-            min-width: 160px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            outline: none;
-        }
-
-        .filters select:hover {
-            border-color: #4CAF50;
-            background-color: #ffffff;
-        }
-
-        .filters select:focus {
-            border-color: #4CAF50;
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
-            background-color: #ffffff;
-        }
-
-        .filters select option {
-            padding: 8px;
-            background-color: #ffffff;
-        }
-
-        /* Add hover effect for options */
-        .filters select option:hover {
-            background-color: #4CAF50;
-            color: #ffffff;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .filters {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .filters select {
-                width: 100%;
-            }
-        }
-
-        .date-filters {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .date-input {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .date-input label {
-            color: #333;
-            font-size: 0.9rem;
-        }
-
-        .date-input input[type="date"] {
-            padding: 8px 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            background-color: #f8f9fa;
-            color: #333;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            outline: none;
-        }
-
-        .date-input input[type="date"]:hover {
-            border-color: #4CAF50;
-            background-color: #ffffff;
-        }
-
-        .date-input input[type="date"]:focus {
-            border-color: #4CAF50;
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
-            background-color: #ffffff;
-        }
-
-        .clear-filters-btn {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 8px 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            background-color: #f8f9fa;
-            color: #666;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-left: auto;
-        }
-
-        .clear-filters-btn:hover {
-            background-color: #e0e0e0;
-            color: #333;
-        }
-
-        .clear-filters-btn i {
-            font-size: 18px;
-        }
     </style>
 </body>
 
