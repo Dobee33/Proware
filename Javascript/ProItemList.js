@@ -285,6 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Initial filter application
+   
+
     applyFilters();
 });

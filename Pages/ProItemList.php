@@ -147,205 +147,82 @@
 
         <main class="content">
             <div class="products-grid">
-                <div class="product-container">
-                    <img src="../Images/your-product-image.jpg" alt="Product Name">
-                    <div class="product-overlay">
-                        <div class="items"></div>
-                        <div class="items head">
-                            <p>STI College Uniform</p>
-                            <hr>
-                        </div>
-                        <div class="items price">
-                            <p class="new">₱999</p>
-                        </div>
-                        <div class="items sizes">
-                            <span>Sizes:</span>
-                            <div class="size-options">
-                                <button class="size-btn">S</button>
-                                <button class="size-btn">M</button>
-                                <button class="size-btn">L</button>
-                                <button class="size-btn">XL</button>
-                                <button class="size-btn">2XL</button>
-                                <button class="size-btn">3XL</button>
-                                <button class="size-btn">4XL</button>
-                                <button class="size-btn">5XL</button>
-                                <button class="size-btn">6XL</button>
-                                <button class="size-btn">7XL</button>
-                            </div>
-                        </div>
-                        <div class="items cart">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span>ADD TO CART</span>
-                        </div>
-                    </div>
-                </div>
+                <?php
+                $conn = mysqli_connect("localhost", "root", "", "proware");
+                if (!$conn) {
+                    die("Connection failed: " . mysqli_connect_error());
+                }
 
-                <div class="product-container">
-                    <img src="../Images/your-product-image.jpg" alt="Product Name">
-                    <div class="product-overlay">
-                        <div class="items"></div>
-                        <div class="items head">
-                            <p>STI College Uniform</p>
-                            <hr>
-                        </div>
-                        <div class="items price">
-                            <p class="new">₱999</p>
-                        </div>
-                        <div class="items sizes">
-                            <span>Sizes:</span>
-                            <div class="size-options">
-                                <button class="size-btn">S</button>
-                                <button class="size-btn">M</button>
-                                <button class="size-btn">L</button>
-                                <button class="size-btn">XL</button>
-                                <button class="size-btn">2XL</button>
-                                <button class="size-btn">3XL</button>
-                                <button class="size-btn">4XL</button>
-                                <button class="size-btn">5XL</button>
-                                <button class="size-btn">6XL</button>
-                                <button class="size-btn">7XL</button>
-                            </div>
-                        </div>
-                        <div class="items cart">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span>ADD TO CART</span>
-                        </div>
-                    </div>
-                </div>
+                $sql = "SELECT * FROM inventory ORDER BY created_at DESC";
+                $result = mysqli_query($conn, $sql);
 
-                <div class="product-container">
-                    <img src="../Images/your-product-image.jpg" alt="Product Name">
-                    <div class="product-overlay">
-                        <div class="items"></div>
-                        <div class="items head">
-                            <p>STI College Uniform</p>
-                            <hr>
-                        </div>
-                        <div class="items price">
-                            <p class="new">₱999</p>
-                        </div>
-                        <div class="items sizes">
-                            <span>Sizes:</span>
-                            <div class="size-options">
-                                <button class="size-btn">S</button>
-                                <button class="size-btn">M</button>
-                                <button class="size-btn">L</button>
-                                <button class="size-btn">XL</button>
-                                <button class="size-btn">2XL</button>
-                                <button class="size-btn">3XL</button>
-                                <button class="size-btn">4XL</button>
-                                <button class="size-btn">5XL</button>
-                                <button class="size-btn">6XL</button>
-                                <button class="size-btn">7XL</button>
-                            </div>
-                        </div>
-                        <div class="items cart">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span>ADD TO CART</span>
-                        </div>
-                    </div>
-                </div>
+                $products = []; // Array to hold products grouped by item name and code
+                
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $itemCode = $row['item_code'];
+                    $itemName = $row['item_name'];
+                    $itemImage = $row['image_path'];
+                    $itemPrice = number_format($row['price'], 2);
+                    $itemCategory = $row['category'];
+                    $sizes = explode(',', $row['sizes']); // Assuming sizes are stored in a comma-separated format
+                
+                    // Group products by item code
+                    if (!isset($products[$itemCode])) {
+                        $products[$itemCode] = [
+                            'name' => $itemName,
+                            'image' => $itemImage,
+                            'price' => $itemPrice,
+                            'category' => $itemCategory,
+                            'sizes' => $sizes
+                        ];
+                    } else {
+                        // Merge sizes if the item already exists
+                        $products[$itemCode]['sizes'] = array_unique(array_merge($products[$itemCode]['sizes'], $sizes));
+                    }
+                }
 
-                <div class="product-container">
-                    <img src="../Images/STI-BSTM.jpg" alt="Product Name">
-                    <div class="product-overlay">
-                        <div class="items"></div>
-                        <div class="items head">
-                            <p>STI College Uniform</p>
-                            <hr>
-                        </div>
-                        <div class="items price">
-                            <p class="new">₱999</p>
-                        </div>
-                        <div class="items sizes">
-                            <span>Sizes:</span>
-                            <div class="size-options">
-                                <button class="size-btn">S</button>
-                                <button class="size-btn">M</button>
-                                <button class="size-btn">L</button>
-                                <button class="size-btn">XL</button>
-                                <button class="size-btn">2XL</button>
-                                <button class="size-btn">3XL</button>
-                                <button class="size-btn">4XL</button>
-                                <button class="size-btn">5XL</button>
-                                <button class="size-btn">6XL</button>
-                                <button class="size-btn">7XL</button>
+                // Display products
+                foreach ($products as $product):
+                    $availableSizes = $product['sizes'];
+                    ?>
+                    <div class="product-container">
+                        <img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>">
+                        <div class="product-overlay">
+                            <div class="items"></div>
+                            <div class="items head">
+                                <p><?php echo $product['name']; ?></p>
+                                <p class="category"><?php echo htmlspecialchars($product['category']); ?></p>
+                                <p class="stock" style="display: none;">Stocks: <span
+                                        class="stock-count"><?php echo $row['stock']; ?></span></p>
+                                <hr>
                             </div>
-                        </div>
-                        <div class="items cart">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span>ADD TO CART</span>
-                        </div>
-                    </div>
-                </div>
+                            <div class="items price">
+                                <p class="new">₱<?php echo $product['price']; ?></p>
+                            </div>
+                            <div class="items sizes">
+                                <span>Sizes:</span>
+                                <div class="size-options">
+                                    <?php
+                                    // Define all possible sizes
+                                    $allSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL'];
 
-                <div class="product-container">
-                    <img src="../Images/STI-TM.jpg" alt="Product Name">
-                    <div class="product-overlay">
-                        <div class="items"></div>
-                        <div class="items head">
-                            <p>STI College Uniform</p>
-                            <hr>
-                        </div>
-                        <div class="items price">
-                            <p class="new">₱999</p>
-                        </div>
-                        <div class="items sizes">
-                            <span>Sizes:</span>
-                            <div class="size-options">
-                                <button class="size-btn">S</button>
-                                <button class="size-btn">M</button>
-                                <button class="size-btn">L</button>
-                                <button class="size-btn">XL</button>
-                                <button class="size-btn">2XL</button>
-                                <button class="size-btn">3XL</button>
-                                <button class="size-btn">4XL</button>
-                                <button class="size-btn">5XL</button>
-                                <button class="size-btn">6XL</button>
-                                <button class="size-btn">7XL</button>
+                                    foreach ($allSizes as $size):
+                                        // Check if the size is available
+                                        $isAvailable = in_array($size, $availableSizes);
+                                        ?>
+                                        <button class="size-btn" style="opacity: <?php echo $isAvailable ? '1' : '0.5'; ?>;">
+                                            <?php echo $size; ?>
+                                        </button>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <div class="items cart" onclick="toggleStockDisplay(this)">
+                                <i class="fa fa-shopping-cart"></i>
+                                <span>ADD TO CART</span>
                             </div>
                         </div>
-                        <div class="items cart">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span>ADD TO CART</span>
-                        </div>
                     </div>
-                </div>
-
-                <div class="product-container">
-                    <img src="../Images/STI-ICT.jpg" alt="Product Name">
-                    <div class="product-overlay">
-                        <div class="items"></div>
-                        <div class="items head">
-                            <p>STI College Uniform</p>
-                            <hr>
-                        </div>
-                        <div class="items price">
-                            <p class="new">₱999</p>
-                        </div>
-                        <div class="items sizes">
-                            <span>Sizes:</span>
-                            <div class="size-options">
-                                <button class="size-btn">S</button>
-                                <button class="size-btn">M</button>
-                                <button class="size-btn">L</button>
-                                <button class="size-btn">XL</button>
-                                <button class="size-btn">2XL</button>
-                                <button class="size-btn">3XL</button>
-                                <button class="size-btn">4XL</button>
-                                <button class="size-btn">5XL</button>
-                                <button class="size-btn">6XL</button>
-                                <button class="size-btn">7XL</button>
-                            </div>
-                        </div>
-                        <div class="items cart">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span>ADD TO CART</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- Product Card 2-6 (repeated structure) -->
-                <!-- Add 5 more similar card structures -->
+                <?php endforeach; ?>
             </div>
         </main>
     </div>
@@ -360,6 +237,8 @@
             offset: 100,
             once: true
         });
+
+
     </script>
 </body>
 

@@ -13,7 +13,6 @@ $success = $stmt->execute();
 
 echo json_encode(['success' => $success]);
 
-// After successfully adding quantity
 $activity_description = "Added $quantityToAdd to item: $itemId";
 $log_activity_query = "INSERT INTO activities (action_type, description, timestamp) VALUES ('quantity_update', ?, NOW())";
 $stmt = $conn->prepare($log_activity_query);
