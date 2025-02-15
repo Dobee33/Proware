@@ -60,11 +60,9 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
                         <p class="empty-cart-message">Your cart is empty</p>
                     </div>
                     <div class="cart-footer">
-                        <div class="cart-total">
-                            <span>Total:</span>
-                            <span>₱0.00</span>
+                        <div class="cart-buttons">
+                            <a href="ProPreOrder.php" class="checkout-btn">Checkout</a>
                         </div>
-                        <a href="#" class="checkout-btn">Checkout</a>
                     </div>
                 </div>
             </div>
@@ -88,7 +86,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
 
             <?php if (isset($_SESSION['user_id'])): ?>
                 <div class="icon">
-                    <a href="#" class="fas fa-user"></a>
+                    <a href="profile.php" class="fas fa-user"></a>
                 </div>
                 <div class="icon">
                     <a href="login.php" class="fas fa-sign-out-alt" title="Sign Out" onclick="signOut(event)"></a>
@@ -128,25 +126,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         }
     }
 
-    // Enhanced mobile menu functionality
-    document.addEventListener('DOMContentLoaded', function () {
-        const hamburger = document.querySelector('.hamburger');
-        const navLinks = document.querySelector('.nav-links');
-
-        hamburger.addEventListener('click', function () {
-            this.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function (e) {
-            if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
-                navLinks.classList.remove('active');
-                hamburger.classList.remove('active');
-            }
-        });
-    });
-
     document.addEventListener('DOMContentLoaded', function () {
         const hamburger = document.querySelector('.hamburger');
         const navLinks = document.querySelector('.nav-links');
@@ -167,6 +146,33 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
             }, 5000); // Wait for 5 seconds
         }
     };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const cartIcon = document.querySelector('.cart-icon');
+        const cartPopup = document.querySelector('.cart-popup');
+
+        // Toggle cart popup when clicking the cart icon
+        cartIcon.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            cartPopup.classList.toggle('show');
+            cartIcon.classList.toggle('active'); // Toggle active state
+        });
+
+        // Close popup only when clicking outside (not on hover)
+        document.addEventListener('click', function(e) {
+            // Only close if click is outside cart icon and cart popup
+            if (!cartIcon.contains(e.target) && !cartPopup.contains(e.target)) {
+                cartPopup.classList.remove('show');
+                cartIcon.classList.remove('active'); // Remove active state
+            }
+        });
+
+        // Prevent clicks inside popup from closing it
+        cartPopup.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
 
 </script>
 
@@ -222,10 +228,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         transform: scale(1.1);
     }
 
-    .nav-links li:hover a {
-        color: rgb(0, 0, 0);
-    }
-
     .icons {
         display: flex;
         gap: 1rem;
@@ -239,7 +241,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         padding: 6px;
         border-radius: 50%;
         transition: all 0.3s ease;
-        background: rgba(255, 255, 255, 0.1);
     }
 
     .icon a {
@@ -256,14 +257,9 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
 
     /* Hover effects for icons */
     .icon:hover {
-        background: var(--primary-color);
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        transform: translateY(-7px);
     }
 
-    .icon:hover a {
-        color: white;
-    }
 
     /* Cart count badge */
     .cart-count {
@@ -291,7 +287,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     }
 
     .icon.active a {
-        color: white;
+        color: black;
     }
 
     /* Mobile responsive design */
@@ -446,18 +442,42 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         padding: 1rem;
         display: none;
-        /* Hidden by default */
         z-index: 1001;
         margin-top: 10px;
     }
 
-    .cart-popup.active {
+    .cart-popup.show {
         display: block;
-        animation: slideIn 0.3s ease;
     }
 
+    /* Remove any hover-related styles */
     .cart-icon:hover .cart-popup {
         display: none;
+    }
+
+    .checkout-btn {
+        display: block;
+        width: calc(100% - 2rem);
+        padding: 0.8rem;
+        background-color: var(--primary-color);
+        color: white;
+        text-align: center;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .checkout-btn:hover {
+        background-color: #000;
+    }
+
+    /* Add active state for cart icon */
+    .cart-icon.active {
+        background: var(--primary-color);
+    }
+
+    .cart-icon.active a {
+        color: black;
     }
 
     .cart-header {
@@ -511,23 +531,31 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     .cart-footer {
         padding-top: 1rem;
         border-top: 1px solid #eee;
-        margin-bottom: 0;
-        /* Remove extra bottom margin */
     }
 
-    .cart-total {
+    .cart-buttons {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-        font-weight: 500;
+        gap: 10px;
+    }
+
+    .view-cart-btn, .checkout-btn {
+        flex: 1;
+        padding: 0.8rem;
+        text-align: center;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .view-cart-btn {
+        background-color: #f8f9fa;
         color: var(--primary-color);
+        border: 1px solid var(--primary-color);
     }
 
     .checkout-btn {
         display: block;
-        width: calc(100% - 2rem);
-        /* Adjust width to account for padding */
+        width: calc(100% - 2rem); /* Adjust width to account for padding */
         padding: 0.8rem;
         background-color: var(--primary-color);
         color: white;
@@ -539,6 +567,10 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
 
     .checkout-btn:hover {
         background-color: #000;
+    }
+
+    .view-cart-btn:hover {
+        background-color: #e9ecef;
     }
 
     /* Responsive adjustments */
@@ -878,5 +910,22 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     .nav-links a.active {
         color: #092d45;
         text-decoration: none;
+    }
+
+    .view-cart-btn {
+        display: block;
+        width: 100%;
+        padding: 0.8rem;
+        background-color: var(--primary-color);
+        color: white;
+        text-align: center;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+        margin-top: 1rem;
+    }
+
+    .view-cart-btn:hover {
+        background-color: #005a94;
     }
 </style>
