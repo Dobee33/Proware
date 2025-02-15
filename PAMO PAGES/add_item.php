@@ -43,11 +43,31 @@ try {
     $sold_quantity = 0;
     $status = ($actual_quantity <= 0) ? 'Out of Stock' : (($actual_quantity <= 10) ? 'Low Stock' : 'In Stock');
 
+    if (isset($_FILES['newImage']) && $_FILES['newImage']['error'] === UPLOAD_ERR_OK) {
+        $imageTmpPath = $_FILES['newImage']['tmp_name'];
+        $imageName = $_FILES['newImage']['name'];
+        $imageSize = $_FILES['newImage']['size'];
+        $imageType = $_FILES['newImage']['type'];
+
+        $uploadDir = 'uploads/Itemlist/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $imagePath = $uploadDir . basename($imageName);
+
+        if (!move_uploaded_file($imageTmpPath, $imagePath)) {
+            throw new Exception('Error moving uploaded file');
+        }
+    } else {
+        throw new Exception('Error uploading image');
+    }
+
     $sql = "INSERT INTO inventory (
         item_code, category, item_name, sizes, price, 
         actual_quantity, new_delivery, beginning_quantity, 
-        damage, sold_quantity, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        damage, sold_quantity, status, image_path
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = mysqli_prepare($conn, $sql);
     if (!$stmt) {
@@ -67,7 +87,8 @@ try {
         $beginning_quantity,
         $damage,
         $sold_quantity,
-        $status
+        $status,
+        $imagePath
     );
 
     if (!mysqli_stmt_execute($stmt)) {

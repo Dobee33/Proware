@@ -206,7 +206,7 @@ session_start();
     <div id="addItemModal" class="modal">
         <div class="modal-content">
             <h2>Add New Item</h2>
-            <form id="addItemForm" onsubmit="submitNewItem(event)">
+            <form id="addItemForm" onsubmit="submitNewItem(event)" enctype="multipart/form-data">
                 <div class="input-group">
                     <label for="newItemCode">Item Code:</label>
                     <input type="text" id="newItemCode" name="newItemCode" required>
@@ -260,6 +260,11 @@ session_start();
                 <div class="input-group">
                     <label for="newItemDamage">Damage:</label>
                     <input type="number" id="newItemDamage" name="newItemDamage" min="0" value="0" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="newImage">Upload Image:</label>
+                    <input type="file" id="newImage" name="newImage" accept="image/*" required>
                 </div>
 
                 <div class="modal-buttons">

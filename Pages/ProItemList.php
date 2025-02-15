@@ -156,13 +156,13 @@
                 $sql = "SELECT * FROM inventory ORDER BY created_at DESC";
                 $result = mysqli_query($conn, $sql);
 
-                $products = []; // Array to hold products grouped by item name and code
-                
+                $products = [];
+
                 while ($row = mysqli_fetch_assoc($result)) {
                     $itemCode = $row['item_code'];
                     $itemName = $row['item_name'];
                     $itemImage = $row['image_path'];
-                    $itemPrice = number_format($row['price'], 2);
+                    $itemPrice = $row['price'];
                     $itemCategory = $row['category'];
                     $sizes = explode(',', $row['sizes']); // Assuming sizes are stored in a comma-separated format
                 
@@ -171,33 +171,34 @@
                         $products[$itemCode] = [
                             'name' => $itemName,
                             'image' => $itemImage,
-                            'price' => $itemPrice,
+                            'prices' => [$itemPrice], // Initialize prices as an array
                             'category' => $itemCategory,
                             'sizes' => $sizes
                         ];
                     } else {
-                        // Merge sizes if the item already exists
                         $products[$itemCode]['sizes'] = array_unique(array_merge($products[$itemCode]['sizes'], $sizes));
+                        $products[$itemCode]['prices'][] = $itemPrice; // Add the price to the existing array
                     }
                 }
 
                 // Display products
                 foreach ($products as $product):
                     $availableSizes = $product['sizes'];
+                    $prices = $product['prices']; // This should be defined
                     ?>
-                    <div class="product-container">
+                    <div class="product-container" data-sizes="<?php echo implode(',', $availableSizes); ?>"
+                        data-prices="<?php echo implode(',', $prices); ?>">
                         <img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>">
                         <div class="product-overlay">
                             <div class="items"></div>
                             <div class="items head">
                                 <p><?php echo $product['name']; ?></p>
                                 <p class="category"><?php echo htmlspecialchars($product['category']); ?></p>
-                                <p class="stock" style="display: none;">Stocks: <span
-                                        class="stock-count"><?php echo $row['stock']; ?></span></p>
                                 <hr>
                             </div>
                             <div class="items price">
-                                <p class="new">₱<?php echo $product['price']; ?></p>
+                                <p class="price-range">Price: ₱<?php echo number_format(min($prices), 2); ?> -
+                                    ₱<?php echo number_format(max($prices), 2); ?></p> <!-- Display price range -->
                             </div>
                             <div class="items sizes">
                                 <span>Sizes:</span>

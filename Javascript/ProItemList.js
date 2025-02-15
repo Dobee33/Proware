@@ -285,7 +285,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-   
+    document.querySelectorAll('.size-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const selectedSize = this.textContent;
+            const card = this.closest('.product-container');
+            const prices = card.dataset.prices.split(','); // Assuming prices are stored in a data attribute
+            const sizes = card.dataset.sizes.split(','); // Assuming sizes are stored in a data attribute
+
+            const index = sizes.indexOf(selectedSize);
+            if (index !== -1) {
+                const price = prices[index];
+                card.querySelector('.price-range').textContent = `Price: ₱${parseFloat(price).toFixed(2)}`; // Update displayed price
+            } else {
+                // If the size is not found, you can handle it here (optional)
+                card.querySelector('.price-range').textContent = 'Price not available'; // Fallback message
+            }
+        });
+    });
 
     applyFilters();
 });

@@ -712,3 +712,56 @@ function updatePriceDisplay(itemId, newPrice) {
         priceCell.textContent = `₱${parseFloat(newPrice).toFixed(2)}`; // Format the price
     }
 }
+
+function submitNewItem(event) {
+    event.preventDefault();
+
+    const quantity = parseInt(document.getElementById('newItemQuantity').value);
+    const damage = parseInt(document.getElementById('newItemDamage').value) || 0;
+    const newImage = document.getElementById('newImage').files[0]; // Get the image file
+
+    const formData = new FormData();
+    formData.append('item_code', document.getElementById('newItemCode').value.trim());
+    formData.append('category', document.getElementById('newCategory').value.trim());
+    formData.append('item_name', document.getElementById('newItemName').value.trim());
+    formData.append('sizes', document.getElementById('newSize').value.trim());
+    formData.append('price', parseFloat(document.getElementById('newItemPrice').value));
+    formData.append('quantity', quantity);
+    formData.append('actual_quantity', quantity - damage);
+    formData.append('beginning_quantity', quantity);
+    formData.append('new_delivery', 0);
+    formData.append('damage', damage);
+    formData.append('status', 'In Stock');
+    formData.append('newImage', newImage); // Append the image file
+
+    console.log('Sending data:', formData);
+
+    fetch('add_item.php', {
+        method: 'POST',
+        body: formData // Send FormData directly
+    })
+    .then(async response => {
+        const text = await response.text();
+        console.log('Raw server response:', text);
+
+        try {
+            const data = JSON.parse(text);
+            if (data.success) {
+                alert('Item added successfully!');
+                location.reload();
+            } else {
+                throw new Error(data.message || 'Unknown error');
+            }
+        } catch (e) {
+            console.error('Parse error:', e);
+            console.error('Response text:', text);
+            throw new Error('Server response was not valid JSON: ' + text);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error: ' + error.message);
+    });
+
+    document.getElementById('addItemForm').reset();
+}
