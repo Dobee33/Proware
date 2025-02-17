@@ -164,27 +164,26 @@
                     $itemImage = $row['image_path'];
                     $itemPrice = $row['price'];
                     $itemCategory = $row['category'];
-                    $sizes = explode(',', $row['sizes']); // Assuming sizes are stored in a comma-separated format
-                
-                    // Group products by item code
-                    if (!isset($products[$itemCode])) {
-                        $products[$itemCode] = [
+                    $sizes = explode(',', $row['sizes']);
+                    $baseItemCode = strtok($itemCode, '-');
+
+                    if (!isset($products[$baseItemCode])) {
+                        $products[$baseItemCode] = [
                             'name' => $itemName,
                             'image' => $itemImage,
-                            'prices' => [$itemPrice], // Initialize prices as an array
+                            'prices' => [$itemPrice],
                             'category' => $itemCategory,
                             'sizes' => $sizes
                         ];
                     } else {
-                        $products[$itemCode]['sizes'] = array_unique(array_merge($products[$itemCode]['sizes'], $sizes));
-                        $products[$itemCode]['prices'][] = $itemPrice; // Add the price to the existing array
+                        $products[$baseItemCode]['sizes'] = array_unique(array_merge($products[$baseItemCode]['sizes'], $sizes));
+                        $products[$baseItemCode]['prices'][] = $itemPrice;
                     }
                 }
 
-                // Display products
                 foreach ($products as $product):
                     $availableSizes = $product['sizes'];
-                    $prices = $product['prices']; // This should be defined
+                    $prices = $product['prices'];
                     ?>
                     <div class="product-container" data-sizes="<?php echo implode(',', $availableSizes); ?>"
                         data-prices="<?php echo implode(',', $prices); ?>">
@@ -198,17 +197,16 @@
                             </div>
                             <div class="items price">
                                 <p class="price-range">Price: ₱<?php echo number_format(min($prices), 2); ?> -
-                                    ₱<?php echo number_format(max($prices), 2); ?></p> <!-- Display price range -->
+                                    ₱<?php echo number_format(max($prices), 2); ?></p>
                             </div>
                             <div class="items sizes">
                                 <span>Sizes:</span>
                                 <div class="size-options">
                                     <?php
-                                    // Define all possible sizes
+
                                     $allSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL'];
 
                                     foreach ($allSizes as $size):
-                                        // Check if the size is available
                                         $isAvailable = in_array($size, $availableSizes);
                                         ?>
                                         <button class="size-btn" style="opacity: <?php echo $isAvailable ? '1' : '0.5'; ?>;">

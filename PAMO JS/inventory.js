@@ -254,9 +254,7 @@ function updateStockStatus(row) {
         statusClass = 'status-in-stock';
     }
 
-    // Remove any existing status classes
     statusCell.classList.remove('status-in-stock', 'status-low-stock', 'status-out-of-stock');
-    // Add new status class
     statusCell.classList.add(statusClass);
     statusCell.textContent = status;
 }
@@ -269,13 +267,9 @@ function applyFilters() {
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
 
-    // Get all table rows
     const rows = document.querySelectorAll('.inventory-table tbody tr');
-    
-    // Get the size column header
     const sizeHeader = document.querySelector('.inventory-table thead th:nth-child(8)');
-    
-    // Show/hide size column based on category
+
     if (categoryFilter === 'STI-Accessories') {
         if (sizeHeader) sizeHeader.style.display = 'none';
         rows.forEach(row => {
@@ -290,7 +284,6 @@ function applyFilters() {
         });
     }
 
-    // Apply filters
     rows.forEach(row => {
         const itemName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
         const category = row.querySelector('td:nth-child(3)').textContent;
@@ -323,7 +316,6 @@ function isWithinDateRange(dateStr, startDate, endDate) {
     if (startDate && endDate) {
         const start = new Date(startDate);
         const end = new Date(endDate);
-        // Set end date to end of day
         end.setHours(23, 59, 59, 999);
         return recordDate >= start && recordDate <= end;
     } else if (startDate) {
@@ -338,32 +330,20 @@ function isWithinDateRange(dateStr, startDate, endDate) {
     return true;
 }
 
-// Update the DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', function() {
-    // Get the date input elements
     const startDateInput = document.getElementById('startDate');
     const endDateInput = document.getElementById('endDate');
 
-    // Initially disable end date input
     endDateInput.disabled = true;
-
-    // Add event listener to start date
     startDateInput.addEventListener('change', function() {
-        // Enable end date input when start date is selected
         endDateInput.disabled = false;
-        
-        // Set the minimum date for the end date input
         endDateInput.min = this.value;
-        
-        // If end date is earlier than start date, clear it
         if (endDateInput.value && endDateInput.value < this.value) {
             endDateInput.value = '';
         }
-        
         applyFilters();
     });
 
-    // Add event listener to end date
     endDateInput.addEventListener('change', function() {
         if (this.value && this.value < startDateInput.value) {
             alert('End date cannot be earlier than start date');
@@ -453,6 +433,7 @@ function clearAllFilters() {
 function populateFilters() {
     const sizeFilter = document.getElementById('sizeFilter');
     const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL'];
+    const categories = ['Tertiary-Uniform', 'SHS-Uniform', 'STI-Shirts', 'STI-Accessories', 'SHS-PE', 'Tertiary-PE'];
     
     // Get all unique sizes from the table
     const tableRows = document.querySelectorAll('.inventory-table tbody tr');

@@ -53,6 +53,8 @@ session_start();
                         <option value="SHS-Uniform">SHS-Uniform</option>
                         <option value="STI-Shirts">STI-Shirts</option>
                         <option value="STI-Accessories">STI-Accessories</option>
+                        <option value="SHS-PE">SHS-PE</option>
+                        <option value="Tertiary-PE">Tertiary-PE</option>
                     </select>
                     <select id="sizeFilter" onchange="applyFilters()">
                         <option value="">All Sizes</option>
@@ -220,6 +222,8 @@ session_start();
                         <option value="SHS-Uniform">SHS-Uniform</option>
                         <option value="STI-Shirts">STI-Shirts</option>
                         <option value="STI-Accessories">STI-Accessories</option>
+                        <option value="SHS-PE">SHS-PE</option>
+                        <option value="Tertiary-PE">Tertiary-PE</option>
                     </select>
                 </div>
 
