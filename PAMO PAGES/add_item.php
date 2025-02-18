@@ -6,36 +6,13 @@ try {
         throw new Exception('Connection failed: ' . mysqli_connect_error());
     }
 
-    $rawData = file_get_contents('php://input');
-    error_log("Raw data received: " . $rawData);
-
-    $data = json_decode($rawData, true);
-    error_log("Decoded data: " . print_r($data, true));
-
-    if (!$data || !is_array($data)) {
-        throw new Exception('Invalid JSON data received');
-    }
-
-    $required_fields = ['item_code', 'category', 'item_name', 'sizes', 'price', 'quantity'];
-    $missing_fields = [];
-
-    foreach ($required_fields as $field) {
-        if (!isset($data[$field]) || $data[$field] === '') {
-            $missing_fields[] = $field;
-        }
-    }
-
-    if (!empty($missing_fields)) {
-        throw new Exception('Missing required fields: ' . implode(', ', $missing_fields));
-    }
-
-    $item_code = mysqli_real_escape_string($conn, $data['item_code']);
-    $category = mysqli_real_escape_string($conn, $data['category']);
-    $item_name = mysqli_real_escape_string($conn, $data['item_name']);
-    $sizes = mysqli_real_escape_string($conn, $data['sizes']);
-    $price = floatval($data['price']);
-    $quantity = intval($data['quantity']);
-    $damage = intval($data['damage']);
+    $item_code = mysqli_real_escape_string($conn, $_POST['newItemCode']);
+    $category = mysqli_real_escape_string($conn, $_POST['newCategory']);
+    $item_name = mysqli_real_escape_string($conn, $_POST['newItemName']);
+    $sizes = mysqli_real_escape_string($conn, $_POST['newSize']);
+    $price = floatval($_POST['newItemPrice']);
+    $quantity = intval($_POST['newItemQuantity']);
+    $damage = intval($_POST['newItemDamage']);
 
     $actual_quantity = $quantity - $damage;
     $new_delivery = $quantity;
@@ -49,12 +26,17 @@ try {
         $imageSize = $_FILES['newImage']['size'];
         $imageType = $_FILES['newImage']['type'];
 
-        $uploadDir = 'uploads/Itemlist/';
+        $uploadDir = '../uploads/itemlist/';
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
 
-        $imagePath = $uploadDir . basename($imageName);
+        // Get file extension
+        $imageExtension = pathinfo($imageName, PATHINFO_EXTENSION);
+
+        // Generate unique filename
+        $uniqueName = uniqid('img_', true) . '.' . $imageExtension;
+        $imagePath = $uploadDir . $uniqueName;
 
         if (!move_uploaded_file($imageTmpPath, $imagePath)) {
             throw new Exception('Error moving uploaded file');
@@ -62,6 +44,7 @@ try {
     } else {
         throw new Exception('Error uploading image');
     }
+
 
     $sql = "INSERT INTO inventory (
         item_code, category, item_name, sizes, price, 
@@ -76,7 +59,7 @@ try {
 
     mysqli_stmt_bind_param(
         $stmt,
-        "ssssdiiiiis",
+        "ssssdiiiiiss",
         $item_code,
         $category,
         $item_name,
@@ -88,7 +71,7 @@ try {
         $damage,
         $sold_quantity,
         $status,
-        $imagePath
+        $uniqueName
     );
 
     if (!mysqli_stmt_execute($stmt)) {

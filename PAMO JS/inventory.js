@@ -152,7 +152,7 @@ function submitNewItem(event) {
     const quantity = parseInt(document.getElementById('newItemQuantity').value);
     const damage = parseInt(document.getElementById('newItemDamage').value) || 0;
 
-    const formData = {
+    /* const formData = {
         item_code: document.getElementById('newItemCode').value.trim(),
         category: document.getElementById('newCategory').value.trim(),
         item_name: document.getElementById('newItemName').value.trim(),
@@ -165,28 +165,35 @@ function submitNewItem(event) {
         damage: damage,
         status: 'In Stock'
     };
+    */
+    const form = document.getElementById('addItemForm');
+const formData = new FormData(form);
 
-    console.log('Sending data:', formData);
+for (const pair of formData.entries()) {
+    console.log(pair[0] + ': ' + pair[1]);
+}
 
-    if (!formData.item_code || !formData.category || !formData.item_name ||
-        !formData.sizes || isNaN(formData.price) || isNaN(formData.quantity)) {
-        alert('Please fill in all required fields with valid values');
-        return;
-    }
+console.log('Sending data:', formData.get('newItemCode'));
 
-    fetch('add_item.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-    })
-        .then(async response => {
-            const text = await response.text();
-            console.log('Raw server response:', text);
+// Validate inputs
+if (!formData.get('newItemCode') || !formData.get('newCategory') || !formData.get('newItemName') ||
+    !formData.get('newSize') || isNaN(formData.get('newItemPrice')) || isNaN(formData.get('newItemQuantity'))) {
+    alert('Please fill in all required fields with valid values');
+    return;
+}
 
+// Create XMLHttpRequest
+const xhr = new XMLHttpRequest();
+xhr.open('POST', 'add_item.php', true);
+xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // Optional: Helps detect AJAX requests in PHP
+
+xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+        console.log('Raw server response:', xhr.responseText);
+
+        if (xhr.status === 200) {
             try {
-                const data = JSON.parse(text);
+                const data = JSON.parse(xhr.responseText);
                 if (data.success) {
                     alert('Item added successfully!');
                     location.reload();
@@ -195,14 +202,18 @@ function submitNewItem(event) {
                 }
             } catch (e) {
                 console.error('Parse error:', e);
-                console.error('Response text:', text);
-                throw new Error('Server response was not valid JSON: ' + text);
+                console.error('Response text:', xhr.responseText);
+                alert('Server response was not valid JSON: ' + xhr.responseText);
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error: ' + error.message);
-        });
+        } else {
+            alert('Error: ' + xhr.statusText);
+        }
+    }
+};
+
+// Send FormData
+xhr.send(formData);
+
 
     document.getElementById('addItemForm').reset();
 }
@@ -692,57 +703,4 @@ function updatePriceDisplay(itemId, newPrice) {
         const priceCell = row.cells[8]; // Assuming the price is in the 9th cell
         priceCell.textContent = `₱${parseFloat(newPrice).toFixed(2)}`; // Format the price
     }
-}
-
-function submitNewItem(event) {
-    event.preventDefault();
-
-    const quantity = parseInt(document.getElementById('newItemQuantity').value);
-    const damage = parseInt(document.getElementById('newItemDamage').value) || 0;
-    const newImage = document.getElementById('newImage').files[0]; // Get the image file
-
-    const formData = new FormData();
-    formData.append('item_code', document.getElementById('newItemCode').value.trim());
-    formData.append('category', document.getElementById('newCategory').value.trim());
-    formData.append('item_name', document.getElementById('newItemName').value.trim());
-    formData.append('sizes', document.getElementById('newSize').value.trim());
-    formData.append('price', parseFloat(document.getElementById('newItemPrice').value));
-    formData.append('quantity', quantity);
-    formData.append('actual_quantity', quantity - damage);
-    formData.append('beginning_quantity', quantity);
-    formData.append('new_delivery', 0);
-    formData.append('damage', damage);
-    formData.append('status', 'In Stock');
-    formData.append('newImage', newImage); // Append the image file
-
-    console.log('Sending data:', formData);
-
-    fetch('add_item.php', {
-        method: 'POST',
-        body: formData // Send FormData directly
-    })
-    .then(async response => {
-        const text = await response.text();
-        console.log('Raw server response:', text);
-
-        try {
-            const data = JSON.parse(text);
-            if (data.success) {
-                alert('Item added successfully!');
-                location.reload();
-            } else {
-                throw new Error(data.message || 'Unknown error');
-            }
-        } catch (e) {
-            console.error('Parse error:', e);
-            console.error('Response text:', text);
-            throw new Error('Server response was not valid JSON: ' + text);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error: ' + error.message);
-    });
-
-    document.getElementById('addItemForm').reset();
 }
