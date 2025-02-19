@@ -151,21 +151,6 @@ function submitNewItem(event) {
 
     const quantity = parseInt(document.getElementById('newItemQuantity').value);
     const damage = parseInt(document.getElementById('newItemDamage').value) || 0;
-
-    /* const formData = {
-        item_code: document.getElementById('newItemCode').value.trim(),
-        category: document.getElementById('newCategory').value.trim(),
-        item_name: document.getElementById('newItemName').value.trim(),
-        sizes: document.getElementById('newSize').value.trim(),
-        price: parseFloat(document.getElementById('newItemPrice').value),
-        quantity: quantity,
-        actual_quantity: quantity - damage,
-        beginning_quantity: quantity,
-        new_delivery: 0,
-        damage: damage,
-        status: 'In Stock'
-    };
-    */
     const form = document.getElementById('addItemForm');
 const formData = new FormData(form);
 
@@ -175,17 +160,15 @@ for (const pair of formData.entries()) {
 
 console.log('Sending data:', formData.get('newItemCode'));
 
-// Validate inputs
 if (!formData.get('newItemCode') || !formData.get('newCategory') || !formData.get('newItemName') ||
     !formData.get('newSize') || isNaN(formData.get('newItemPrice')) || isNaN(formData.get('newItemQuantity'))) {
     alert('Please fill in all required fields with valid values');
     return;
 }
 
-// Create XMLHttpRequest
 const xhr = new XMLHttpRequest();
 xhr.open('POST', 'add_item.php', true);
-xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // Optional: Helps detect AJAX requests in PHP
+xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
 xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
@@ -211,9 +194,7 @@ xhr.onreadystatechange = function () {
     }
 };
 
-// Send FormData
 xhr.send(formData);
-
 
     document.getElementById('addItemForm').reset();
 }
@@ -363,52 +344,37 @@ document.addEventListener('DOMContentLoaded', function() {
         applyFilters();
     });
 
-    // Check if we should apply low stock filter
     if (sessionStorage.getItem('applyLowStockFilter')) {
-        // Clear the flag
         sessionStorage.removeItem('applyLowStockFilter');
-        
-        // Set the status filter to "Low Stock"
+
         const statusFilter = document.getElementById('statusFilter');
         if (statusFilter) {
             statusFilter.value = 'Low Stock';
-            // Force trigger the change event
+
             const event = new Event('change');
             statusFilter.dispatchEvent(event);
             applyFilters();
         }
     }
 
-    // Initialize size column visibility
     initializeSizeColumnVisibility();
 
-    // Add event listener for the Edit button
     document.getElementById('editBtn').addEventListener('click', handleEdit);
 });
 
-// Update the clear filters function to ensure size column is shown when filters are cleared
 function clearAllFilters() {
-    // Clear date inputs
     const startDateInput = document.getElementById('startDate');
     const endDateInput = document.getElementById('endDate');
-    
-    // Reset start date
     startDateInput.value = '';
-    
-    // Reset and disable end date
     endDateInput.value = '';
     endDateInput.disabled = true;
-    endDateInput.min = ''; // Clear the min date constraint
-    
-    // Clear dropdown filters
+    endDateInput.min = ''; 
+
     document.getElementById('categoryFilter').value = '';
     document.getElementById('sizeFilter').value = '';
     document.getElementById('statusFilter').value = '';
-    
-    // Clear search input
     document.getElementById('searchInput').value = '';
-    
-    // Show size column when clearing filters
+
     const sizeHeader = document.querySelector('.inventory-table thead th:nth-child(8)');
     if (sizeHeader) sizeHeader.style.display = '';
     
@@ -417,11 +383,9 @@ function clearAllFilters() {
         const sizeCell = row.querySelector('td:nth-child(8)');
         if (sizeCell) sizeCell.style.display = '';
     });
-    
-    // Apply the cleared filters
+
     applyFilters();
-    
-    // Re-initialize date event listeners
+
     startDateInput.addEventListener('change', function() {
         endDateInput.disabled = false;
         endDateInput.min = this.value;
@@ -440,7 +404,6 @@ function clearAllFilters() {
     });
 }
 
-// Populate size filter dropdown dynamically
 function populateFilters() {
     const sizeFilter = document.getElementById('sizeFilter');
     const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL'];

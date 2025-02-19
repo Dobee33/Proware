@@ -44,105 +44,30 @@
 
             <div class="filter-group">
                 <h3>Categories</h3>
-                <label class="checkbox-container">
-                    <input type="checkbox" data-category="uniform" class="main-category"> Uniform
-                    <span class="checkmark"></span>
-                </label>
-                <div id="uniform-courses" class="subcategory-group hidden">
-                    <label class="checkbox-container">
-                        <input type="checkbox" data-department="shs"> SHS
-                        <span class="checkmark"></span>
-                    </label>
-                    <label class="checkbox-container">
-                        <input type="checkbox" data-department="bsit"> BSIT
-                        <span class="checkmark"></span>
-                    </label>
-                    <label class="checkbox-container">
-                        <input type="checkbox" data-department="bscs"> BSCS
-                        <span class="checkmark"></span>
-                    </label>
-                    <label class="checkbox-container">
-                        <input type="checkbox" data-department="bscpe"> BSCPE
-                        <span class="checkmark"></span>
-                    </label>
-                    <label class="checkbox-container">
-                        <input type="checkbox" data-department="bstm"> BSTM
-                        <span class="checkmark"></span>
-                    </label>
-                    <label class="checkbox-container">
-                        <input type="checkbox" data-department="bscm"> BSCM
-                        <span class="checkmark"></span>
-                    </label>
-                    <label class="checkbox-container">
-                        <input type="checkbox" data-department="bmma"> BMMA
-                        <span class="checkmark"></span>
-                    </label>
-                    <label class="checkbox-container">
-                        <input type="checkbox" data-department="bsba"> BSBA
-                        <span class="checkmark"></span>
-                    </label>
-                </div>
+                <!--     <label class="checkbox-container"> -->
+                <!--         <input type="checkbox" data-category="uniform" class="main-category"> Uniform -->
+                <!--         <span class="checkmark"></span> -->
+                <!--     </label> -->
+                <!--     <div id="uniform-courses" class="subcategory-group hidden"> -->
+                <!--         <label class="checkbox-container"> -->
+                <!--             <input type="checkbox" data-department="shs"> SHS -->
+                <!--             <span class="checkmark"></span> -->
+                <!--         </label> -->
+                <!--         ... other subcategories ... -->
+                <!--     </div> -->
+                <!--     ... other main categories ... -->
+                <!-- </div> -->
 
-                <label class="checkbox-container">
-                    <input type="checkbox" data-category="sti-shirt" class="main-category"> STI Shirt
-                    <span class="checkmark"></span>
-                </label>
-                <div id="sti-shirt-options" class="subcategory-group hidden">
-                    <label class="checkbox-container">
-                        <input type="checkbox" data-shirt="40th"> 40th STI Anniversary Shirt
-                        <span class="checkmark"></span>
-                    </label>
-                    <label class="checkbox-container">
-                        <input type="checkbox" data-shirt="41st"> 41st STI Anniversary Shirt
-                        <span class="checkmark"></span>
-                    </label>
-                </div>
-
-                <label class="checkbox-container">
-                    <input type="checkbox" data-category="accessories" class="main-category"> STI Accessories
-                    <span class="checkmark"></span>
-                </label>
-                <div id="accessories-options" class="subcategory-group hidden">
-                    <label class="checkbox-container">
-                        <input type="checkbox" data-accessory="pin"> STI Eminel Pin
-                        <span class="checkmark"></span>
-                    </label>
-                    <label class="checkbox-container">
-                        <input type="checkbox" data-accessory="lanyard"> STI ID Lanyard
-                        <span class="checkmark"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="filter-group size-filter hidden">
-                <h3>Sizes</h3>
-                <div class="size-options">
-                    <label class="size-btn">
-                        <input type="radio" name="size" value="S">
-                        <span>S</span>
-                    </label>
-                    <label class="size-btn">
-                        <input type="radio" name="size" value="M">
-                        <span>M</span>
-                    </label>
-                    <label class="size-btn">
-                        <input type="radio" name="size" value="L">
-                        <span>L</span>
-                    </label>
-                    <label class="size-btn">
-                        <input type="radio" name="size" value="XL">
-                        <span>XL</span>
-                    </label>
-                    <label class="size-btn">
-                        <input type="radio" name="size" value="XXL">
-                        <span>XXL</span>
-                    </label>
-                    <label class="size-btn">
-                        <input type="radio" name="size" value="XXXL">
-                        <span>XXXL</span>
-                    </label>
-                </div>
-            </div>
+                <!-- <div class="filter-group size-filter hidden"> -->
+                <!--     <h3>Sizes</h3> -->
+                <!--     <div class="size-options"> -->
+                <!--         <label class="size-btn"> -->
+                <!--             <input type="radio" name="size" value="S"> -->
+                <!--             <span>S</span> -->
+                <!--         </label> -->
+                <!--         ... other sizes ... -->
+                <!--     </div> -->
+                <!-- </div> -->
         </aside>
 
         <main class="content">
@@ -161,7 +86,7 @@
                 while ($row = mysqli_fetch_assoc($result)) {
                     $itemCode = $row['item_code'];
                     $itemName = $row['item_name'];
-                    $itemImage = $row['image_path'];
+                    $itemImage = '../uploads/itemlist/' . $row['image_path'];
                     $itemPrice = $row['price'];
                     $itemCategory = $row['category'];
                     $sizes = explode(',', $row['sizes']);
