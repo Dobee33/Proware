@@ -106,7 +106,7 @@ session_start();
                                 <th>Price</th>
                                 <th>Sold Quantity</th>
                                 <th>Status</th>
-                                <th>Date Created</th>
+                                <th>Date Delivered</th>
                             </tr>
                         </thead>
                         <tbody>

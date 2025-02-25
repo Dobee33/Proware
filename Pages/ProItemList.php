@@ -68,6 +68,7 @@
                 <!--         ... other sizes ... -->
                 <!--     </div> -->
                 <!-- </div> -->
+            </div>
         </aside>
 
         <main class="content">
@@ -98,11 +99,13 @@
                             'image' => $itemImage,
                             'prices' => [$itemPrice],
                             'category' => $itemCategory,
-                            'sizes' => $sizes
+                            'sizes' => $sizes,
+                            'stock' => $row['actual_quantity']
                         ];
                     } else {
                         $products[$baseItemCode]['sizes'] = array_unique(array_merge($products[$baseItemCode]['sizes'], $sizes));
                         $products[$baseItemCode]['prices'][] = $itemPrice;
+                        $products[$baseItemCode]['stock'] += $row['actual_quantity'];
                     }
                 }
 
@@ -111,7 +114,7 @@
                     $prices = $product['prices'];
                     ?>
                     <div class="product-container" data-sizes="<?php echo implode(',', $availableSizes); ?>"
-                        data-prices="<?php echo implode(',', $prices); ?>">
+                        data-prices="<?php echo implode(',', $prices); ?>" data-stock="<?php echo $product['stock']; ?>">
                         <img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>">
                         <div class="product-overlay">
                             <div class="items"></div>
@@ -128,9 +131,7 @@
                                 <span>Sizes:</span>
                                 <div class="size-options">
                                     <?php
-
                                     $allSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL'];
-
                                     foreach ($allSizes as $size):
                                         $isAvailable = in_array($size, $availableSizes);
                                         ?>
@@ -139,6 +140,10 @@
                                         </button>
                                     <?php endforeach; ?>
                                 </div>
+
+                            </div>
+                            <div class="items stock">
+                                <p>Stock: <?php echo $product['stock']; ?></p>
                             </div>
                             <div class="items cart" onclick="toggleStockDisplay(this)">
                                 <i class="fa fa-shopping-cart"></i>

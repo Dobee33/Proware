@@ -137,16 +137,16 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             const selectedSize = this.textContent;
             const card = this.closest('.product-container');
-            const prices = card.dataset.prices.split(','); // Assuming prices are stored in a data attribute
-            const sizes = card.dataset.sizes.split(','); // Assuming sizes are stored in a data attribute
+            const prices = card.dataset.prices.split(',');
+            const sizes = card.dataset.sizes.split(',');
 
             const index = sizes.indexOf(selectedSize);
             if (index !== -1) {
                 const price = prices[index];
-                card.querySelector('.price-range').textContent = `Price: ₱${parseFloat(price).toFixed(2)}`; // Update displayed price
+                card.querySelector('.price-range').textContent = `Price: ₱${parseFloat(price).toFixed(2)}`;
+                card.querySelector('.selected-size').textContent = `Selected Size: ${selectedSize}`;
             } else {
-                // If the size is not found, you can handle it here (optional)
-                card.querySelector('.price-range').textContent = 'Price not available'; // Fallback message
+                card.querySelector('.price-range').textContent = 'Price not available';
             }
         });
     });
