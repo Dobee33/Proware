@@ -22,70 +22,150 @@ session_start();
             <header>
                 <div class="search-bar">
                     <i class="material-icons">search</i>
-                    <input type="text" placeholder="Search reports...">
+                    <input type="text" id="searchInput" placeholder="Search reports...">
                 </div>
                 <div class="header-actions">
-                    <button class="generate-report-btn">
-                        <i class="material-icons">description</i>
+                    <div class="date-filters">
+                        <input type="date" id="startDate" placeholder="Start Date">
+                        <input type="date" id="endDate" placeholder="End Date">
+                        <button onclick="clearDates()" class="clear-date-btn">
+                            <i class="material-icons">clear</i>
+                            Clear
+                        </button>
+                    </div>
+                    <button onclick="generateReport()" class="generate-report-btn">
+                        <i class="material-icons">assessment</i>
                         Generate Report
                     </button>
-                    <i class="material-icons">notifications</i>
-                    <i class="material-icons">account_circle</i>
+                    <button onclick="exportToExcel()" class="export-btn">
+                        <i class="material-icons">table_view</i>
+                        Export to Excel
+                    </button>
                 </div>
             </header>
 
             <div class="reports-content">
                 <div class="report-filters">
                     <h3>Report Filters</h3>
-                    <select>
-                        <option value="">Report Type</option>
+                    <select id="reportType" onchange="changeReportType()">
                         <option value="inventory">Inventory Report</option>
                         <option value="sales">Sales Report</option>
-                        <option value="orders">Orders Report</option>
-                    </select>
-                    <select>
-                        <option value="">Time Period</option>
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="yearly">Yearly</option>
+                        <option value="audit">Audit Trail</option>
                     </select>
                 </div>
 
-                <div class="reports-grid">
-                    <div class="report-card">
-                        <h3>Inventory Summary</h3>
-                        <div class="report-stats">
+                <!-- Inventory Report Table -->
+                <div id="inventoryReport" class="report-table">
+                    <h3>Inventory Report</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th>Beginning Quantity</th>
+                                <th>New Delivery</th>
+                                <th>Actual Quantity</th>
+                                <th>Damage</th>
+                                <th>Sold Quantity</th>
+                                <th>Status</th>
+                                <th>Date Delivered</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             <?php
-                            // Add PHP logic for inventory statistics
+                            $conn = mysqli_connect("localhost", "root", "", "proware");
+                            $sql = "SELECT * FROM inventory ORDER BY created_at DESC";
+                            $result = mysqli_query($conn, $sql);
+
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo "<tr>";
+                                echo "<td>{$row['item_code']}</td>";
+                                echo "<td>{$row['item_name']}</td>";
+                                echo "<td>{$row['category']}</td>";
+                                echo "<td>{$row['beginning_quantity']}</td>";
+                                echo "<td>{$row['new_delivery']}</td>";
+                                echo "<td>{$row['actual_quantity']}</td>";
+                                echo "<td>{$row['damage']}</td>";
+                                echo "<td>{$row['sold_quantity']}</td>";
+                                echo "<td>{$row['status']}</td>";
+                                echo "<td>{$row['created_at']}</td>";
+                                echo "</tr>";
+                            }
                             ?>
-                        </div>
-                    </div>
+                        </tbody>
+                    </table>
+                </div>
 
-                    <div class="report-card">
-                        <h3>Sales Analytics</h3>
-                        <div class="report-chart">
-                            <!-- Add chart/graph here -->
-                        </div>
-                    </div>
-
-                    <div class="report-card">
-                        <h3>Recent Reports</h3>
-                        <div class="recent-reports-list">
+                <!-- Sales Report Table -->
+                <div id="salesReport" class="report-table" style="display: none;">
+                    <h3>Sales Report</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th>Quantity Sold</th>
+                                <th>Price</th>
+                                <th>Total Amount</th>
+                                <th>Date Sold</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             <?php
-                            // Add PHP logic to display recent reports
-                            ?>
-                        </div>
-                    </div>
+                            $sql = "SELECT i.item_code, i.item_name, i.category, i.sold_quantity, i.price, 
+                                   (i.sold_quantity * i.price) as total_amount, i.created_at 
+                                   FROM inventory i 
+                                   WHERE i.sold_quantity > 0 
+                                   ORDER BY i.created_at DESC";
+                            $result = mysqli_query($conn, $sql);
 
-                    <div class="report-card">
-                        <h3>Performance Metrics</h3>
-                        <div class="metrics-container">
-                            <?php
-                            // Add PHP logic for performance metrics
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo "<tr>";
+                                echo "<td>{$row['item_code']}</td>";
+                                echo "<td>{$row['item_name']}</td>";
+                                echo "<td>{$row['category']}</td>";
+                                echo "<td>{$row['sold_quantity']}</td>";
+                                echo "<td>₱" . number_format($row['price'], 2) . "</td>";
+                                echo "<td>₱" . number_format($row['total_amount'], 2) . "</td>";
+                                echo "<td>{$row['created_at']}</td>";
+                                echo "</tr>";
+                            }
                             ?>
-                        </div>
-                    </div>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Audit Trail Table -->
+                <div id="auditReport" class="report-table" style="display: none;">
+                    <h3>Audit Trail</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date/Time</th>
+                                <th>Action Type</th>
+                                <th>Item Code</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $sql = "SELECT * FROM activities ORDER BY timestamp DESC";
+                            $result = mysqli_query($conn, $sql);
+
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo "<tr>";
+                                echo "<td>{$row['timestamp']}</td>";
+                                echo "<td>{$row['action_type']}</td>";
+                                echo "<td>{$row['item_code']}</td>";
+                                echo "<td>{$row['description']}</td>";
+                                echo "</tr>";
+                            }
+                            mysqli_close($conn);
+                            ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </main>

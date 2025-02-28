@@ -14,11 +14,14 @@ try {
     $quantity = intval($_POST['newItemQuantity']);
     $damage = intval($_POST['newItemDamage']);
 
-    $actual_quantity = $quantity - $damage;
+    // For new items, beginning_quantity starts at 0 since it's a new entry
+    $beginning_quantity = 0;
+    // New delivery is the initial quantity being added
     $new_delivery = $quantity;
-    $beginning_quantity = $quantity;
+    // Actual quantity is beginning_quantity + new_delivery - damage
+    $actual_quantity = $beginning_quantity + $new_delivery - $damage;
     $sold_quantity = 0;
-    $status = ($actual_quantity <= 0) ? 'Out of Stock' : (($actual_quantity <= 10) ? 'Low Stock' : 'In Stock');
+    $status = ($actual_quantity <= 0) ? 'Out of Stock' : (($actual_quantity <= 20) ? 'Low Stock' : 'In Stock');
 
     if (isset($_FILES['newImage']) && $_FILES['newImage']['error'] === UPLOAD_ERR_OK) {
         $imageTmpPath = $_FILES['newImage']['tmp_name'];
@@ -45,12 +48,11 @@ try {
         throw new Exception('Error uploading image');
     }
 
-
     $sql = "INSERT INTO inventory (
         item_code, category, item_name, sizes, price, 
         actual_quantity, new_delivery, beginning_quantity, 
-        damage, sold_quantity, status, image_path
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        damage, sold_quantity, status, image_path, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
 
     $stmt = mysqli_prepare($conn, $sql);
     if (!$stmt) {
@@ -80,8 +82,9 @@ try {
 
     mysqli_stmt_close($stmt);
 
-    $description = "New item added: {$item_name} ({$item_code})";
-    $sql = "INSERT INTO activities (action_type, description, item_code) VALUES ('new_item', ?, ?)";
+    // Log the activity in the audit trail
+    $description = "New item added: {$item_name} ({$item_code}) - Initial delivery: {$new_delivery}, Damage: {$damage}, Actual quantity: {$actual_quantity}";
+    $sql = "INSERT INTO activities (action_type, description, item_code, timestamp) VALUES ('new_item', ?, ?, NOW())";
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "ss", $description, $item_code);
     mysqli_stmt_execute($stmt);

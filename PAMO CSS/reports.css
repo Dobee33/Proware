@@ -211,4 +211,193 @@ tr:hover {
 #currentPage {
     font-size: 0.9em;
     color: #666;
+}
+
+/* Header Actions */
+.header-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.date-filters {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    position: relative;
+}
+
+.date-filters input[type="date"] {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.generate-report-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s;
+}
+
+.generate-report-btn:hover {
+    background-color: #0056b3;
+}
+
+.export-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s;
+}
+
+.export-btn:hover {
+    background-color: #218838;
+}
+
+.clear-date-btn {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s;
+}
+
+.clear-date-btn:hover {
+    background-color: #5a6268;
+}
+
+/* Report Filters */
+.report-filters {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.report-filters h3 {
+    margin: 0 0 10px 0;
+    color: #495057;
+}
+
+.report-filters select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 200px;
+}
+
+/* Tables */
+.report-table {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.report-table h3 {
+    padding: 15px;
+    margin: 0;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    color: #495057;
+}
+
+.report-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.report-table th {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.report-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #dee2e6;
+    color: #212529;
+}
+
+.report-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Status Colors */
+.status-in-stock {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.status-low-stock {
+    color: #ffc107;
+    font-weight: 500;
+}
+
+.status-out-of-stock {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+/* Search Bar */
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    width: 300px;
+}
+
+.search-bar input {
+    border: none;
+    outline: none;
+    padding: 0 8px;
+    width: 100%;
+    font-size: 14px;
+}
+
+.search-bar i {
+    color: #6c757d;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .date-filters {
+        flex-direction: column;
+    }
+    
+    .search-bar {
+        width: 100%;
+    }
 } 

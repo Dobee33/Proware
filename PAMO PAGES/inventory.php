@@ -39,9 +39,11 @@ session_start();
                     <button onclick="showAddItemModal()" class="action-btn">
                         <i class="material-icons">add_circle</i> Add New Item
                     </button>
+                    
                     <button onclick="handleEdit()" class="action-btn" id="editBtn" disabled>
                         <i class="material-icons">edit</i> Edit
                     </button>
+                    
                 </div>
 
                 <div class="filters">
@@ -58,6 +60,7 @@ session_start();
                     </select>
                     <select id="sizeFilter" onchange="applyFilters()">
                         <option value="">All Sizes</option>
+                        <option value="XS">XS</option>
                         <option value="S">S</option>
                         <option value="M">M</option>
                         <option value="L">L</option>
@@ -76,19 +79,9 @@ session_start();
                         <option value="Low Stock">Low Stock</option>
                         <option value="Out of Stock">Out of Stock</option>
                     </select>
-                    <div class="date-filters">
-                        <div class="date-input">
-                            <label for="startDate">From:</label>
-                            <input type="date" id="startDate" onchange="applyFilters()">
-                        </div>
-                        <div class="date-input">
-                            <label for="endDate">To:</label>
-                            <input type="date" id="endDate" onchange="applyFilters()">
-                        </div>
                         <button onclick="clearAllFilters()" class="clear-filters-btn">
                             <i class="material-icons">clear</i> Clear Filters
                         </button>
-                    </div>
                 </div>
 
                 <div class="inventory-table">

@@ -256,8 +256,6 @@ function applyFilters() {
     const categoryFilter = document.getElementById('categoryFilter').value;
     const sizeFilter = document.getElementById('sizeFilter').value;
     const statusFilter = document.getElementById('statusFilter').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
 
     const rows = document.querySelectorAll('.inventory-table tbody tr');
     const sizeHeader = document.querySelector('.inventory-table thead th:nth-child(8)');
@@ -281,7 +279,6 @@ function applyFilters() {
         const category = row.querySelector('td:nth-child(3)').textContent;
         const size = row.querySelector('td:nth-child(8)').textContent;
         const status = row.querySelector('td:nth-child(11)').textContent.trim();
-        const dateCreated = row.getAttribute('data-created-at');
 
         const matchesSearch = searchTerm === '' || 
             itemName.includes(searchTerm) || 
@@ -289,9 +286,8 @@ function applyFilters() {
         const matchesCategory = categoryFilter === '' || category === categoryFilter;
         const matchesSize = sizeFilter === '' || size === sizeFilter;
         const matchesStatus = statusFilter === '' || status.toLowerCase() === statusFilter.toLowerCase();
-        const matchesDate = isWithinDateRange(dateCreated, startDate, endDate);
 
-        if (matchesSearch && matchesCategory && matchesSize && matchesStatus && matchesDate) {
+        if (matchesSearch && matchesCategory && matchesSize && matchesStatus) {
             row.style.display = '';
         } else {
             row.style.display = 'none';
@@ -299,77 +295,7 @@ function applyFilters() {
     });
 }
 
-function isWithinDateRange(dateStr, startDate, endDate) {
-    // If no dates are selected, show all records
-    if (!startDate && !endDate) return true;
-    
-    const recordDate = new Date(dateStr);
-    
-    if (startDate && endDate) {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);
-        return recordDate >= start && recordDate <= end;
-    } else if (startDate) {
-        const start = new Date(startDate);
-        return recordDate >= start;
-    } else if (endDate) {
-        const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);
-        return recordDate <= end;
-    }
-    
-    return true;
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    const startDateInput = document.getElementById('startDate');
-    const endDateInput = document.getElementById('endDate');
-
-    endDateInput.disabled = true;
-    startDateInput.addEventListener('change', function() {
-        endDateInput.disabled = false;
-        endDateInput.min = this.value;
-        if (endDateInput.value && endDateInput.value < this.value) {
-            endDateInput.value = '';
-        }
-        applyFilters();
-    });
-
-    endDateInput.addEventListener('change', function() {
-        if (this.value && this.value < startDateInput.value) {
-            alert('End date cannot be earlier than start date');
-            this.value = '';
-        }
-        applyFilters();
-    });
-
-    if (sessionStorage.getItem('applyLowStockFilter')) {
-        sessionStorage.removeItem('applyLowStockFilter');
-
-        const statusFilter = document.getElementById('statusFilter');
-        if (statusFilter) {
-            statusFilter.value = 'Low Stock';
-
-            const event = new Event('change');
-            statusFilter.dispatchEvent(event);
-            applyFilters();
-        }
-    }
-
-    initializeSizeColumnVisibility();
-
-    document.getElementById('editBtn').addEventListener('click', handleEdit);
-});
-
 function clearAllFilters() {
-    const startDateInput = document.getElementById('startDate');
-    const endDateInput = document.getElementById('endDate');
-    startDateInput.value = '';
-    endDateInput.value = '';
-    endDateInput.disabled = true;
-    endDateInput.min = ''; 
-
     document.getElementById('categoryFilter').value = '';
     document.getElementById('sizeFilter').value = '';
     document.getElementById('statusFilter').value = '';
@@ -385,23 +311,6 @@ function clearAllFilters() {
     });
 
     applyFilters();
-
-    startDateInput.addEventListener('change', function() {
-        endDateInput.disabled = false;
-        endDateInput.min = this.value;
-        if (endDateInput.value && endDateInput.value < this.value) {
-            endDateInput.value = '';
-        }
-        applyFilters();
-    });
-
-    endDateInput.addEventListener('change', function() {
-        if (this.value && this.value < startDateInput.value) {
-            alert('End date cannot be earlier than start date');
-            this.value = '';
-        }
-        applyFilters();
-    });
 }
 
 function populateFilters() {
@@ -667,3 +576,8 @@ function updatePriceDisplay(itemId, newPrice) {
         priceCell.textContent = `₱${parseFloat(newPrice).toFixed(2)}`; // Format the price
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('editBtn').addEventListener('click', handleEdit);
+    initializeSizeColumnVisibility();
+});
