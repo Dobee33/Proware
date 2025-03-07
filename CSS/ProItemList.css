@@ -470,16 +470,25 @@
     opacity: 1;
   }
   
-.subcategory-group {
-    padding-left: 20px;
+.subcategory {
+    padding-left: 30px;  /* Increased padding for more indentation */
     margin-top: 10px;
     border-left: 2px solid var(--border-color);
     transition: all 0.3s ease;
-    font-size: 30px;
+}
+
+.subcategory label {
+    font-size: 16px;  /* Increased font size */
+    display: block;
+    margin-bottom: 10px;  /* Added spacing between options */
+}
+
+.subcategory input[type="checkbox"] {
+    margin-right: 8px;  /* Added spacing between checkbox and label */
 }
 
 /* Indent subcategories */
-.subcategory-group .checkbox-container {
+.subcategory .checkbox-container {
     font-size: 0.9em;
     margin-bottom: 8px;
 }

@@ -151,3 +151,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+document.addEventListener("DOMContentLoaded", function() {
+    const categories = document.querySelectorAll(".category-checkbox");
+
+    // Ensure all subcategories are hidden when page loads
+    document.querySelectorAll(".subcategory").forEach(sub => {
+        sub.style.display = "none";
+    });
+
+    categories.forEach(category => {
+        category.addEventListener("change", function() {
+            let subcategoryDiv = document.getElementById(this.id + "-sub");
+            subcategoryDiv.style.display = this.checked ? "block" : "none";
+        });
+    });
+});

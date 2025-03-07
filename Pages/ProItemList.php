@@ -44,30 +44,45 @@
 
             <div class="filter-group">
                 <h3>Categories</h3>
-                <!--     <label class="checkbox-container"> -->
-                <!--         <input type="checkbox" data-category="uniform" class="main-category"> Uniform -->
-                <!--         <span class="checkmark"></span> -->
-                <!--     </label> -->
-                <!--     <div id="uniform-courses" class="subcategory-group hidden"> -->
-                <!--         <label class="checkbox-container"> -->
-                <!--             <input type="checkbox" data-department="shs"> SHS -->
-                <!--             <span class="checkmark"></span> -->
-                <!--         </label> -->
-                <!--         ... other subcategories ... -->
-                <!--     </div> -->
-                <!--     ... other main categories ... -->
-                <!-- </div> -->
+                <input type="checkbox" id="tertiary" class="category-checkbox">
+                <label for="tertiary"><strong>Tertiary</strong></label>
+                <div class="subcategory" id="tertiary-sub">
+                    <label><input type="checkbox"> BS in Information Technology (BSIT)</label><br>
+                    <label><input type="checkbox"> BS in Computer Science (BSCS)</label><br>
+                    <label><input type="checkbox"> BS in Business Administration (BSBA)</label><br>
+                    <label><input type="checkbox"> BS in Tourism Management (BSTM)</label><br>
+                    <label><input type="checkbox"> Bachelor of Multimedia Arts (BMMA)</label><br>
+                    <label><input type="checkbox"> BS in Computer Engineering (BSCpE)</label><br>
+                </div>
+            </div>
 
-                <!-- <div class="filter-group size-filter hidden"> -->
-                <!--     <h3>Sizes</h3> -->
-                <!--     <div class="size-options"> -->
-                <!--         <label class="size-btn"> -->
-                <!--             <input type="radio" name="size" value="S"> -->
-                <!--             <span>S</span> -->
-                <!--         </label> -->
-                <!--         ... other sizes ... -->
-                <!--     </div> -->
-                <!-- </div> -->
+            <div class="category">
+                <input type="checkbox" id="senior-high" class="category-checkbox">
+                <label for="senior-high"><strong>Senior High School</strong></label>
+                <div class="subcategory" id="senior-high-sub">
+                    <label><input type="checkbox"> SHS Uniform</label><br>
+                    <label><input type="checkbox"> Senior High School PE</label><br>
+                </div>
+            </div>
+
+            <div class="category">
+                <input type="checkbox" id="accessories" class="category-checkbox">
+                <label for="accessories"><strong>Accessories</strong></label>
+                <div class="subcategory" id="accessories-sub">
+                    <label><input type="checkbox"> Pins</label><br>
+                    <label><input type="checkbox"> Lace</label><br>
+                    <label><input type="checkbox"> Aquaflasks</label><br>
+                </div>
+            </div>
+
+            <div class="category">
+                <input type="checkbox" id="shirts" class="category-checkbox">
+                <label for="shirts"><strong>Shirts</strong></label>
+                <div class="subcategory" id="shirts-sub">
+                    <label><input type="checkbox"> Anniversary Shirts</label><br>
+                    <label><input type="checkbox"> Proware Shirts</label><br>
+                    <label><input type="checkbox"> Org Shirts</label><br>
+                </div>
             </div>
         </aside>
 
@@ -166,7 +181,21 @@
             offset: 100,
             once: true
         });
+        document.addEventListener("DOMContentLoaded", function () {
+            const categories = document.querySelectorAll(".category-checkbox");
 
+            // Ensure all subcategories are hidden when page loads
+            document.querySelectorAll(".subcategory").forEach(sub => {
+                sub.style.display = "none";
+            });
+
+            categories.forEach(category => {
+                category.addEventListener("change", function () {
+                    let subcategoryDiv = document.getElementById(this.id + "-sub");
+                    subcategoryDiv.style.display = this.checked ? "block" : "none";
+                });
+            });
+        });
 
     </script>
 </body>
