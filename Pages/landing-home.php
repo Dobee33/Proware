@@ -87,9 +87,11 @@
 
     <secion class="tagline">
         <div class="tag">
+        
             <h1>Be future-ready. Be STI.</h1>
             <p>Explore our wide range of products and check stock availability right from your device.</p>
         </div>
+        
     </secion>
 
     <section class="Featured">

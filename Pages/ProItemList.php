@@ -45,7 +45,7 @@
             <div class="filter-group">
                 <h3>Categories</h3>
                 <input type="checkbox" id="tertiary" class="category-checkbox">
-                <label for="tertiary"><strong>Tertiary</strong></label>
+                <label for="tertiary" style = "font-size: 30px; font-weight: 500;">Tertiary</label>
                 <div class="subcategory" id="tertiary-sub">
                     <label><input type="checkbox"> BS in Information Technology (BSIT)</label><br>
                     <label><input type="checkbox"> BS in Computer Science (BSCS)</label><br>
@@ -58,7 +58,7 @@
 
             <div class="category">
                 <input type="checkbox" id="senior-high" class="category-checkbox">
-                <label for="senior-high"><strong>Senior High School</strong></label>
+                <label for="senior-high" style = "font-size: 30px; font-weight: 500;">Senior High School</label>
                 <div class="subcategory" id="senior-high-sub">
                     <label><input type="checkbox"> SHS Uniform</label><br>
                     <label><input type="checkbox"> Senior High School PE</label><br>
@@ -67,7 +67,7 @@
 
             <div class="category">
                 <input type="checkbox" id="accessories" class="category-checkbox">
-                <label for="accessories"><strong>Accessories</strong></label>
+                <label for="accessories" style = "font-size: 30px; font-weight: 500;">Accessories</label>
                 <div class="subcategory" id="accessories-sub">
                     <label><input type="checkbox"> Pins</label><br>
                     <label><input type="checkbox"> Lace</label><br>
@@ -77,7 +77,7 @@
 
             <div class="category">
                 <input type="checkbox" id="shirts" class="category-checkbox">
-                <label for="shirts"><strong>Shirts</strong></label>
+                <label for="shirts" style = "font-size: 30px; font-weight: 500;">Shirts</label>
                 <div class="subcategory" id="shirts-sub">
                     <label><input type="checkbox"> Anniversary Shirts</label><br>
                     <label><input type="checkbox"> Proware Shirts</label><br>
