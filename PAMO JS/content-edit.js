@@ -1,3 +1,188 @@
+// Sample data structure
+const contentData = {
+    hero: {
+        images: [
+            { id: 1, url: 'hero1.jpg', title: 'Hero Image 1' },
+            { id: 2, url: 'hero2.jpg', title: 'Hero Image 2' }
+        ]
+    },
+    categories: {
+        uniform: {
+            images: [
+                { id: 1, url: 'uniform1.jpg', title: 'Uniform 1' },
+                { id: 2, url: 'uniform2.jpg', title: 'Uniform 2' }
+            ]
+        },
+        accessories: {
+            images: [
+                { id: 1, url: 'accessory1.jpg', title: 'Accessory 1' },
+                { id: 2, url: 'accessory2.jpg', title: 'Accessory 2' }
+            ]
+        },
+        shirt: {
+            images: [
+                { id: 1, url: 'shirt1.jpg', title: 'Shirt 1' },
+                { id: 2, url: 'shirt2.jpg', title: 'Shirt 2' }
+            ]
+        }
+    },
+    featured: {
+        products: [
+            { id: 1, url: 'product1.jpg', title: 'Featured Product 1' },
+            { id: 2, url: 'product2.jpg', title: 'Featured Product 2' }
+        ]
+    }
+};
+
+// Initialize the page
+document.addEventListener('DOMContentLoaded', function() {
+    loadAllSections();
+});
+
+function loadAllSections() {
+    loadHeroSection();
+    loadCategoriesSection();
+    loadFeaturedSection();
+}
+
+function openSection(sectionId) {
+    // Close all sections first
+    document.querySelectorAll('.section-content').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Open the selected section
+    const section = document.getElementById(`${sectionId}-content`);
+    if (section) {
+        section.classList.add('active');
+    }
+}
+
+function openCategory(categoryId) {
+    // Handle category click
+    console.log(`Opening category: ${categoryId}`);
+    // Add your category-specific logic here
+}
+
+function loadHeroSection() {
+    const heroGrid = document.getElementById('hero-image-grid');
+    if (!heroGrid) return;
+
+    heroGrid.innerHTML = contentData.hero.images.map(image => `
+        <div class="image-item">
+            <img src="${image.url}" alt="${image.title}">
+            <div class="image-controls">
+                <button onclick="editImage('hero', ${image.id})">
+                    <i class="material-icons">edit</i>
+                </button>
+                <button onclick="deleteImage('hero', ${image.id})">
+                    <i class="material-icons">delete</i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function loadCategoriesSection() {
+    // Load STI Uniform
+    const uniformGrid = document.getElementById('uniform-images');
+    if (uniformGrid) {
+        uniformGrid.innerHTML = contentData.categories.uniform.images.map(image => `
+            <div class="image-item">
+                <img src="${image.url}" alt="${image.title}">
+                <div class="image-controls">
+                    <button onclick="editImage('uniform', ${image.id})">
+                        <i class="material-icons">edit</i>
+                    </button>
+                    <button onclick="deleteImage('uniform', ${image.id})">
+                        <i class="material-icons">delete</i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Load STI Accessories
+    const accessoriesGrid = document.getElementById('accessories-images');
+    if (accessoriesGrid) {
+        accessoriesGrid.innerHTML = contentData.categories.accessories.images.map(image => `
+            <div class="image-item">
+                <img src="${image.url}" alt="${image.title}">
+                <div class="image-controls">
+                    <button onclick="editImage('accessories', ${image.id})">
+                        <i class="material-icons">edit</i>
+                    </button>
+                    <button onclick="deleteImage('accessories', ${image.id})">
+                        <i class="material-icons">delete</i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Load STI Shirt
+    const shirtGrid = document.getElementById('shirt-images');
+    if (shirtGrid) {
+        shirtGrid.innerHTML = contentData.categories.shirt.images.map(image => `
+            <div class="image-item">
+                <img src="${image.url}" alt="${image.title}">
+                <div class="image-controls">
+                    <button onclick="editImage('shirt', ${image.id})">
+                        <i class="material-icons">edit</i>
+                    </button>
+                    <button onclick="deleteImage('shirt', ${image.id})">
+                        <i class="material-icons">delete</i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+function loadFeaturedSection() {
+    const featuredGrid = document.getElementById('featured-products-grid');
+    if (!featuredGrid) return;
+
+    featuredGrid.innerHTML = contentData.featured.products.map(product => `
+        <div class="featured-item">
+            <img src="${product.url}" alt="${product.title}">
+            <h3>${product.title}</h3>
+            <div class="product-controls">
+                <button onclick="editProduct(${product.id})">
+                    <i class="material-icons">edit</i>
+                </button>
+                <button onclick="deleteProduct(${product.id})">
+                    <i class="material-icons">delete</i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function editImage(section, imageId) {
+    // Handle image editing
+    console.log(`Editing image ${imageId} in ${section}`);
+    // Add your image editing logic here
+}
+
+function deleteImage(section, imageId) {
+    // Handle image deletion
+    console.log(`Deleting image ${imageId} from ${section}`);
+    // Add your image deletion logic here
+}
+
+function editProduct(productId) {
+    // Handle product editing
+    console.log(`Editing product ${productId}`);
+    // Add your product editing logic here
+}
+
+function deleteProduct(productId) {
+    // Handle product deletion
+    console.log(`Deleting product ${productId}`);
+    // Add your product deletion logic here
+}
+
 // Sample content data
 const contentItems = [
     {
