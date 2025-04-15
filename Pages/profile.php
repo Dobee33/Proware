@@ -94,6 +94,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
                 </div>
             </div>
 
+            <div class="cart-section">
+                <h2>Your Cart</h2>
+                <div class="cart-items">
+                    <?php
+                    // Fetch cart items
+                    $stmt = $conn->prepare("
+                        SELECT c.*, i.item_name, i.price, i.image_path 
+                        FROM cart c 
+                        JOIN inventory i ON c.item_code = i.item_code 
+                        WHERE c.user_id = ?
+                    ");
+                    $stmt->execute([$_SESSION['user_id']]);
+                    $cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    
+                    $subtotal = 0;
+                    
+                    if (!empty($cart_items)):
+                        foreach ($cart_items as $item):
+                            $item_total = $item['price'] * $item['quantity'];
+                            $subtotal += $item_total;
+                    ?>
+                    <div class="cart-item" data-item-id="<?php echo $item['id']; ?>">
+                        <div class="cart-item-image">
+                            <img src="../uploads/itemlist/<?php echo htmlspecialchars($item['image_path']); ?>" 
+                                 alt="<?php echo htmlspecialchars($item['item_name']); ?>">
+                        </div>
+                        <div class="cart-item-details">
+                            <h3><?php echo htmlspecialchars($item['item_name']); ?></h3>
+                            <p class="sku">SKU: <?php echo htmlspecialchars($item['item_code']); ?></p>
+                            <p class="price">Price: ₱<?php echo number_format($item['price'], 2); ?></p>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" class="quantity-input" value="<?php echo $item['quantity']; ?>" min="1" max="99">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <button class="remove-item">×</button>
+                        </div>
+                    </div>
+                    <?php
+                        endforeach;
+                    else:
+                    ?>
+                    <p class="empty-cart-message">Your cart is empty</p>
+                    <?php endif; ?>
+                </div>
+                <?php if (!empty($cart_items)): ?>
+                <div class="cart-summary">
+                    <div class="subtotal">
+                        <span>Subtotal</span>
+                        <span class="amount">₱<?php echo number_format($subtotal, 2); ?></span>
+                    </div>
+                    <button class="checkout-btn">Check out</button>
+                </div>
+                <?php endif; ?>
+            </div>
+
             <div class="password-section">
                 <h2>Change Password</h2>
                 <?php echo $passwordMessage; ?>
@@ -343,6 +399,167 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
                 padding: 10px;
             }
         }
+
+        /* Add these new styles for the cart section */
+        .cart-section {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .cart-section h2 {
+            color: var(--primary-color);
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            font-family: var(--primary-font-family);
+            font-weight: 300;
+        }
+
+        .cart-items {
+            margin-bottom: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            position: relative;
+        }
+
+        .cart-item-image {
+            width: 100px;
+            height: 100px;
+            margin-right: 20px;
+        }
+
+        .cart-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .cart-item-details {
+            flex: 1;
+            position: relative;
+        }
+
+        .cart-item-details h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .cart-item-details .sku {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-details .price {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #dee2e6;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            transition: all 0.2s;
+        }
+
+        .quantity-btn:hover {
+            background: #f8f9fa;
+        }
+
+        .quantity-input {
+            width: 50px;
+            height: 30px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        .remove-item {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #dc3545;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .cart-summary {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .subtotal {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .checkout-btn:hover {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .cart-section {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .cart-item {
+                flex-direction: column;
+            }
+
+            .cart-item-image {
+                width: 100%;
+                height: 200px;
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
     </style>
 
     <script>
@@ -399,6 +616,129 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
             notificationPopup.addEventListener('click', function(e) {
                 e.stopPropagation();
             });
+
+            // Quantity controls
+            const quantityControls = document.querySelectorAll('.quantity-controls');
+            
+            quantityControls.forEach(control => {
+                const minusBtn = control.querySelector('.minus');
+                const plusBtn = control.querySelector('.plus');
+                const input = control.querySelector('.quantity-input');
+                const cartItem = control.closest('.cart-item');
+                const itemId = cartItem.dataset.itemId;
+                
+                minusBtn.addEventListener('click', () => {
+                    let value = parseInt(input.value);
+                    if (value > 1) {
+                        input.value = value - 1;
+                        updateCartItem(itemId, input.value);
+                    }
+                });
+                
+                plusBtn.addEventListener('click', () => {
+                    let value = parseInt(input.value);
+                    if (value < 99) {
+                        input.value = value + 1;
+                        updateCartItem(itemId, input.value);
+                    }
+                });
+                
+                input.addEventListener('change', () => {
+                    let value = parseInt(input.value);
+                    if (value < 1) input.value = 1;
+                    if (value > 99) input.value = 99;
+                    updateCartItem(itemId, input.value);
+                });
+            });
+            
+            // Remove item functionality
+            const removeButtons = document.querySelectorAll('.remove-item');
+            removeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const cartItem = this.closest('.cart-item');
+                    const itemId = cartItem.dataset.itemId;
+                    removeCartItem(itemId);
+                });
+            });
+            
+            // Function to update cart item quantity
+            async function updateCartItem(itemId, quantity) {
+                try {
+                    const response = await fetch('../Includes/cart_operations.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `action=update&item_id=${itemId}&quantity=${quantity}`
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        updateSubtotal();
+                        // Update cart count in header if needed
+                        const cartCount = document.querySelector('.cart-count');
+                        if (cartCount) {
+                            cartCount.textContent = data.cart_count;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+            
+            // Function to remove cart item
+            async function removeCartItem(itemId) {
+                if (confirm('Are you sure you want to remove this item?')) {
+                    try {
+                        const response = await fetch('../Includes/cart_operations.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `action=remove&item_id=${itemId}`
+                        });
+                        
+                        const data = await response.json();
+                        if (data.success) {
+                            const cartItem = document.querySelector(`.cart-item[data-item-id="${itemId}"]`);
+                            cartItem.remove();
+                            updateSubtotal();
+                            
+                            // Update cart count in header
+                            const cartCount = document.querySelector('.cart-count');
+                            if (cartCount) {
+                                cartCount.textContent = data.cart_count;
+                            }
+                            
+                            // Check if cart is empty
+                            const cartItems = document.querySelectorAll('.cart-item');
+                            if (cartItems.length === 0) {
+                                document.querySelector('.cart-items').innerHTML = '<p class="empty-cart-message">Your cart is empty</p>';
+                                document.querySelector('.cart-summary')?.remove();
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                }
+            }
+            
+            // Update subtotal function
+            function updateSubtotal() {
+                const cartItems = document.querySelectorAll('.cart-item');
+                let subtotal = 0;
+                
+                cartItems.forEach(item => {
+                    const price = parseFloat(item.querySelector('.price').textContent.replace('Price: ₱', ''));
+                    const quantity = parseInt(item.querySelector('.quantity-input').value);
+                    subtotal += price * quantity;
+                });
+                
+                const subtotalElement = document.querySelector('.amount');
+                if (subtotalElement) {
+                    subtotalElement.textContent = '₱' + subtotal.toFixed(2);
+                }
+            }
         });
     </script>
 

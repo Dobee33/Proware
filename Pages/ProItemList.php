@@ -124,12 +124,15 @@
                     }
                 }
 
-                foreach ($products as $product):
+                foreach ($products as $itemCode => $product):
                     $availableSizes = $product['sizes'];
                     $prices = $product['prices'];
                     ?>
-                    <div class="product-container" data-sizes="<?php echo implode(',', $availableSizes); ?>"
-                        data-prices="<?php echo implode(',', $prices); ?>" data-stock="<?php echo $product['stock']; ?>">
+                    <div class="product-container" 
+                        data-sizes="<?php echo implode(',', $availableSizes); ?>"
+                        data-prices="<?php echo implode(',', $prices); ?>" 
+                        data-stock="<?php echo $product['stock']; ?>"
+                        data-item-code="<?php echo htmlspecialchars($itemCode); ?>">
                         <img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>">
                         <div class="product-overlay">
                             <div class="items"></div>
@@ -142,25 +145,10 @@
                                 <p class="price-range">Price: ₱<?php echo number_format(min($prices), 2); ?> -
                                     ₱<?php echo number_format(max($prices), 2); ?></p>
                             </div>
-                            <div class="items sizes">
-                                <span>Sizes:</span>
-                                <div class="size-options">
-                                    <?php
-                                    $allSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL'];
-                                    foreach ($allSizes as $size):
-                                        $isAvailable = in_array($size, $availableSizes);
-                                        ?>
-                                        <button class="size-btn" style="opacity: <?php echo $isAvailable ? '1' : '0.5'; ?>;">
-                                            <?php echo $size; ?>
-                                        </button>
-                                    <?php endforeach; ?>
-                                </div>
-
-                            </div>
                             <div class="items stock">
                                 <p>Stock: <?php echo $product['stock']; ?></p>
                             </div>
-                            <div class="items cart" onclick="toggleStockDisplay(this)">
+                            <div class="items cart" onclick="addToCart(this)" data-item-code="<?php echo htmlspecialchars($itemCode); ?>">
                                 <i class="fa fa-shopping-cart"></i>
                                 <span>ADD TO CART</span>
                             </div>

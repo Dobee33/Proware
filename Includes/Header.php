@@ -450,11 +450,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         display: block;
     }
 
-    /* Remove any hover-related styles */
-    .cart-icon:hover .cart-popup {
-        display: none;
-    }
-
     .checkout-btn {
         display: block;
         width: calc(100% - 2rem);
@@ -468,7 +463,8 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     }
 
     .checkout-btn:hover {
-        background-color: #000;
+        background-color: #00008B; /* Dark blue color */
+        color: white;
     }
 
     /* Add active state for cart icon */
@@ -566,7 +562,8 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     }
 
     .checkout-btn:hover {
-        background-color: #000;
+        background-color: #00008B; /* Dark blue color */
+        color: white;
     }
 
     .view-cart-btn:hover {

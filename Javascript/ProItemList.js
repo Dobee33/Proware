@@ -77,24 +77,87 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get all checkboxes
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
     
-    // Add to cart functionality
-    document.querySelectorAll('.add-to-cart, .pre-order-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const card = this.closest('.product-card');
-            const quantity = card.querySelector('.quantity input').value;
-            const product = {
-                name: card.querySelector('h3').textContent,
-                price: parseFloat(card.dataset.price),
-                quantity: parseInt(quantity)
-            };
-            
-            // Add animation
-            btn.classList.add('added');
-            setTimeout(() => btn.classList.remove('added'), 1500);
-            
-            // Here you would typically send this data to your cart handling system
-            console.log('Added to cart:', product);
+    // Update the add to cart functionality
+    document.querySelectorAll('.cart').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const productContainer = this.closest('.product-container');
+            const itemName = productContainer.querySelector('.head p').textContent;
+            const itemCode = productContainer.dataset.itemCode;
+            const quantity = 1; // Default quantity, can be modified if you have quantity input
+
+            try {
+                const response = await fetch('../Includes/cart_operations.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `action=add&item_code=${itemCode}&quantity=${quantity}`
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update cart count in header
+                    const cartCount = document.querySelector('.cart-count');
+                    if (cartCount) {
+                        cartCount.textContent = data.cart_count;
+                    }
+                    
+                    // Show success message
+                    alert('Item added to cart successfully!');
+                    
+                    // Update cart popup content
+                    updateCartPopup();
+                } else {
+                    alert(data.message || 'Error adding item to cart');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error adding item to cart');
+            }
         });
+    });
+
+    // Function to update cart popup content
+    async function updateCartPopup() {
+        try {
+            const response = await fetch('../Includes/cart_operations.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'action=get_cart'
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                const cartItems = document.querySelector('.cart-items');
+                if (cartItems) {
+                    if (data.cart_items && data.cart_items.length > 0) {
+                        cartItems.innerHTML = data.cart_items.map(item => `
+                            <div class="cart-item">
+                                <img src="../uploads/itemlist/${item.image_path}" alt="${item.item_name}">
+                                <div class="cart-item-details">
+                                    <div class="cart-item-name">${item.item_name}</div>
+                                    <div class="cart-item-price">₱${item.price} × ${item.quantity}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        cartItems.innerHTML = '<p class="empty-cart-message">Your cart is empty</p>';
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    // Initial cart popup update
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartPopup();
     });
 
     // Get all main category checkboxes
@@ -151,6 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
 document.addEventListener("DOMContentLoaded", function() {
     const categories = document.querySelectorAll(".category-checkbox");
 
@@ -165,4 +229,87 @@ document.addEventListener("DOMContentLoaded", function() {
             subcategoryDiv.style.display = this.checked ? "block" : "none";
         });
     });
+});
+
+function addToCart(button) {
+    const itemCode = button.dataset.itemCode;
+    const quantity = 1; // Default quantity
+
+    // Add loading state
+    button.style.pointerEvents = 'none';
+    button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Adding...';
+
+    fetch('../Includes/cart_operations.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `action=add&item_code=${itemCode}&quantity=${quantity}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update cart count in header
+            const cartCount = document.querySelector('.cart-count');
+            if (cartCount) {
+                cartCount.textContent = data.cart_count;
+            }
+            
+            // Show success message
+            button.innerHTML = '<i class="fa fa-check"></i> Added!';
+            setTimeout(() => {
+                button.innerHTML = '<i class="fa fa-shopping-cart"></i><span>ADD TO CART</span>';
+                button.style.pointerEvents = 'auto';
+            }, 2000);
+            
+            // Update cart popup content
+            updateCartPopup();
+        } else {
+            alert(data.message || 'Error adding item to cart');
+            button.innerHTML = '<i class="fa fa-shopping-cart"></i><span>ADD TO CART</span>';
+            button.style.pointerEvents = 'auto';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error adding item to cart');
+        button.innerHTML = '<i class="fa fa-shopping-cart"></i><span>ADD TO CART</span>';
+        button.style.pointerEvents = 'auto';
+    });
+}
+
+function updateCartPopup() {
+    fetch('../Includes/cart_operations.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=get_cart'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const cartItems = document.querySelector('.cart-items');
+            if (cartItems) {
+                if (data.cart_items && data.cart_items.length > 0) {
+                    cartItems.innerHTML = data.cart_items.map(item => `
+                        <div class="cart-item">
+                            <img src="../uploads/itemlist/${item.image_path}" alt="${item.item_name}">
+                            <div class="cart-item-details">
+                                <div class="cart-item-name">${item.item_name}</div>
+                                <div class="cart-item-price">₱${item.price} × ${item.quantity}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    cartItems.innerHTML = '<p class="empty-cart-message">Your cart is empty</p>';
+                }
+            }
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    updateCartPopup();
 });
