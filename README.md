@@ -23,17 +23,11 @@ The database structure is included in the file: `proware (3).sql`.
         - Select the `proware` database.
         - Go to the **Import** tab.
         - Choose the `proware (3).sql` file and click **Go**.
-
-    - **Using Command Line**:
-        ```bash
-        mysql -u root -p proware_db < "proware (3).sql"
-        ```
-
 ---
 
 ## 🧾 Notes
 
-- Make sure the database connection credentials in your PHP config match the database name (`proware_db`), username, and password.
+- Make sure the database connection credentials in your PHP config match the database name (`proware`), username, and password.
 - This SQL file contains the schema and initial data needed for the application to run properly.
 
 ---
