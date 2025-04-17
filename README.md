@@ -11,7 +11,7 @@ The database structure is included in the file: `proware (3).sql`.
 
 You can download the SQL file from the `/sql` folder in this repository.
 
-**Direct path:** [sql/proware.sql](./sql/proware.sql)
+**Direct path:** [sql/proware.sql](proware(3).sql)
 
 If you downloaded the project as a `.zip` file, you’ll find the database file inside the `sql` folder:
 
