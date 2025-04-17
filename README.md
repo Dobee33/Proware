@@ -7,6 +7,14 @@ This project is a web-based pre-order inventory system with a built-in e-commerc
 ## 🗄️ Database Setup
 
 The database structure is included in the file: `proware (3).sql`.
+### 📦 Download the Database
+
+You can download the SQL file from the `/sql` folder in this repository.
+
+**Direct path:** [sql/proware.sql](./sql/proware.sql)
+
+If you downloaded the project as a `.zip` file, you’ll find the database file inside the `sql` folder:
+
 
 ### 📥 How to Import the Database
 
