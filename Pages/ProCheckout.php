@@ -97,6 +97,7 @@ $_SESSION['checkout_total'] = $total_amount;
                         <small class="phone-hint">Enter your 10-digit mobile number (e.g., 9123456789)</small>
                     </div>
                     <input type="hidden" name="cart_items" value='<?php echo json_encode($cart_items); ?>'>
+                    <input type="hidden" name="included_items" value='<?php echo json_encode($included_items); ?>'>
                     <input type="hidden" name="total_amount" value="<?php echo $total_amount; ?>">
                     <button type="submit" class="place-order-btn">Place Order</button>
                 </form>

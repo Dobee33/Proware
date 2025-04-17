@@ -73,6 +73,8 @@ body {
     padding: 2rem;
     margin-bottom: 2rem;
     box-shadow: var(--shadow);
+    height: auto;
+    min-height: fit-content;
 }
 
 .cart-section h2 {
@@ -88,6 +90,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    height: auto;
+    min-height: fit-content;
 }
 
 .cart-item {
@@ -149,24 +153,34 @@ body {
 
 .cart-total {
     margin-top: 2rem;
-    padding-top: 1.5rem;
+    padding: 2rem;
     border-top: 1px solid #e0e0e0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background-color: #f8fafc;
+    border-radius: var(--border-radius);
 }
 
 .checkout-btn {
     background-color: var(--primary-color);
     color: white;
-    padding: 12px 24px;
+    padding: 15px 40px;
     border-radius: var(--border-radius);
     text-decoration: none;
     transition: background-color 0.2s ease;
+    font-size: 1.1rem;
+    margin-left: 2rem;
 }
 
 .checkout-btn:hover {
     background-color: var(--secondary-color);
+}
+
+.cart-total h3 {
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    margin: 0;
 }
 
 /* Orders Section Styling */

@@ -146,10 +146,25 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             
             const includedItems = [];
+            const updatedCartItems = [];
+            
             document.querySelectorAll('tr[data-item-id]').forEach(row => {
                 const checkBtn = row.querySelector('.toggle-checkout-btn.check');
                 if (checkBtn && checkBtn.classList.contains('active')) {
-                    includedItems.push(row.dataset.itemId);
+                    const itemId = row.dataset.itemId;
+                    const quantity = parseInt(row.querySelector('.qty-input').value);
+                    const price = parseFloat(row.querySelector('td:nth-child(3)').textContent.replace('₱', ''));
+                    const itemName = row.querySelector('td:nth-child(2)').textContent;
+                    const itemCode = row.querySelector('td:nth-child(1) img').alt;
+                    
+                    includedItems.push(itemId);
+                    updatedCartItems.push({
+                        id: itemId,
+                        item_code: itemCode,
+                        item_name: itemName,
+                        price: price,
+                        quantity: quantity
+                    });
                 }
             });
 
@@ -161,6 +176,15 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update the included items input
             const includedItemsInput = this.querySelector('#includedItems');
             includedItemsInput.value = JSON.stringify(includedItems);
+
+            // Update the cart items input with the latest quantities
+            const cartItemsInput = this.querySelector('input[name="cart_items"]');
+            cartItemsInput.value = JSON.stringify(updatedCartItems);
+
+            // Update the total amount
+            const totalAmountInput = this.querySelector('input[name="total_amount"]');
+            const total = updatedCartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            totalAmountInput.value = total;
 
             // Submit the form
             this.submit();

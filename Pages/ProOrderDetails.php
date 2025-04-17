@@ -10,12 +10,21 @@ $course = $_POST['course'] ?? '';
 $email = $_POST['email'] ?? '';
 $phone = $_POST['phone'] ?? '';
 $cart_items = json_decode($_POST['cart_items'] ?? '[]', true);
+$included_items = json_decode($_POST['included_items'] ?? '[]', true);
 $total_amount = $_POST['total_amount'] ?? 0;
+
+// Filter cart items to only include selected items
+$selected_items = array_filter($cart_items, function($item) use ($included_items) {
+    return in_array($item['id'], $included_items);
+});
+
+// Reindex the array
+$selected_items = array_values($selected_items);
 
 // Generate order number based on the first item's code
 $order_number = '';
-if (!empty($cart_items)) {
-    $first_item = $cart_items[0];
+if (!empty($selected_items)) {
+    $first_item = $selected_items[0];
     $order_number = 'PRO-' . $first_item['item_code'] . '-' . date('YmdHis');
 }
 
@@ -32,14 +41,16 @@ try {
     $stmt->execute([
         $order_number,
         $_SESSION['user_id'],
-        json_encode($cart_items),
+        json_encode($selected_items),
         $phone,
         $total_amount
     ]);
 
-    // Clear the user's cart
-    $stmt = $conn->prepare("DELETE FROM cart WHERE user_id = ?");
-    $stmt->execute([$_SESSION['user_id']]);
+    // Delete only the included items from cart
+    $placeholders = str_repeat('?,', count($included_items) - 1) . '?';
+    $stmt = $conn->prepare("DELETE FROM cart WHERE user_id = ? AND id IN ($placeholders)");
+    $params = array_merge([$_SESSION['user_id']], $included_items);
+    $stmt->execute($params);
 
     // Commit transaction
     $conn->commit();
@@ -109,8 +120,8 @@ try {
                 <div class="ordered-items">
                     <h4>Ordered Items</h4>
                     <div class="item-list">
-                        <?php if (!empty($cart_items)): ?>
-                            <?php foreach ($cart_items as $item): ?>
+                        <?php if (!empty($selected_items)): ?>
+                            <?php foreach ($selected_items as $item): ?>
                                 <div class="order-item">
                                     <span class="item-name"><?php echo htmlspecialchars($item['item_name']); ?></span>
                                     <span class="item-quantity">x<?php echo $item['quantity']; ?></span>

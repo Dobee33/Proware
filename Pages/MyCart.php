@@ -83,10 +83,10 @@ $cart_total = 0;
                                 </div>
                             </div>
                         <?php endforeach; ?>
-                        <div class="cart-total">
-                            <h3>Total: ₱<?php echo number_format($cart_total, 2); ?></h3>
-                            <a href="ProCheckout.php" class="checkout-btn">Proceed to Checkout</a>
-                        </div>
+                    </div>
+                    <div class="cart-total">
+                        <h3>Total: ₱<?php echo number_format($cart_total, 2); ?></h3>
+                        <a href="ProCheckout.php" class="checkout-btn">Proceed to Checkout</a>
                     </div>
                 <?php else: ?>
                     <div class="empty-cart">

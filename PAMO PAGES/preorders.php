@@ -2,13 +2,28 @@
 session_start();
 require_once '../Includes/connection.php';
 
-// Fetch all pre-orders
-$stmt = $conn->prepare("
+// Get status from URL parameter or filter dropdown
+$status = isset($_GET['status']) ? $_GET['status'] : '';
+
+// Build the query based on status
+$query = "
     SELECT po.*, a.first_name, a.last_name, a.email, a.program_or_position
     FROM pre_orders po
     JOIN account a ON po.user_id = a.id
-    ORDER BY po.created_at DESC
-");
+";
+
+if ($status) {
+    $query .= " WHERE po.status = :status";
+}
+
+$query .= " ORDER BY po.created_at DESC";
+
+$stmt = $conn->prepare($query);
+
+if ($status) {
+    $stmt->bindParam(':status', $status);
+}
+
 $stmt->execute();
 $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -38,11 +53,11 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="header-actions">
                     <div class="filter-dropdown">
-                        <select id="statusFilter">
+                        <select id="statusFilter" onchange="filterByStatus(this.value)">
                             <option value="">All Status</option>
-                            <option value="pending">Pending</option>
-                            <option value="approved">Approved</option>
-                            <option value="rejected">Rejected</option>
+                            <option value="pending" <?php echo $status === 'pending' ? 'selected' : ''; ?>>Pending</option>
+                            <option value="approved" <?php echo $status === 'approved' ? 'selected' : ''; ?>>Approved</option>
+                            <option value="rejected" <?php echo $status === 'rejected' ? 'selected' : ''; ?>>Rejected</option>
                         </select>
                     </div>
                     <div class="notification-icon">
@@ -157,18 +172,9 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         });
 
         // Filter by status
-        document.getElementById('statusFilter').addEventListener('change', function(e) {
-            const status = e.target.value;
-            const cards = document.querySelectorAll('.order-card');
-            
-            cards.forEach(card => {
-                if (!status || card.dataset.status === status) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
+        function filterByStatus(status) {
+            window.location.href = `preorders.php?status=${status}`;
+        }
 
         // Update notification count
         function updateNotificationCount() {

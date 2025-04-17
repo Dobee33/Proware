@@ -651,16 +651,19 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         width: calc(100% - 2rem);
         padding: 0.8rem;
         background-color: var(--primary-color);
-        color: white;
+        color: white !important;
         text-align: center;
         border-radius: 4px;
         text-decoration: none;
+        font-weight: 500;
+        font-size: 1rem;
         transition: background-color 0.3s ease;
     }
 
     .checkout-btn:hover {
-        background-color: #00008B; /* Dark blue color */
-        color: white;
+        background-color: #00008B;
+        color: white !important;
+        text-decoration: none;
     }
 
     /* Add active state for cart icon */
@@ -836,8 +839,22 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     }
 
     .notification-count {
-        color: #666;
-        font-size: 0.9rem;
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background-color: #ff4444;
+        color: white;
+        font-size: 0.7rem;
+        font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 10px;
+        min-width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid white;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
 
     .notification-items {
