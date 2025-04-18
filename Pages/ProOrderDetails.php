@@ -154,8 +154,8 @@ try {
                     </div>
                 </div>
 
-                <button class="back-home-btn" onclick="window.location.href='home.php'">
-                    Back to Home
+                <button class="back-home-btn" onclick="window.location.href='MyOrders.php'">
+                    Back to My Orders
                 </button>
             </div>
         </div>
