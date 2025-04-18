@@ -1,200 +1,234 @@
 .preorder-container {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
 }
 
 .process-steps {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background: white;
-    border-radius: 8px;
-    margin-top: 100px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  margin-top: 100px;
 }
 
 .step {
-    font-family: var(--primary-font-family);
-    color: var(--text-color);
-    padding: 0.5rem 1rem;
+  font-family: var(--primary-font-family);
+  color: var(--text-color);
+  padding: 0.5rem 1rem;
 }
 
 .step.active {
-    color: var(--primary-color);
+  color: var(--primary-color);
 }
 
 .step.completed {
-    color: green;
+  color: green;
 }
 
 .delete-btn {
-    background: none;
-    border: none;
-    color: #dc3545;
-    cursor: pointer;
-    padding: 0.5rem;
-    font-size: 1.2rem;
-    transition: color 0.3s ease;
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
 }
 
 .delete-btn:hover {
-    color: #c82333;
+  color: #c82333;
 }
 
 h1 {
-    text-align: center;
-    color: var(--primary-color);
-    margin-bottom: 2rem;
+  text-align: center;
+  color: var(--primary-color);
+  margin-bottom: 2rem;
 }
 
-.products-table, .total-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.products-table,
+.total-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.products-table th, .products-table td,
-.total-table th, .total-table td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid #eee;
+.products-table th,
+.products-table td,
+.total-table th,
+.total-table td {
+  padding: 15px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.products-table th:nth-child(1),
+.products-table td:nth-child(1) {
+  width: 120px;
+}
+
+.products-table th:nth-child(2),
+.products-table td:nth-child(2) {
+  width: 250px;
+  text-align: left;
+}
+
+.products-table th:nth-child(3),
+.products-table td:nth-child(3) {
+  width: 100px;
+}
+
+.products-table th:nth-child(4),
+.products-table td:nth-child(4) {
+  width: 120px;
+}
+
+.products-table th:nth-child(5),
+.products-table td:nth-child(5) {
+  width: 150px;
+}
+
+.products-table th:nth-child(6),
+.products-table td:nth-child(6) {
+  width: 150px;
 }
 
 .products-table th {
-    background: var(--primary-color);
-    color: white;
+  background: var(--primary-color);
+  color: white;
 }
 
 .product-image {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
 }
 
 .quantity-control {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .qty-btn {
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    border-radius: 4px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
 }
 
 .qty-input {
-    width: 60px;
-    padding: 0.5rem;
-    text-align: center;
+  width: 60px;
+  padding: 0.5rem;
+  text-align: center;
 }
 
 .total-table {
-    max-width: 300px;
-    margin-left: auto;
+  max-width: 300px;
+  margin-left: auto;
 }
 
 .proceed-btn {
-    display: block;
-    width: 200px;
-    margin: 2rem 0 0 auto;
-    padding: 1rem;
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: var(--secondary-font-family);
-    font-size: 1.1rem;
+  display: block;
+  width: 200px;
+  margin: 2rem 0 0 auto;
+  padding: 1rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--secondary-font-family);
+  font-size: 1.1rem;
 }
 
 .proceed-btn:hover {
-    background: #005a94;
+  background: #005a94;
 }
 
 .cart-layout {
-    display: flex;
-    gap: 2rem;
-    align-items: flex-start;
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
 }
 
 .products-section {
-    flex: 1;
+  flex: 1;
 }
 
 .summary-section {
-    width: 300px;
-    background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  width: 300px;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .total-table {
-    margin-left: 0;
-    margin-bottom: 1.5rem;
+  margin-left: 0;
+  margin-bottom: 1.5rem;
 }
 
 .proceed-btn {
-    width: 100%;
-    margin: 0;
+  width: 100%;
+  margin: 0;
 }
 
 @media (max-width: 768px) {
-    .cart-layout {
-        flex-direction: column;
-    }
+  .cart-layout {
+    flex-direction: column;
+  }
 
-    .summary-section {
-        width: 100%;
-    }
+  .summary-section {
+    width: 100%;
+  }
 }
 
 .toggle-container {
-    display: flex;
-    gap: 5px;
-    justify-content: center;
+  display: flex;
+  gap: 5px;
+  justify-content: center;
 }
 
 .toggle-checkout-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 5px;
-    font-size: 1.2em;
-    transition: all 0.3s ease;
-    border-radius: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 1.2em;
+  transition: all 0.3s ease;
+  border-radius: 4px;
 }
 
 .toggle-checkout-btn.check {
-    color: #4CAF50;
-    background-color: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+  background-color: rgba(76, 175, 80, 0.1);
 }
 
 .toggle-checkout-btn.x {
-    color: #f44336;
-    background-color: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+  background-color: rgba(244, 67, 54, 0.1);
 }
 
 .toggle-checkout-btn.active {
-    transform: scale(1.1);
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  transform: scale(1.1);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
 .toggle-checkout-btn:not(.active) {
-    opacity: 0.5;
+  opacity: 0.5;
 }
 
 .toggle-checkout-btn:hover {
-    transform: scale(1.1);
+  transform: scale(1.1);
 }
 
 .toggle-checkout-btn i {
-    pointer-events: none;
+  pointer-events: none;
 }

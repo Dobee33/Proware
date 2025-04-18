@@ -137,10 +137,20 @@ try {
                     <h4>Ordered Items</h4>
                     <div class="item-list">
                         <?php if (!empty($selected_items)): ?>
-                            <?php foreach ($selected_items as $item): ?>
+                            <div class="order-item header">
+                                <span class="item-name">Item</span>
+                                <span class="item-size">Size</span>
+                                <span class="item-quantity">Qty</span>
+                                <span class="item-price">Price</span>
+                            </div>
+                            <?php foreach ($selected_items as $item): 
+                                // Remove size suffix from item name
+                                $clean_name = rtrim($item['item_name'], " SMLX234567");
+                            ?>
                                 <div class="order-item">
-                                    <span class="item-name"><?php echo htmlspecialchars($item['item_name']); ?></span>
-                                    <span class="item-quantity">x<?php echo $item['quantity']; ?></span>
+                                    <span class="item-name"><?php echo htmlspecialchars($clean_name); ?></span>
+                                    <span class="item-size"><?php echo htmlspecialchars($item['size'] ?? 'N/A'); ?></span>
+                                    <span class="item-quantity"><?php echo $item['quantity']; ?></span>
                                     <span class="item-price">₱<?php echo number_format($item['price'] * $item['quantity'], 2); ?></span>
                                 </div>
                             <?php endforeach; ?>
@@ -162,7 +172,202 @@ try {
     </div>
 
     <style>
-       
+        .order-details {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+        }
+
+        .order-details h3 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .details-group {
+            background: #f8f9fa;
+            padding: 1.2rem;
+            border-radius: 6px;
+            margin-bottom: 2rem;
+        }
+
+        .details-group p {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .details-group p:last-child {
+            margin-bottom: 0;
+        }
+
+        .details-group strong {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .details-group span {
+            color: #555;
+            font-weight: 500;
+        }
+
+        .customer-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 2rem;
+        }
+
+        .customer-info h4 {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--primary-color);
+        }
+
+        .customer-info p {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .customer-info p:last-child {
+            margin-bottom: 0;
+        }
+
+        .customer-info strong {
+            color: #333;
+            font-weight: 600;
+            min-width: 120px;
+        }
+
+        .customer-info span {
+            color: #555;
+            font-weight: 500;
+            text-align: right;
+            flex: 1;
+            margin-left: 1rem;
+        }
+
+        .ordered-items {
+            margin-top: 2rem;
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .ordered-items h4 {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--primary-color);
+        }
+
+        .item-list {
+            margin-top: 1rem;
+        }
+
+        .order-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 1rem;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+
+        .order-item.header {
+            font-weight: 600;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-name {
+            font-weight: 500;
+        }
+
+        .item-size {
+            text-align: center;
+        }
+
+        .item-quantity {
+            text-align: center;
+        }
+
+        .item-price {
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--primary-color);
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .total-amount {
+            color: var(--primary-color);
+        }
+
+        .back-home-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            margin-top: 2rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-home-btn:hover {
+            background: yellow;
+            color: black;
+            transform: translateY(-2px);
+        }
+
+        .success-message {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: #e8f5e9;
+            border-radius: 8px;
+        }
+
+        .success-message i {
+            font-size: 3rem;
+            color: #2e7d32;
+            margin-bottom: 1rem;
+        }
+
+        .success-message h2 {
+            color: #2e7d32;
+            margin-bottom: 0.5rem;
+        }
+
+        .success-message p {
+            color: #1b5e20;
+            font-size: 1.1rem;
+        }
     </style>
 </body>
 </html>

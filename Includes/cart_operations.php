@@ -83,8 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         i.image_path,
                         i.category 
                     FROM cart c 
-                    LEFT JOIN inventory i ON c.item_code = i.item_code 
-                        OR i.item_code LIKE CONCAT(c.item_code, '-%')
+                    LEFT JOIN inventory i ON c.item_code = i.item_code
                     WHERE c.user_id = ?
                     GROUP BY c.id
                 ");
@@ -102,6 +101,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         } else {
                             $item['image_path'] = '../uploads/itemlist/default.jpg';
                         }
+                        // Remove any size suffix from item name (e.g., "Item Name S" -> "Item Name")
+                        $item['item_name'] = rtrim($item['item_name'], " SMLX234567");
                         $final_cart_items[] = $item;
                     } else {
                         // Try one more time with a broader search
@@ -122,6 +123,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             } else {
                                 $inventory_item['image_path'] = '../uploads/itemlist/default.jpg';
                             }
+                            // Remove any size suffix from item name
+                            $inventory_item['item_name'] = rtrim($inventory_item['item_name'], " SMLX234567");
                             $final_cart_items[] = array_merge($item, $inventory_item);
                         } else {
                             // Fallback for items that might not be in inventory anymore

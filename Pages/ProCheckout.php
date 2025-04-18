@@ -74,19 +74,19 @@ $_SESSION['checkout_total'] = $total_amount;
                 <form action="ProOrderDetails.php" method="POST">
                     <div class="form-group">
                         <label for="firstName">First Name</label>
-                        <input type="text" id="firstName" name="firstName" value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
+                        <input type="text" id="firstName" name="firstName" value="<?php echo htmlspecialchars($user['first_name']); ?>" readonly required>
                     </div>
                     <div class="form-group">
                         <label for="lastName">Last Name</label>
-                        <input type="text" id="lastName" name="lastName" value="<?php echo htmlspecialchars($user['last_name']); ?>" required>
+                        <input type="text" id="lastName" name="lastName" value="<?php echo htmlspecialchars($user['last_name']); ?>" readonly required>
                     </div>
                     <div class="form-group">
                         <label for="course">Course/Strand</label>
-                        <input type="text" id="course" name="course" value="<?php echo htmlspecialchars($user['program_or_position']); ?>" required>
+                        <input type="text" id="course" name="course" value="<?php echo htmlspecialchars($user['program_or_position']); ?>" readonly required>
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" readonly required>
                     </div>
                     <div class="form-group">
                         <label for="phone">Phone Number</label>
@@ -107,12 +107,20 @@ $_SESSION['checkout_total'] = $total_amount;
                 <h3>Order Summary</h3>
                 <div class="summary-items">
                     <?php if (!empty($selected_items)): ?>
-                        <?php foreach ($selected_items as $item): ?>
+                        <div class="summary-header">
+                            <span class="item-name-header">Item</span>
+                            <span class="item-size-header">Size</span>
+                            <span class="item-quantity-header">Qty</span>
+                            <span class="item-price-header">Price</span>
+                        </div>
+                        <?php foreach ($selected_items as $item): 
+                            // Remove size suffix from item name
+                            $clean_name = rtrim($item['item_name'], " SMLX234567");
+                        ?>
                             <div class="summary-item">
-                                <div class="item-info">
-                                    <span class="item-name"><?php echo htmlspecialchars($item['item_name']); ?></span>
-                                    <span class="item-quantity">x<?php echo $item['quantity']; ?></span>
-                                </div>
+                                <span class="item-name"><?php echo htmlspecialchars($clean_name); ?></span>
+                                <span class="item-size"><?php echo htmlspecialchars($item['size'] ?? 'N/A'); ?></span>
+                                <span class="item-quantity"><?php echo $item['quantity']; ?></span>
                                 <span class="item-price">₱<?php echo number_format($item['price'] * $item['quantity'], 2); ?></span>
                             </div>
                         <?php endforeach; ?>

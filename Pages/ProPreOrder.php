@@ -71,6 +71,7 @@
                         <tr>
                             <th>Product</th>
                             <th>Name</th>
+                            <th>Size</th>
                             <th>Price</th>
                             <th>Quantity</th>
                             <th>Include in Checkout</th>
@@ -81,14 +82,17 @@
                             <?php foreach ($final_cart_items as $item): 
                                 $item_total = $item['price'] * $item['quantity'];
                                 $total_amount += $item_total;
+                                // Remove size suffix from item name
+                                $clean_name = rtrim($item['item_name'], " SMLX234567");
                             ?>
                                 <tr data-item-id="<?php echo $item['id']; ?>">
                                     <td>
                                         <img src="../uploads/itemlist/<?php echo htmlspecialchars($item['image_path']); ?>" 
-                                             alt="<?php echo htmlspecialchars($item['item_name']); ?>" 
+                                             alt="<?php echo htmlspecialchars($clean_name); ?>" 
                                              class="product-image">
                                     </td>
-                                    <td><?php echo htmlspecialchars($item['item_name']); ?></td>
+                                    <td><?php echo htmlspecialchars($clean_name); ?></td>
+                                    <td><?php echo htmlspecialchars($item['size'] ?? 'N/A'); ?></td>
                                     <td>₱<?php echo number_format($item['price'], 2); ?></td>
                                     <td>
                                         <div class="quantity-control">
@@ -124,14 +128,21 @@
                 <table class="total-table">
                     <tr>
                         <th>Total Amount:</th>
-                        <td>₱<?php echo number_format($total_amount, 2); ?></td>
+                        <td>₱<?php 
+                            $included_total = 0;
+                            foreach ($final_cart_items as $item) {
+                                // Only add to total if item is included (default is true)
+                                $included_total += $item['price'] * $item['quantity'];
+                            }
+                            echo number_format($included_total, 2); 
+                        ?></td>
                     </tr>
                 </table>
 
                 <?php if (!empty($final_cart_items)): ?>
                 <form action="ProCheckout.php" method="POST" id="checkoutForm">
                     <input type="hidden" name="cart_items" value='<?php echo json_encode($final_cart_items); ?>'>
-                    <input type="hidden" name="total_amount" value="<?php echo $total_amount; ?>">
+                    <input type="hidden" name="total_amount" value="<?php echo $included_total; ?>">
                     <input type="hidden" name="included_items" id="includedItems" value="">
                     <button type="submit" class="proceed-btn">Proceed to Checkout</button>
                 </form>
