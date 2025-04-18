@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+ document.addEventListener('DOMContentLoaded', function() {
     // Initialize variables
     const productsGrid = document.querySelector('.products-grid');
     const filterInputs = document.querySelectorAll('.filter-group input');

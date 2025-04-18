@@ -208,12 +208,15 @@
 
         .modal-content {
             background-color: #fff;
-            margin: 15% auto;
+            position: relative;
             padding: 20px;
             border-radius: 8px;
             width: 80%;
             max-width: 500px;
-            position: relative;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .close {
@@ -263,7 +266,7 @@
         }
 
         .size-option.unavailable {
-            opacity: 0.5;
+            opacity: 1;
             background-color: #f5f5f5;
             cursor: not-allowed;
             border-color: #ddd;
