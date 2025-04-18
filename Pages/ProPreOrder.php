@@ -22,14 +22,36 @@
     require_once '../Includes/connection.php';
 
     // Fetch cart items for the current user
-    $stmt = $conn->prepare("
-        SELECT c.*, i.item_name, i.price, i.image_path 
-        FROM cart c 
-        JOIN inventory i ON c.item_code = i.item_code 
-        WHERE c.user_id = ?
-    ");
+    $stmt = $conn->prepare("SELECT * FROM cart WHERE user_id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    $final_cart_items = [];
+    foreach ($cart_items as $cart_item) {
+        // Try to get inventory details for each cart item
+        $stmt = $conn->prepare("SELECT item_name, price, image_path FROM inventory WHERE item_code = ?");
+        $stmt->execute([$cart_item['item_code']]);
+        $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($inventory_item) {
+            $final_cart_items[] = array_merge($cart_item, $inventory_item);
+        } else {
+            // Try to find the item with a LIKE query to catch potential formatting differences
+            $stmt = $conn->prepare("SELECT item_name, price, image_path FROM inventory WHERE item_code LIKE ?");
+            $stmt->execute(['%' . $cart_item['item_code'] . '%']);
+            $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($inventory_item) {
+                $final_cart_items[] = array_merge($cart_item, $inventory_item);
+            } else {
+                $final_cart_items[] = array_merge($cart_item, [
+                    'item_name' => 'Item no longer available',
+                    'price' => 0,
+                    'image_path' => 'default.jpg'
+                ]);
+            }
+        }
+    }
     
     $total_amount = 0;
     ?>
@@ -55,8 +77,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (!empty($cart_items)): ?>
-                            <?php foreach ($cart_items as $item): 
+                        <?php if (!empty($final_cart_items)): ?>
+                            <?php foreach ($final_cart_items as $item): 
                                 $item_total = $item['price'] * $item['quantity'];
                                 $total_amount += $item_total;
                             ?>
@@ -106,9 +128,9 @@
                     </tr>
                 </table>
 
-                <?php if (!empty($cart_items)): ?>
+                <?php if (!empty($final_cart_items)): ?>
                 <form action="ProCheckout.php" method="POST" id="checkoutForm">
-                    <input type="hidden" name="cart_items" value='<?php echo json_encode($cart_items); ?>'>
+                    <input type="hidden" name="cart_items" value='<?php echo json_encode($final_cart_items); ?>'>
                     <input type="hidden" name="total_amount" value="<?php echo $total_amount; ?>">
                     <input type="hidden" name="included_items" id="includedItems" value="">
                     <button type="submit" class="proceed-btn">Proceed to Checkout</button>

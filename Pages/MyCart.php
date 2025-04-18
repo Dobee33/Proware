@@ -9,14 +9,46 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // Get cart items
-$cart_query = $conn->prepare("
-    SELECT c.*, i.item_name, i.price, i.image_path 
-    FROM cart c 
-    JOIN inventory i ON c.item_code = i.item_code 
-    WHERE c.user_id = ?
-");
+$cart_query = $conn->prepare("SELECT * FROM cart WHERE user_id = ?");
 $cart_query->execute([$_SESSION['user_id']]);
 $cart_items = $cart_query->fetchAll(PDO::FETCH_ASSOC);
+
+$final_cart_items = [];
+foreach ($cart_items as $cart_item) {
+    // Debug: Log the cart item code
+    error_log("Cart Item Code: " . $cart_item['item_code']);
+    
+    // Try to get inventory details for each cart item
+    $stmt = $conn->prepare("SELECT item_name, price, image_path FROM inventory WHERE item_code = ?");
+    $stmt->execute([$cart_item['item_code']]);
+    $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($inventory_item) {
+        // Debug: Log successful match
+        error_log("Found matching inventory item for: " . $cart_item['item_code']);
+        $final_cart_items[] = array_merge($cart_item, $inventory_item);
+    } else {
+        // Debug: Log failed match
+        error_log("No matching inventory item found for: " . $cart_item['item_code']);
+        
+        // Try to find the item with a LIKE query to catch potential formatting differences
+        $stmt = $conn->prepare("SELECT item_name, price, image_path FROM inventory WHERE item_code LIKE ?");
+        $stmt->execute(['%' . $cart_item['item_code'] . '%']);
+        $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($inventory_item) {
+            error_log("Found similar inventory item using LIKE query for: " . $cart_item['item_code']);
+            $final_cart_items[] = array_merge($cart_item, $inventory_item);
+        } else {
+            $final_cart_items[] = array_merge($cart_item, [
+                'item_name' => 'Item no longer available',
+                'price' => 0,
+                'image_path' => 'default.jpg'
+            ]);
+        }
+    }
+}
+
 $cart_total = 0;
 ?>
 
@@ -56,11 +88,11 @@ $cart_total = 0;
         <!-- Main Content -->
         <div class="main-content">
             <!-- Cart Section -->
-            <div class="cart-section <?php echo empty($cart_items) ? 'empty' : ''; ?>">
-                <h2><i class="fas fa-shopping-cart"></i> My Cart (<?php echo count($cart_items); ?> items)</h2>
-                <?php if (!empty($cart_items)): ?>
+            <div class="cart-section <?php echo empty($final_cart_items) ? 'empty' : ''; ?>">
+                <h2><i class="fas fa-shopping-cart"></i> My Cart (<?php echo count($final_cart_items); ?> items)</h2>
+                <?php if (!empty($final_cart_items)): ?>
                     <div class="cart-items">
-                        <?php foreach ($cart_items as $item):
+                        <?php foreach ($final_cart_items as $item):
                             $subtotal = $item['price'] * $item['quantity'];
                             $cart_total += $subtotal;
                         ?>

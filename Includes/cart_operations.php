@@ -53,14 +53,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $user_id = $_SESSION['user_id'];
-                $stmt = $conn->prepare("
-                    SELECT c.*, i.item_name, i.price, i.image_path 
-                    FROM cart c 
-                    JOIN inventory i ON c.item_code = i.item_code 
-                    WHERE c.user_id = ?
-                ");
+                
+                // First get all cart items
+                $stmt = $conn->prepare("SELECT * FROM cart WHERE user_id = ?");
                 $stmt->execute([$user_id]);
                 $cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                $final_cart_items = [];
+                foreach ($cart_items as $cart_item) {
+                    // Debug: Log the cart item code
+                    error_log("Cart Item Code: " . $cart_item['item_code']);
+                    
+                    // Try to get inventory details for each cart item
+                    $stmt = $conn->prepare("SELECT item_name, price, image_path FROM inventory WHERE item_code = ?");
+                    $stmt->execute([$cart_item['item_code']]);
+                    $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
+                    
+                    if ($inventory_item) {
+                        // Debug: Log successful match
+                        error_log("Found matching inventory item for: " . $cart_item['item_code']);
+                        $final_cart_items[] = array_merge($cart_item, $inventory_item);
+                    } else {
+                        // Debug: Log failed match
+                        error_log("No matching inventory item found for: " . $cart_item['item_code']);
+                        
+                        // Try to find the item with a LIKE query to catch potential formatting differences
+                        $stmt = $conn->prepare("SELECT item_name, price, image_path FROM inventory WHERE item_code LIKE ?");
+                        $stmt->execute(['%' . $cart_item['item_code'] . '%']);
+                        $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
+                        
+                        if ($inventory_item) {
+                            error_log("Found similar inventory item using LIKE query for: " . $cart_item['item_code']);
+                            $final_cart_items[] = array_merge($cart_item, $inventory_item);
+                        } else {
+                            $final_cart_items[] = array_merge($cart_item, [
+                                'item_name' => 'Item no longer available',
+                                'price' => 0,
+                                'image_path' => 'default.jpg'
+                            ]);
+                        }
+                    }
+                }
 
                 // Update cart count
                 $stmt = $conn->prepare("SELECT SUM(quantity) as total FROM cart WHERE user_id = ?");
@@ -69,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['cart_count'] = $total;
 
                 $response['success'] = true;
-                $response['cart_items'] = $cart_items;
+                $response['cart_items'] = $final_cart_items;
                 $response['cart_count'] = $total;
                 break;
 
