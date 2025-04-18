@@ -18,7 +18,6 @@ function getUnreadNotifications($conn, $user_id) {
             SELECT * FROM notifications 
             WHERE user_id = ? 
             ORDER BY created_at DESC
-            LIMIT 10
         ");
         $stmt->execute([$user_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

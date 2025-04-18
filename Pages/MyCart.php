@@ -69,7 +69,9 @@ $cart_total = 0;
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <?php include("../Includes/Header.php"); ?>
+<?php
+    include("../Includes/header.php");
+    ?>
 
     <div class="cart-page">
         <div class="cart-header">
@@ -176,7 +178,6 @@ $cart_total = 0;
         }
 
         .cart-count {
-            background: rgba(255, 255, 255, 0.1);
             padding: 0.8rem 1.2rem;
             border-radius: 8px;
             backdrop-filter: blur(5px);
@@ -329,7 +330,8 @@ $cart_total = 0;
         }
 
         .checkout-btn:hover {
-            background: var(--primary-color-dark);
+            background: yellow;
+            color: black;
             transform: translateY(-2px);
         }
 
