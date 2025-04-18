@@ -94,13 +94,25 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     
                                     <div class="items-list">
                                         <h4>Ordered Items:</h4>
-                                        <?php foreach ($order_items as $item): ?>
-                                            <div class="item">
-                                                <span class="item-name"><?php echo htmlspecialchars($item['item_name']); ?></span>
-                                                <span class="item-quantity">x<?php echo $item['quantity']; ?></span>
-                                                <span class="item-price">₱<?php echo number_format($item['price'] * $item['quantity'], 2); ?></span>
+                                        <div class="items-table">
+                                            <div class="table-header">
+                                                <span class="item-name">Item</span>
+                                                <span class="item-size">Size</span>
+                                                <span class="item-quantity">Qty</span>
+                                                <span class="item-price">Price</span>
                                             </div>
-                                        <?php endforeach; ?>
+                                            <?php foreach ($order_items as $item): 
+                                                // Remove size suffix from item name
+                                                $clean_name = rtrim($item['item_name'], " SMLX234567");
+                                            ?>
+                                                <div class="table-row">
+                                                    <span class="item-name"><?php echo htmlspecialchars($clean_name); ?></span>
+                                                    <span class="item-size"><?php echo htmlspecialchars($item['size'] ?? 'N/A'); ?></span>
+                                                    <span class="item-quantity"><?php echo $item['quantity']; ?></span>
+                                                    <span class="item-price">₱<?php echo number_format($item['price'] * $item['quantity'], 2); ?></span>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
                                     </div>
                                     
                                     <div class="order-footer">
@@ -185,6 +197,200 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         // Initial notification count update
         updateNotificationCount();
     </script>
+
+    <style>
+        /* Add this to your existing styles */
+        .items-list {
+            margin: 1.5rem 0;
+            background: #f8f9fa;
+            padding: 1.2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .items-list h4 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .items-table {
+            width: 100%;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 1rem;
+            padding: 0.8rem 0;
+            border-bottom: 2px solid #0056b3;
+            font-weight: 600;
+            color: #0056b3;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 1rem;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .item-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .item-size {
+            text-align: center;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .item-quantity {
+            text-align: center;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .item-price {
+            text-align: right;
+            font-weight: 600;
+            color: #0056b3;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+
+        .order-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .order-header {
+            background: #f8f9fa;
+            padding: 1.2rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .order-details {
+            padding: 1.5rem;
+        }
+
+        .customer-info {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .customer-info p {
+            margin: 0.5rem 0;
+            color: #333;
+        }
+
+        .customer-info strong {
+            color: #0056b3;
+            min-width: 120px;
+            display: inline-block;
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .total-amount {
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .total-amount strong {
+            color: #0056b3;
+        }
+
+        .order-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .order-actions {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .accept-btn, .reject-btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .accept-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .accept-btn:hover {
+            background: #218838;
+        }
+
+        .reject-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .reject-btn:hover {
+            background: #c82333;
+        }
+
+        .status-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge.approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
 </body>
 
 </html>
