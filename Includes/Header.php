@@ -28,6 +28,8 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
             <?php if (isset($_SESSION['user_id'])): ?>
             <li><a href="MyOrders.php"
                     class="<?php echo ($current_page == 'MyOrders.php') ? 'active' : ''; ?>">My Orders</a></li>
+            <li><a href="MyCart.php"
+                    class="<?php echo ($current_page == 'MyCart.php') ? 'active' : ''; ?>">My Cart</a></li>
             <?php endif; ?>
             <li><a href="about.php" class="<?php echo ($current_page == 'about.php') ? 'active' : ''; ?>">About</a></li>
             <li><a href="faq.php" class="<?php echo ($current_page == 'faq.php') ? 'active' : ''; ?>">FAQ</a></li>
@@ -52,7 +54,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     <?php if (isset($_SESSION['user_id'])): ?>
         <div class="icons">
             <div class="icon cart-icon">
-                <a href="#" class="fas fa-shopping-cart">
+                <a href="MyCart.php" class="fas fa-shopping-cart">
                     <?php if (isset($_SESSION['cart_count']) && $_SESSION['cart_count'] > 0): ?>
                         <span class="cart-count"><?php echo $_SESSION['cart_count']; ?></span>
                     <?php endif; ?>
@@ -68,7 +70,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
                     </div>
                     <div class="cart-footer">
                         <div class="cart-buttons">
-                            <a href="ProPreOrder.php" class="checkout-btn">Checkout</a>
+                            <a href="MyCart.php" class="checkout-btn">View Cart</a>
                         </div>
                     </div>
                 </div>
@@ -385,10 +387,13 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: white;
+        background-color: rgba(255, 255, 255, 0.8); /* Reduced opacity */
+        backdrop-filter: blur(10px); /* Glassy effect */
+        -webkit-backdrop-filter: blur(10px); /* For Safari */
         padding: 0.5rem 0.5rem 0.5rem 0;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         z-index: 1000;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     }
 
     .logo-container {
@@ -420,8 +425,9 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         font-weight: 500;
         padding: 0.5rem 1rem;
         font-family: var(--primary-font-family);
-        font-size: 20px;
+        font-size: 16px; /* Reduced font size */
         transition: .3s ease-out;
+        letter-spacing: 0.3px;
     }
 
     .nav-links>li:hover {
@@ -445,7 +451,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
 
     .icon a {
         color: var(--primary-color);
-        font-size: 1.2rem;
+        font-size: 1rem; /* Slightly reduced icon size */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -460,6 +466,11 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         transform: translateY(-7px);
     }
 
+    /* Add hover effect for glassy look */
+    .nav-links a:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+    }
 
     /* Cart count badge */
     .cart-count {
@@ -976,7 +987,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         padding: 5px 15px 10px 15px;
         margin-right: 25px;
         color: var(--primary-color);
-        font-size: 25px;
+        font-size: 18px; /* Reduced font size */
         text-decoration: none;
         text-align: center;
         font-family: var(--primary-font-family);
@@ -990,7 +1001,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     .login .icon:hover a {
         color: yellow;
     }
-
 
     @media screen and (max-width: 768px) {
         .icons {
@@ -1108,19 +1118,17 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     }
 
     .logo-image {
-        width: 60px;
-        height: 60px;
-
+        width: 50px;
+        height: 50px;
     }
 
     .welcome-message {
         color: var(--primary-color);
         padding: 10px 15px;
-        font-size: 30px;
+        font-size: 20px; /* Reduced font size */
         position: relative;
         opacity: 1;
         transition: opacity 1s ease-out;
-
     }
 
     .nav-links a.active {
@@ -1301,8 +1309,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         color: #666;
         padding: 1rem 0;
     }
-
-
 
     /* Count Badges */
     .cart-count, .notification-count {
