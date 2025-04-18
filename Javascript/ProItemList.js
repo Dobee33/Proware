@@ -138,10 +138,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (data.cart_items && data.cart_items.length > 0) {
                         cartItems.innerHTML = data.cart_items.map(item => `
                             <div class="cart-item">
-                                <img src="../uploads/itemlist/${item.image_path}" alt="${item.item_name}">
+                                <img src="${item.image_path}" alt="${item.item_name}">
                                 <div class="cart-item-details">
                                     <div class="cart-item-name">${item.item_name}</div>
-                                    <div class="cart-item-price">₱${item.price} × ${item.quantity}</div>
+                                    <div class="cart-item-info">
+                                        ${item.size ? `<div class="cart-item-size">Size: ${item.size}</div>` : ''}
+                                        <div class="cart-item-price">₱${item.price} × ${item.quantity}</div>
+                                    </div>
                                 </div>
                             </div>
                         `).join('');
@@ -265,27 +268,39 @@ function createFlyingElement(startElement) {
     }, 800);
 }
 
-function addToCart(button) {
-    const itemCode = button.dataset.itemCode;
-    const quantity = 1; // Default quantity
+async function addToCart(element, customData = null) {
+    try {
+        let itemCode, quantity, size;
+        
+        if (customData) {
+            // Data coming from the size selection modal
+            itemCode = customData.itemCode;
+            quantity = customData.quantity;
+            size = customData.size;
+        } else {
+            // Direct add to cart (for accessories)
+            const productContainer = element.closest('.product-container');
+            itemCode = productContainer.dataset.itemCode;
+            quantity = 1;
+            size = null;
+        }
 
-    // Add loading state
-    button.style.pointerEvents = 'none';
-    button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Adding...';
+        const response = await fetch('../Includes/cart_operations.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `action=add&item_code=${itemCode}&quantity=${quantity}${size ? `&size=${size}` : ''}`
+        });
 
-    // Start flying animation
-    createFlyingElement(button);
-
-    fetch('../Includes/cart_operations.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `action=add&item_code=${itemCode}&quantity=${quantity}`
-    })
-    .then(response => response.json())
-    .then(data => {
+        const data = await response.json();
+        
         if (data.success) {
+            // Create flying animation from the clicked button to cart icon
+            if (element) {
+                createFlyingElement(element);
+            }
+            
             // Update cart count in header
             const cartCount = document.querySelector('.cart-count');
             if (cartCount) {
@@ -293,26 +308,17 @@ function addToCart(button) {
             }
             
             // Show success message
-            button.innerHTML = '<i class="fa fa-check"></i> Added!';
-            setTimeout(() => {
-                button.innerHTML = '<i class="fa fa-shopping-cart"></i><span>ADD TO CART</span>';
-                button.style.pointerEvents = 'auto';
-            }, 2000);
+            alert('Item added to cart successfully!');
             
             // Update cart popup content
             updateCartPopup();
         } else {
             alert(data.message || 'Error adding item to cart');
-            button.innerHTML = '<i class="fa fa-shopping-cart"></i><span>ADD TO CART</span>';
-            button.style.pointerEvents = 'auto';
         }
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Error:', error);
         alert('Error adding item to cart');
-        button.innerHTML = '<i class="fa fa-shopping-cart"></i><span>ADD TO CART</span>';
-        button.style.pointerEvents = 'auto';
-    });
+    }
 }
 
 function updateCartPopup() {
@@ -331,10 +337,13 @@ function updateCartPopup() {
                 if (data.cart_items && data.cart_items.length > 0) {
                     cartItems.innerHTML = data.cart_items.map(item => `
                         <div class="cart-item">
-                            <img src="../uploads/itemlist/${item.image_path}" alt="${item.item_name}">
+                            <img src="${item.image_path}" alt="${item.item_name}">
                             <div class="cart-item-details">
                                 <div class="cart-item-name">${item.item_name}</div>
-                                <div class="cart-item-price">₱${item.price} × ${item.quantity}</div>
+                                <div class="cart-item-info">
+                                    ${item.size ? `<div class="cart-item-size">Size: ${item.size}</div>` : ''}
+                                    <div class="cart-item-price">₱${item.price} × ${item.quantity}</div>
+                                </div>
                             </div>
                         </div>
                     `).join('');
@@ -350,3 +359,160 @@ function updateCartPopup() {
 document.addEventListener('DOMContentLoaded', function() {
     updateCartPopup();
 });
+
+function showSizeModal(element) {
+    const productContainer = element.closest('.product-container');
+    const category = productContainer.dataset.category;
+    
+    // If it's an accessory, add to cart directly without showing the modal
+    if (category.toLowerCase() === 'accessories') {
+        addToCart(element);
+        return;
+    }
+
+    // Get all item data including stocks for each size
+    const itemData = [];
+    const sizes = productContainer.dataset.sizes.split(',');
+    const prices = productContainer.dataset.prices.split(',');
+    const stocks = productContainer.dataset.stocks ? productContainer.dataset.stocks.split(',') : [];
+
+    sizes.forEach((size, index) => {
+        itemData.push({
+            size: size,
+            price: prices[index],
+            stock: stocks[index] || 0
+        });
+    });
+
+    currentProduct = {
+        itemCode: productContainer.dataset.itemCode,
+        name: productContainer.dataset.itemName,
+        itemData: itemData,
+        image: productContainer.querySelector('img').src
+    };
+
+    // Update modal content
+    document.getElementById('modalProductImage').src = currentProduct.image;
+    document.getElementById('modalProductName').textContent = currentProduct.name;
+    
+    // Show initial price range
+    const allPrices = currentProduct.itemData.map(item => Number(item.price));
+    const minPrice = Math.min(...allPrices);
+    const maxPrice = Math.max(...allPrices);
+    document.getElementById('modalProductPrice').textContent = 
+        minPrice === maxPrice 
+            ? `Price: ₱${minPrice.toFixed(2)}` 
+            : `Price Range: ₱${minPrice.toFixed(2)} - ₱${maxPrice.toFixed(2)}`;
+
+    // Show total stock
+    const totalStock = currentProduct.itemData.reduce((sum, item) => sum + Number(item.stock), 0);
+    document.getElementById('modalProductStock').textContent = `Total Stock: ${totalStock}`;
+
+    // Generate size options
+    const sizeOptionsContainer = document.querySelector('.size-options');
+    sizeOptionsContainer.innerHTML = '';
+    
+    // All possible sizes
+    const allSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL'];
+    
+    allSizes.forEach(size => {
+        const itemInfo = currentProduct.itemData.find(item => item.size === size);
+        const sizeBtn = document.createElement('div');
+        sizeBtn.className = 'size-option';
+        sizeBtn.textContent = size;
+        
+        // Check if size is available
+        const isAvailable = itemInfo && Number(itemInfo.stock) > 0;
+        sizeBtn.classList.add(isAvailable ? 'available' : 'unavailable');
+        
+        if (isAvailable) {
+            // Store price and stock data in the button's dataset
+            sizeBtn.dataset.price = itemInfo.price;
+            sizeBtn.dataset.stock = itemInfo.stock;
+            sizeBtn.onclick = () => selectSize(sizeBtn);
+        }
+        
+        sizeOptionsContainer.appendChild(sizeBtn);
+    });
+
+    // Disable Add to Cart button by default
+    const addToCartBtn = document.querySelector('.add-to-cart-btn');
+    addToCartBtn.disabled = true;
+
+    modal.style.display = 'block';
+}
+
+function selectSize(element) {
+    // Only allow selection/deselection if the size is available
+    if (!element.classList.contains('available')) {
+        return;
+    }
+    
+    // If clicking on already selected size, deselect it
+    if (element.classList.contains('selected')) {
+        element.classList.remove('selected');
+        // Reset price and stock display
+        const allPrices = currentProduct.itemData.map(item => Number(item.price));
+        const minPrice = Math.min(...allPrices);
+        const maxPrice = Math.max(...allPrices);
+        document.getElementById('modalProductPrice').textContent = 
+            minPrice === maxPrice 
+                ? `Price: ₱${minPrice.toFixed(2)}` 
+                : `Price Range: ₱${minPrice.toFixed(2)} - ₱${maxPrice.toFixed(2)}`;
+        
+        const totalStock = currentProduct.itemData.reduce((sum, item) => sum + Number(item.stock), 0);
+        document.getElementById('modalProductStock').textContent = `Total Stock: ${totalStock}`;
+        
+        // Disable add to cart button
+        const addToCartBtn = document.querySelector('.add-to-cart-btn');
+        addToCartBtn.disabled = true;
+        return;
+    }
+    
+    // Otherwise, proceed with selection
+    document.querySelectorAll('.size-option').forEach(btn => btn.classList.remove('selected'));
+    element.classList.add('selected');
+    
+    // Update price and stock display for selected size
+    const price = Number(element.dataset.price);
+    const stock = Number(element.dataset.stock);
+    
+    document.getElementById('modalProductPrice').textContent = `Price: ₱${price.toFixed(2)}`;
+    document.getElementById('modalProductStock').textContent = `Stock: ${stock}`;
+    document.getElementById('modalProductStock').className = 
+        stock < 10 ? 'stock-display low-stock' : 'stock-display';
+    
+    // Update quantity input max value
+    const quantityInput = document.getElementById('quantity');
+    quantityInput.max = stock;
+    quantityInput.value = Math.min(Number(quantityInput.value), stock);
+    
+    // Enable add to cart button
+    const addToCartBtn = document.querySelector('.add-to-cart-btn');
+    addToCartBtn.disabled = false;
+}
+
+function addToCartWithSize() {
+    const selectedSize = document.querySelector('.size-option.selected');
+    if (!selectedSize || !selectedSize.classList.contains('available')) {
+        alert('Please select an available size');
+        return;
+    }
+
+    const quantity = document.getElementById('quantity').value;
+    const size = selectedSize.textContent;
+
+    // Add to cart with size and quantity
+    addToCart(null, {
+        itemCode: currentProduct.itemCode,
+        size: size,
+        quantity: quantity
+    });
+
+    // Close modal
+    modal.style.display = 'none';
+    // Reset quantity
+    document.getElementById('quantity').value = 1;
+    // Reset size selection
+    document.querySelectorAll('.size-option').forEach(btn => btn.classList.remove('selected'));
+}

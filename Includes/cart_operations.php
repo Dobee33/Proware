@@ -18,21 +18,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $item_code = $_POST['item_code'];
                 $quantity = $_POST['quantity'];
+                $size = $_POST['size'] ?? null;
                 $user_id = $_SESSION['user_id'];
 
-                // Check if item already exists in cart
-                $stmt = $conn->prepare("SELECT id, quantity FROM cart WHERE user_id = ? AND item_code = ?");
-                $stmt->execute([$user_id, $item_code]);
+                // Check if item already exists in cart with the same size
+                $stmt = $conn->prepare("SELECT id, quantity FROM cart WHERE user_id = ? AND item_code = ? AND (size = ? OR (size IS NULL AND ? IS NULL))");
+                $stmt->execute([$user_id, $item_code, $size, $size]);
                 $existing_item = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if ($existing_item) {
-                    // Update quantity if item exists
+                    // Update quantity if item exists with same size
                     $stmt = $conn->prepare("UPDATE cart SET quantity = quantity + ? WHERE id = ?");
                     $stmt->execute([$quantity, $existing_item['id']]);
                 } else {
-                    // Insert new item if it doesn't exist
-                    $stmt = $conn->prepare("INSERT INTO cart (user_id, item_code, quantity) VALUES (?, ?, ?)");
-                    $stmt->execute([$user_id, $item_code, $quantity]);
+                    // Insert new item if it doesn't exist with this size
+                    $stmt = $conn->prepare("INSERT INTO cart (user_id, item_code, quantity, size) VALUES (?, ?, ?, ?)");
+                    $stmt->execute([$user_id, $item_code, $quantity, $size]);
                 }
 
                 // Get total items in cart
@@ -54,42 +55,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $user_id = $_SESSION['user_id'];
                 
-                // First get all cart items
-                $stmt = $conn->prepare("SELECT * FROM cart WHERE user_id = ?");
+                // Get all cart items including size, using LIKE for item_code matching
+                $stmt = $conn->prepare("
+                    SELECT 
+                        c.*,
+                        i.item_name,
+                        i.price,
+                        i.image_path,
+                        i.category 
+                    FROM cart c 
+                    LEFT JOIN inventory i ON c.item_code = i.item_code 
+                        OR i.item_code LIKE CONCAT(c.item_code, '-%')
+                    WHERE c.user_id = ?
+                    GROUP BY c.id
+                ");
                 $stmt->execute([$user_id]);
                 $cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 
                 $final_cart_items = [];
-                foreach ($cart_items as $cart_item) {
-                    // Debug: Log the cart item code
-                    error_log("Cart Item Code: " . $cart_item['item_code']);
-                    
-                    // Try to get inventory details for each cart item
-                    $stmt = $conn->prepare("SELECT item_name, price, image_path FROM inventory WHERE item_code = ?");
-                    $stmt->execute([$cart_item['item_code']]);
-                    $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
-                    
-                    if ($inventory_item) {
-                        // Debug: Log successful match
-                        error_log("Found matching inventory item for: " . $cart_item['item_code']);
-                        $final_cart_items[] = array_merge($cart_item, $inventory_item);
-                    } else {
-                        // Debug: Log failed match
-                        error_log("No matching inventory item found for: " . $cart_item['item_code']);
-                        
-                        // Try to find the item with a LIKE query to catch potential formatting differences
-                        $stmt = $conn->prepare("SELECT item_name, price, image_path FROM inventory WHERE item_code LIKE ?");
-                        $stmt->execute(['%' . $cart_item['item_code'] . '%']);
-                        $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
-                        
-                        if ($inventory_item) {
-                            error_log("Found similar inventory item using LIKE query for: " . $cart_item['item_code']);
-                            $final_cart_items[] = array_merge($cart_item, $inventory_item);
+                foreach ($cart_items as $item) {
+                    if ($item['item_name']) {
+                        // Fix image path
+                        if ($item['image_path']) {
+                            // Remove any existing path prefix
+                            $image_name = basename($item['image_path']);
+                            $item['image_path'] = '../uploads/itemlist/' . $image_name;
                         } else {
-                            $final_cart_items[] = array_merge($cart_item, [
+                            $item['image_path'] = '../uploads/itemlist/default.jpg';
+                        }
+                        $final_cart_items[] = $item;
+                    } else {
+                        // Try one more time with a broader search
+                        $stmt = $conn->prepare("
+                            SELECT item_name, price, image_path, category 
+                            FROM inventory 
+                            WHERE item_code LIKE ?
+                            LIMIT 1
+                        ");
+                        $stmt->execute(['%' . $item['item_code'] . '%']);
+                        $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                        if ($inventory_item) {
+                            // Fix image path for found inventory item
+                            if ($inventory_item['image_path']) {
+                                $image_name = basename($inventory_item['image_path']);
+                                $inventory_item['image_path'] = '../uploads/itemlist/' . $image_name;
+                            } else {
+                                $inventory_item['image_path'] = '../uploads/itemlist/default.jpg';
+                            }
+                            $final_cart_items[] = array_merge($item, $inventory_item);
+                        } else {
+                            // Fallback for items that might not be in inventory anymore
+                            $final_cart_items[] = array_merge($item, [
                                 'item_name' => 'Item no longer available',
                                 'price' => 0,
-                                'image_path' => 'default.jpg'
+                                'image_path' => '../uploads/itemlist/default.jpg'
                             ]);
                         }
                     }

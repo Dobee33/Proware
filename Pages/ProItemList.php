@@ -127,12 +127,16 @@
                 foreach ($products as $itemCode => $product):
                     $availableSizes = $product['sizes'];
                     $prices = $product['prices'];
+                    $stocks = isset($product['stocks']) ? $product['stocks'] : array_fill(0, count($availableSizes), $product['stock']);
                     ?>
                     <div class="product-container" 
                         data-sizes="<?php echo implode(',', $availableSizes); ?>"
                         data-prices="<?php echo implode(',', $prices); ?>" 
+                        data-stocks="<?php echo implode(',', $stocks); ?>"
                         data-stock="<?php echo $product['stock']; ?>"
-                        data-item-code="<?php echo htmlspecialchars($itemCode); ?>">
+                        data-category="<?php echo htmlspecialchars($product['category']); ?>"
+                        data-item-code="<?php echo htmlspecialchars($itemCode); ?>"
+                        data-item-name="<?php echo htmlspecialchars($product['name']); ?>">
                         <img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>">
                         <div class="product-overlay">
                             <div class="items"></div>
@@ -148,7 +152,7 @@
                             <div class="items stock">
                                 <p>Stock: <?php echo $product['stock']; ?></p>
                             </div>
-                            <div class="items cart" onclick="addToCart(this)" data-item-code="<?php echo htmlspecialchars($itemCode); ?>">
+                            <div class="items cart" onclick="showSizeModal(this)" data-item-code="<?php echo htmlspecialchars($itemCode); ?>">
                                 <i class="fa fa-shopping-cart"></i>
                                 <span>ADD TO CART</span>
                             </div>
@@ -159,7 +163,188 @@
         </main>
     </div>
 
+    <!-- Size Selection Modal -->
+    <div id="sizeModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Select Size</h2>
+            <div class="product-info">
+                <img id="modalProductImage" src="" alt="Product Image">
+                <div class="product-details">
+                    <h3 id="modalProductName"></h3>
+                    <p id="modalProductPrice" class="price-display">Price Range: --</p>
+                    <p id="modalProductStock" class="stock-display">Stock: --</p>
+                </div>
+            </div>
+            <div class="size-options">
+                <!-- Size options will be dynamically added here -->
+            </div>
+            <div class="quantity-selector">
+                <label for="quantity">Quantity:</label>
+                <div class="quantity-controls">
+                    <button type="button" onclick="decrementQuantity()">-</button>
+                    <input type="number" id="quantity" value="1" min="1">
+                    <button type="button" onclick="incrementQuantity()">+</button>
+                </div>
+            </div>
+            <button class="add-to-cart-btn" onclick="addToCartWithSize()">Add to Cart</button>
+        </div>
+    </div>
+
     <?php include("../Includes/Footer.php"); ?>
+
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .product-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .product-info img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+
+        .size-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .size-option {
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .size-option.available {
+            opacity: 1;
+            background-color: #fff;
+            border-color: #007bff;
+            color: #007bff;
+        }
+
+        .size-option.unavailable {
+            opacity: 0.5;
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+            border-color: #ddd;
+            color: #999;
+        }
+
+        .size-option.selected {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+            opacity: 1;
+        }
+
+        .size-option.available:hover {
+            background-color: #e6f2ff;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .quantity-controls button {
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            background: #f0f0f0;
+            cursor: pointer;
+        }
+
+        .quantity-controls input {
+            width: 50px;
+            text-align: center;
+            padding: 5px;
+        }
+
+        .add-to-cart-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .add-to-cart-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .price-display, .stock-display {
+            font-size: 1.1em;
+            margin: 5px 0;
+        }
+
+        .price-display {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .stock-display {
+            color: #28a745;
+        }
+
+        .low-stock {
+            color: #dc3545;
+        }
+    </style>
 
     <script src="../Javascript/ProItemList.js" defer></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -185,6 +370,100 @@
             });
         });
 
+        // Modal functionality
+        const modal = document.getElementById('sizeModal');
+        const closeBtn = document.getElementsByClassName('close')[0];
+        let currentProduct = null;
+
+        function showSizeModal(element) {
+            const productContainer = element.closest('.product-container');
+            const category = productContainer.dataset.category;
+            
+            // If it's an accessory, add to cart directly without showing the modal
+            if (category.toLowerCase() === 'accessories') {
+                addToCart(element);
+                return;
+            }
+
+            currentProduct = {
+                itemCode: productContainer.dataset.itemCode,
+                name: productContainer.dataset.itemName,
+                sizes: productContainer.dataset.sizes.split(','),
+                prices: productContainer.dataset.prices.split(','),
+                image: productContainer.querySelector('img').src
+            };
+
+            // Update modal content
+            document.getElementById('modalProductImage').src = currentProduct.image;
+            document.getElementById('modalProductName').textContent = currentProduct.name;
+            document.getElementById('modalProductPrice').textContent = `Price Range: ₱${Math.min(...currentProduct.prices.map(Number)).toFixed(2)} - ₱${Math.max(...currentProduct.prices.map(Number)).toFixed(2)}`;
+            document.getElementById('modalProductStock').textContent = `Stock: ${currentProduct.stock}`;
+
+            // Generate size options
+            const sizeOptionsContainer = document.querySelector('.size-options');
+            sizeOptionsContainer.innerHTML = '';
+            currentProduct.sizes.forEach(size => {
+                const sizeBtn = document.createElement('div');
+                sizeBtn.className = 'size-option';
+                sizeBtn.textContent = size;
+                sizeBtn.onclick = () => selectSize(sizeBtn);
+                sizeOptionsContainer.appendChild(sizeBtn);
+            });
+
+            modal.style.display = 'block';
+        }
+
+        function selectSize(element) {
+            document.querySelectorAll('.size-option').forEach(btn => btn.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
+        function incrementQuantity() {
+            const input = document.getElementById('quantity');
+            input.value = parseInt(input.value) + 1;
+        }
+
+        function decrementQuantity() {
+            const input = document.getElementById('quantity');
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+            }
+        }
+
+        function addToCartWithSize() {
+            const selectedSize = document.querySelector('.size-option.selected');
+            if (!selectedSize && currentProduct.category !== 'accessories') {
+                alert('Please select a size');
+                return;
+            }
+
+            const quantity = document.getElementById('quantity').value;
+            const size = selectedSize ? selectedSize.textContent : null;
+
+            // Add to cart with size and quantity
+            addToCart(null, {
+                itemCode: currentProduct.itemCode,
+                size: size,
+                quantity: quantity
+            });
+
+            // Close modal
+            modal.style.display = 'none';
+            // Reset quantity
+            document.getElementById('quantity').value = 1;
+        }
+
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+            document.getElementById('quantity').value = 1;
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+                document.getElementById('quantity').value = 1;
+            }
+        }
     </script>
 </body>
 

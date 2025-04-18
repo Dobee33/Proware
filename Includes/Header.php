@@ -113,6 +113,8 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
 
 <!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!-- Cart Styles -->
+<link rel="stylesheet" href="../CSS/cart.css">
 
 <script>
     function checkLoginStatus(destination) {
@@ -126,7 +128,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     // Add sign out function with confirmation
     function signOut(event) {
         event.preventDefault();
-        if (confirm("Are you sure you want to log out?")) { // Confirmation popup
+        if (confirm("Are you sure you want to log out?")) {
             window.location.href = 'logout.php';
         }
     }
@@ -146,9 +148,9 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         const welcomeMessage = document.getElementById('welcomeMessage');
         if (welcomeMessage) {
             setTimeout(() => {
-                welcomeMessage.style.transition = "opacity 1s ease-out"; // Smooth transition
-                welcomeMessage.style.opacity = 0; // Fade out
-            }, 5000); // Wait for 5 seconds
+                welcomeMessage.style.transition = "opacity 1s ease-out";
+                welcomeMessage.style.opacity = 0;
+            }, 5000);
         }
     };
 
@@ -370,6 +372,9 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         }
     }
 </script>
+
+<!-- Include cart functionality -->
+<script src="../Javascript/cart.js"></script>
 
 <style>
     .navbar {
