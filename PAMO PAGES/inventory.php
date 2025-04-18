@@ -12,6 +12,20 @@ session_start();
     <link rel="stylesheet" href="../PAMO CSS/inventory.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="../PAMO JS/inventory.js"></script>
+    <script>
+        // Check for low stock filter on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const applyLowStockFilter = sessionStorage.getItem('applyLowStockFilter');
+            if (applyLowStockFilter === 'true') {
+                // Set the status filter to Low Stock
+                document.getElementById('statusFilter').value = 'Low Stock';
+                // Apply the filters
+                applyFilters();
+                // Clear the session storage
+                sessionStorage.removeItem('applyLowStockFilter');
+            }
+        });
+    </script>
 </head>
 
 <body>
