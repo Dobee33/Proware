@@ -12,15 +12,15 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
 <nav class="navbar" role="navigation" aria-label="Main navigation">
     <div class="logo-container">
         <div class="logo">
-            <a href="ProHome.php" aria-label="Home">
+            <a href="home.php" aria-label="Home">
                 <img src="../Images/STI-LOGO.png" alt="STI Logo" class="logo-image">
             </a>
         </div>
 
         <!-- Middle - Navigation Links -->
         <ul class="nav-links">
-            <li><a href="ProHome.php"
-                    class="<?php echo ($current_page == 'ProHome.php') ? 'active' : ''; ?>">Homepage</a></li>
+            <li><a href="home.php"
+                    class="<?php echo ($current_page == 'home.php') ? 'active' : ''; ?>">Homepage</a></li>
             <li><a href="ProItemList.php"
                     class="<?php echo ($current_page == 'ProItemList.php') ? 'active' : ''; ?>">Item List</a></li>
             <li><a href="ProPreOrder.php"
@@ -35,7 +35,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     </div>
 
     <!-- Welcome Message -->
-    <?php if (isset($_SESSION['user_id']) && $current_page == 'ProHome.php'): ?>
+    <?php if (isset($_SESSION['user_id']) && $current_page == 'home.php'): ?>
         <div class="welcome-message" id="welcomeMessage">
             Welcome, <?php echo htmlspecialchars($_SESSION['last_name']); ?>
             (<?php echo htmlspecialchars($_SESSION['role_category']); ?>)
@@ -82,7 +82,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
                 <div class="notification-popup">
                     <div class="notification-header">
                         <h3>Notifications</h3>
-                        <span class="notification-count">0</span>
                     </div>
                     <div class="notification-items">
                         <!-- Notifications will be loaded here -->

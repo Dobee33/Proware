@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="../CSS/landing-header.css">
+    <link rel="stylesheet" href="../CSS/header.css">
     <link rel="stylesheet" href="../CSS/global.css">
     <link rel="stylesheet" href="../CSS/ProHome.css">
     <meta charset="UTF-8">
@@ -35,7 +35,11 @@
             <h1>UNLOCK YOUR FUTURE <br> WITH PRE-ORDER <br> SAVINGS</h1>
             <p>At PAMO, we streamline your Purchasing and Asset Management needs with ease. <br> Explore our inventory
                 and discover the resources available <br> right at your fingertips.</p>
-            <a href="login.php"><button class="pre-order-button">Pre Order</button></a>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="ProItemList.php"><button class="pre-order-button">Pre Order</button></a>
+            <?php else: ?>
+                <a href="login.php"><button class="pre-order-button">Pre Order</button></a>
+            <?php endif; ?>
         </div>
     </section>
 
@@ -55,7 +59,11 @@
                     <p>Comfortable and professional attire for STI students, for daily use.</p>
                 </div>
                 <div class="btn">
-                    <a href="login.php"><button class="buy-btn">Pre Order</button></a>
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <a href="ProItemList.php"><button class="buy-btn">Pre Order</button></a>
+                    <?php else: ?>
+                        <a href="login.php"><button class="buy-btn">Pre Order</button></a>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="card" class="code code--small code--left aos-init aos-animate" data-aos="zoom-in">
@@ -67,7 +75,11 @@
                     <p>Trendy and versatile shirt with the STI logo, ideal for events and casual wear.</p>
                 </div>
                 <div class="btn">
-                    <a href="login.php"><button class="buy-btn">Pre Order</button></a>
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <a href="ProItemList.php"><button class="buy-btn">Pre Order</button></a>
+                    <?php else: ?>
+                        <a href="login.php"><button class="buy-btn">Pre Order</button></a>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="card" class="code code--small code--right aos-init aos-animate" data-aos="zoom-in-left">
@@ -79,7 +91,11 @@
                     <p>Stylish lanyards, pins, and bags to showcase school pride and functionality.</p>
                 </div>
                 <div class="btn">
-                    <a href="login.php"><button class="buy-btn">Pre Order</button></a>
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <a href="ProItemList.php"><button class="buy-btn">Pre Order</button></a>
+                    <?php else: ?>
+                        <a href="login.php"><button class="buy-btn">Pre Order</button></a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -87,11 +103,9 @@
 
     <secion class="tagline">
         <div class="tag">
-        
             <h1>Be future-ready. Be STI.</h1>
             <p>Explore our wide range of products and check stock availability right from your device.</p>
         </div>
-        
     </secion>
 
     <section class="Featured">
@@ -101,7 +115,11 @@
                 data-aos-anchor-placement="top-center">Explore Our Featured <br>
                 Products for <br> Purchase</h1>
             <p>Explore a wide selection of essential items, updated <br> regularly to meet your needs.</p>
-            <a href="login.php"><button class="pre-order-button">Pre Order</button></a>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="ProItemList.php"><button class="pre-order-button">Pre Order</button></a>
+            <?php else: ?>
+                <a href="login.php"><button class="pre-order-button">Pre Order</button></a>
+            <?php endif; ?>
         </div>
         <div class="slideshow">
             <img src="../Images/ACS ALL.jpg" alt="Featured Product 1">
@@ -159,28 +177,6 @@
         // Change slide every 5 seconds
         setInterval(showHeroSlides, 5000);
     </script>
-    <script>
-        const hamburger = document.querySelector(".hamburger");
-        const navLinks = document.querySelector(".nav-links");
-        const dropdowns = document.querySelectorAll(".dropdown");
-
-        hamburger.addEventListener("click", () => {
-            hamburger.classList.toggle("active");
-            navLinks.classList.toggle("active");
-        });
-
-        dropdowns.forEach(dropdown => {
-            dropdown.addEventListener("click", () => {
-                dropdown.classList.toggle("active");
-            });
-        });
-
-        // Close menu when clicking a link
-        document.querySelectorAll(".nav-links a").forEach(n => n.addEventListener("click", () => {
-            hamburger.classList.remove("active");
-            navLinks.classList.remove("active");
-        }));
-    </script>
 </body>
 
-</html>
+</html> 

@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['last_name'] = $user['last_name'];
 
             if ($user['role_category'] === 'COLLEGE STUDENT' || $user['role_category'] === 'SHS') {
-                header("Location: ProHome.php");
+                header("Location: Home.php");
                 exit();
             } else if ($user['program_or_position'] === 'PAMO') {
                 header("Location: ../PAMO PAGES/dashboard.php");
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     <?php endif; ?>
                 </form>
-                <a href="landing-home.php" class="back-btn">
+                <a href="home.php" class="back-btn">
                     <i class="fas fa-arrow-left"></i>
                     <span>Back to Home</span>
                 </a>

@@ -138,7 +138,7 @@ try {
                     </div>
                 </div>
 
-                <button class="back-home-btn" onclick="window.location.href='ProHome.php'">
+                <button class="back-home-btn" onclick="window.location.href='home.php'">
                     Back to Home
                 </button>
             </div>
