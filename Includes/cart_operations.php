@@ -17,9 +17,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $item_code = $_POST['item_code'];
-                $quantity = $_POST['quantity'];
-                $size = $_POST['size'] ?? null;
+                $quantity = intval($_POST['quantity']);
+                $size = isset($_POST['size']) && !empty($_POST['size']) ? $_POST['size'] : null;
                 $user_id = $_SESSION['user_id'];
+
+                // Get item category from inventory
+                $stmt = $conn->prepare("SELECT category FROM inventory WHERE item_code = ? OR item_code LIKE ? LIMIT 1");
+                $stmt->execute([$item_code, $item_code . '-%']);
+                $item = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                // Debug logging
+                error_log("Adding item to cart - Item Code: " . $item_code . ", Category: " . ($item ? $item['category'] : 'not found') . ", Size: " . ($size ?? 'null'));
+
+                // Set size to 'One Size' for accessories if not set
+                if ($item && (stripos($item['category'], 'accessories') !== false || stripos($item['category'], 'sti-accessories') !== false)) {
+                    $size = 'One Size';
+                }
 
                 // Check if item already exists in cart with the same size
                 $stmt = $conn->prepare("SELECT id, quantity FROM cart WHERE user_id = ? AND item_code = ? AND (size = ? OR (size IS NULL AND ? IS NULL))");
@@ -29,11 +42,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($existing_item) {
                     // Update quantity if item exists with same size
                     $stmt = $conn->prepare("UPDATE cart SET quantity = quantity + ? WHERE id = ?");
-                    $stmt->execute([$quantity, $existing_item['id']]);
+                    $success = $stmt->execute([$quantity, $existing_item['id']]);
                 } else {
                     // Insert new item if it doesn't exist with this size
                     $stmt = $conn->prepare("INSERT INTO cart (user_id, item_code, quantity, size) VALUES (?, ?, ?, ?)");
-                    $stmt->execute([$user_id, $item_code, $quantity, $size]);
+                    $success = $stmt->execute([$user_id, $item_code, $quantity, $size]);
+                }
+
+                if (!$success) {
+                    $response['message'] = 'Failed to update cart';
+                    error_log("Failed to update cart - " . json_encode($stmt->errorInfo()));
+                    break;
                 }
 
                 // Get total items in cart

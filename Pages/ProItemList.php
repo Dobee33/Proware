@@ -152,7 +152,7 @@
                             <div class="items stock">
                                 <p>Stock: <?php echo $product['stock']; ?></p>
                             </div>
-                            <div class="items cart" onclick="showSizeModal(this)" data-item-code="<?php echo htmlspecialchars($itemCode); ?>">
+                            <div class="items cart" onclick="handleAddToCart(this)" data-item-code="<?php echo htmlspecialchars($itemCode); ?>">
                                 <i class="fa fa-shopping-cart"></i>
                                 <span>ADD TO CART</span>
                             </div>
@@ -188,6 +188,31 @@
                 </div>
             </div>
             <button class="add-to-cart-btn" onclick="addToCartWithSize()">Add to Cart</button>
+        </div>
+    </div>
+
+    <!-- Accessories Quantity Modal -->
+    <div id="accessoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAccessoryModal()">&times;</span>
+            <h2>Select Quantity</h2>
+            <div class="product-info">
+                <img id="accessoryModalImage" src="" alt="Product Image">
+                <div class="product-details">
+                    <h3 id="accessoryModalName"></h3>
+                    <p id="accessoryModalPrice" class="price-display">Price: --</p>
+                    <p id="accessoryModalStock" class="stock-display">Stock: --</p>
+                </div>
+            </div>
+            <div class="quantity-selector">
+                <label for="accessoryQuantity">Quantity:</label>
+                <div class="quantity-controls">
+                    <button type="button" onclick="decrementAccessoryQuantity()">-</button>
+                    <input type="number" id="accessoryQuantity" value="1" min="1">
+                    <button type="button" onclick="incrementAccessoryQuantity()">+</button>
+                </div>
+            </div>
+            <button class="add-to-cart-btn" onclick="addAccessoryToCart()">Add to Cart</button>
         </div>
     </div>
 
@@ -347,6 +372,52 @@
         .low-stock {
             color: #dc3545;
         }
+
+        /* Add specific styles for accessory modal */
+        #accessoryModal .quantity-selector {
+            margin: 20px 0;
+        }
+
+        #accessoryModal .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #accessoryModal .quantity-controls button {
+            padding: 5px 15px;
+            font-size: 18px;
+            border: 1px solid #ddd;
+            background: #f8f8f8;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        #accessoryModal .quantity-controls input {
+            width: 60px;
+            text-align: center;
+            padding: 5px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #accessoryModal .add-to-cart-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        #accessoryModal .add-to-cart-btn:hover {
+            background-color: #0056b3;
+        }
     </style>
 
     <script src="../Javascript/ProItemList.js" defer></script>
@@ -378,22 +449,88 @@
         const closeBtn = document.getElementsByClassName('close')[0];
         let currentProduct = null;
 
+        function handleAddToCart(element) {
+            const productContainer = element.closest('.product-container');
+            const category = productContainer.dataset.category;
+            
+            if (category && (category.toLowerCase().includes('accessories') || category.toLowerCase().includes('sti-accessories'))) {
+                showAccessoryModal(element);
+            } else {
+                showSizeModal(element);
+            }
+        }
+
+        function showAccessoryModal(element) {
+            const productContainer = element.closest('.product-container');
+            const price = productContainer.dataset.prices.split(',')[0];
+            const stock = productContainer.dataset.stock;
+            
+            currentProduct = {
+                itemCode: productContainer.dataset.itemCode,
+                name: productContainer.dataset.itemName,
+                price: price,
+                stock: stock,
+                image: productContainer.querySelector('img').src,
+                category: productContainer.dataset.category
+            };
+
+            // Update modal content
+            document.getElementById('accessoryModalImage').src = currentProduct.image;
+            document.getElementById('accessoryModalName').textContent = currentProduct.name;
+            document.getElementById('accessoryModalPrice').textContent = `Price: ₱${parseFloat(currentProduct.price).toFixed(2)}`;
+            document.getElementById('accessoryModalStock').textContent = `Stock: ${currentProduct.stock}`;
+
+            // Set max quantity
+            document.getElementById('accessoryQuantity').max = currentProduct.stock;
+            
+            // Show the modal
+            document.getElementById('accessoryModal').style.display = 'block';
+        }
+
+        function closeAccessoryModal() {
+            document.getElementById('accessoryModal').style.display = 'none';
+            document.getElementById('accessoryQuantity').value = 1;
+        }
+
+        function incrementAccessoryQuantity() {
+            const input = document.getElementById('accessoryQuantity');
+            const max = parseInt(input.max);
+            const currentValue = parseInt(input.value);
+            if (currentValue < max) {
+                input.value = currentValue + 1;
+            }
+        }
+
+        function decrementAccessoryQuantity() {
+            const input = document.getElementById('accessoryQuantity');
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+            }
+        }
+
+        function addAccessoryToCart() {
+            const quantity = document.getElementById('accessoryQuantity').value;
+            
+            addToCart(null, {
+                itemCode: currentProduct.itemCode,
+                quantity: quantity,
+                size: 'One Size'
+            });
+
+            closeAccessoryModal();
+        }
+
         function showSizeModal(element) {
             const productContainer = element.closest('.product-container');
             const category = productContainer.dataset.category;
             
-            // If it's an accessory, add to cart directly without showing the modal
-            if (category.toLowerCase() === 'accessories') {
-                addToCart(element);
-                return;
-            }
-
             currentProduct = {
                 itemCode: productContainer.dataset.itemCode,
                 name: productContainer.dataset.itemName,
                 sizes: productContainer.dataset.sizes.split(','),
                 prices: productContainer.dataset.prices.split(','),
-                image: productContainer.querySelector('img').src
+                image: productContainer.querySelector('img').src,
+                category: category
             };
 
             // Update modal content
@@ -413,7 +550,7 @@
                 sizeOptionsContainer.appendChild(sizeBtn);
             });
 
-            modal.style.display = 'block';
+            document.getElementById('sizeModal').style.display = 'block';
         }
 
         function selectSize(element) {
@@ -435,13 +572,13 @@
 
         function addToCartWithSize() {
             const selectedSize = document.querySelector('.size-option.selected');
-            if (!selectedSize && currentProduct.category !== 'accessories') {
+            if (!selectedSize && !currentProduct.category?.toLowerCase().includes('accessories')) {
                 alert('Please select a size');
                 return;
             }
 
             const quantity = document.getElementById('quantity').value;
-            const size = selectedSize ? selectedSize.textContent : null;
+            const size = currentProduct.category?.toLowerCase().includes('accessories') ? 'One Size' : selectedSize.textContent;
 
             // Add to cart with size and quantity
             addToCart(null, {
@@ -456,15 +593,17 @@
             document.getElementById('quantity').value = 1;
         }
 
-        closeBtn.onclick = function() {
-            modal.style.display = 'none';
-            document.getElementById('quantity').value = 1;
-        }
+        // Add event listeners for the close buttons
+        document.querySelectorAll('.modal .close').forEach(closeBtn => {
+            closeBtn.onclick = function() {
+                this.closest('.modal').style.display = 'none';
+            }
+        });
 
+        // Close modals when clicking outside
         window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
-                document.getElementById('quantity').value = 1;
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
             }
         }
     </script>

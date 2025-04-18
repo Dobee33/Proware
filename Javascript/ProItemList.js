@@ -1,4 +1,4 @@
- document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     // Initialize variables
     const productsGrid = document.querySelector('.products-grid');
     const filterInputs = document.querySelectorAll('.filter-group input');
@@ -273,27 +273,40 @@ async function addToCart(element, customData = null) {
         let itemCode, quantity, size;
         
         if (customData) {
-            // Data coming from the size selection modal
+            // Data coming from the size selection modal or direct accessory add
             itemCode = customData.itemCode;
             quantity = customData.quantity;
             size = customData.size;
+            console.log('Using custom data:', customData); // Debug log
         } else {
             // Direct add to cart (for accessories)
             const productContainer = element.closest('.product-container');
+            const category = productContainer.dataset.category;
             itemCode = productContainer.dataset.itemCode;
             quantity = 1;
-            size = null;
+            size = (category && (category.toLowerCase().includes('accessories') || category.toLowerCase().includes('sti-accessories'))) ? 'One Size' : null;
+            console.log('Direct add data:', { itemCode, quantity, size, category }); // Debug log
         }
+
+        // Create the form data
+        const formData = new URLSearchParams();
+        formData.append('action', 'add');
+        formData.append('item_code', itemCode);
+        formData.append('quantity', quantity);
+        formData.append('size', size || ''); // Ensure size is always sent, even if empty string
+
+        console.log('Sending to server:', formData.toString()); // Debug log
 
         const response = await fetch('../Includes/cart_operations.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: `action=add&item_code=${itemCode}&quantity=${quantity}${size ? `&size=${size}` : ''}`
+            body: formData.toString()
         });
 
         const data = await response.json();
+        console.log('Server response:', data); // Debug log
         
         if (data.success) {
             // Create flying animation from the clicked button to cart icon
@@ -494,13 +507,13 @@ function selectSize(element) {
 
 function addToCartWithSize() {
     const selectedSize = document.querySelector('.size-option.selected');
-    if (!selectedSize || !selectedSize.classList.contains('available')) {
+    if (!selectedSize && !currentProduct.category?.toLowerCase().includes('accessories')) {
         alert('Please select an available size');
         return;
     }
 
     const quantity = document.getElementById('quantity').value;
-    const size = selectedSize.textContent;
+    const size = currentProduct.category?.toLowerCase().includes('accessories') ? 'One Size' : selectedSize.textContent;
 
     // Add to cart with size and quantity
     addToCart(null, {
