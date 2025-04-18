@@ -157,6 +157,7 @@
 
 /* Product Card */
 .product-container {
+  border-radius: 13px;
   position: relative;
   width: 100%;
   height: 400px;

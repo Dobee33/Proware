@@ -1,7 +1,6 @@
 <?php
 session_start();
 require_once '../Includes/connection.php';
-include("../Includes/Header.php");
 
 // Get the submitted form data
 $firstName = $_POST['firstName'] ?? '';
@@ -25,7 +24,29 @@ $selected_items = array_values($selected_items);
 $order_number = '';
 if (!empty($selected_items)) {
     $first_item = $selected_items[0];
-    $order_number = 'PRO-' . $first_item['item_code'] . '-' . date('YmdHis');
+    error_log("First item: " . print_r($first_item, true)); // Debug log
+    
+    try {
+        // Get the item code directly from inventory using the item name
+        $stmt = $conn->prepare("SELECT item_code FROM inventory WHERE item_name = ?");
+        $stmt->execute([$first_item['item_name']]);
+        $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        error_log("Inventory item found: " . print_r($inventory_item, true)); // Debug log
+        
+        if ($inventory_item) {
+            $order_number = $inventory_item['item_code'] . '-' . date('YmdHis');
+            error_log("Generated order number: " . $order_number); // Debug log
+        } else {
+            error_log("No inventory item found for name: " . $first_item['item_name']); // Debug log
+            // Fallback to using the item code from cart if inventory lookup fails
+            $order_number = $first_item['item_code'] . '-' . date('YmdHis');
+        }
+    } catch (PDOException $e) {
+        error_log("Error getting inventory item: " . $e->getMessage());
+        // Fallback to using the item code from cart if query fails
+        $order_number = $first_item['item_code'] . '-' . date('YmdHis');
+    }
 }
 
 // Save order to database
@@ -69,20 +90,15 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../CSS/">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>Pre Order Details</title>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../CSS/header.css">
-    <link rel="stylesheet" href="../CSS/">
     <link rel="stylesheet" href="../CSS/global.css">
     <link rel="stylesheet" href="../CSS/ProOrderDetails.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anton+SC&family=Smooch+Sans:wght@100..900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
