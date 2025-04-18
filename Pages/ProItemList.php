@@ -177,7 +177,6 @@
                 </div>
             </div>
             <div class="size-options">
-                <!-- Size options will be dynamically added here -->
             </div>
             <div class="quantity-selector">
                 <label for="quantity">Quantity:</label>
