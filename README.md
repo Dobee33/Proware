@@ -47,6 +47,3 @@ If you downloaded the project as a `.zip` file, you’ll find the database file 
 3. **Student** – Views and pre-orders items.
 
 ---
-
-## 📂 Project Structure (Simplified)
-
