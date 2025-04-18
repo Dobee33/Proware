@@ -22,7 +22,7 @@ If you downloaded the project as a `.zip` file, you’ll find the database file 
 2. Create a new database, for example:
 
     ```sql
-    CREATE DATABASE proware_db;
+    CREATE DATABASE proware;
     ```
 
 3. Import the SQL file:
