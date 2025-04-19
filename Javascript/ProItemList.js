@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const applyFiltersBtn = document.querySelector('.apply-btn');
     const sortSelect = document.getElementById('sort-select');
     const searchInput = document.getElementById('search');
-    const productCount = document.getElementById('product-count');
     const quantityInputs = document.querySelectorAll('.quantity input');
     const wishlistBtns = document.querySelectorAll('.wishlist-btn');
 
@@ -17,6 +16,48 @@ document.addEventListener('DOMContentLoaded', function() {
             offset: 100,
             once: true
         });
+    }
+
+    // Add search functionality
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            const productContainers = document.querySelectorAll('.product-container');
+            const noResultsMessage = document.getElementById('no-results-message');
+            let visibleCount = 0;
+            
+            productContainers.forEach(container => {
+                const itemName = container.getAttribute('data-item-name').toLowerCase();
+                const itemCategory = container.getAttribute('data-category').toLowerCase();
+                
+                if (itemName.includes(searchTerm) || itemCategory.includes(searchTerm)) {
+                    container.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    container.style.display = 'none';
+                }
+            });
+            
+            // Show or hide the no results message
+            if (noResultsMessage) {
+                if (visibleCount === 0) {
+                    noResultsMessage.style.display = 'flex';
+                } else {
+                    noResultsMessage.style.display = 'none';
+                }
+            }
+        });
+        
+        // Add search button functionality
+        const searchBtn = document.querySelector('.search-btn');
+        if (searchBtn) {
+            searchBtn.addEventListener('click', function() {
+                searchInput.focus();
+                // Trigger the input event to perform the search
+                const event = new Event('input');
+                searchInput.dispatchEvent(event);
+            });
+        }
     }
 
     // Handle category checkboxes

@@ -137,7 +137,9 @@
                         ];
                     }
                 }
-
+                ?>
+                
+                <?php
                 foreach ($products as $baseItemCode => $product):
                     $availableSizes = $product['sizes'];
                     $prices = $product['prices'];
@@ -183,6 +185,13 @@
                         </div>
                     </div>
                 <?php endforeach; ?>
+                
+                <!-- No results message -->
+                <div id="no-results-message" class="no-results-message" style="display: none;">
+                    <i class="fas fa-search"></i>
+                    <h3>No products found</h3>
+                    <p>Try adjusting your search terms or filters</p>
+                </div>
             </div>
         </main>
     </div>

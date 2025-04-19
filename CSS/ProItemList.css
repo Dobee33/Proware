@@ -49,28 +49,46 @@
 }
 
 .search-container {
+  position: relative;
   max-width: 600px;
-  margin: 2rem auto 0;
-  display: flex;
-  gap: 0.5rem;
+  margin: 0 auto;
 }
 
 .search-container input {
-  flex: 1;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  border: none;
-  box-shadow: var(--shadow-sm);
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e9ecef;
+  border-radius: 30px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.search-container input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 .search-btn {
-  padding: 0 1.5rem;
-  background: var(--accent-color);
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #007bff;
   color: white;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease;
+}
+
+.search-btn:hover {
+  background: #0056b3;
 }
 
 /* Sidebar Styles */
@@ -148,16 +166,17 @@
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 300px));
   gap: 2rem;
   padding: 2rem;
+  justify-content: center;
 }
 
 /* Product Card */
 .product-container {
   border-radius: 13px;
   position: relative;
-  width: 100%;
+  width: 300px;
   height: 400px;
   background-size: cover;
   background-position: center;
@@ -168,8 +187,13 @@
   overflow: hidden;
 }
 
-.product-container:hover {
-  transform: translateY(-5px);
+.product-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .product-overlay {
@@ -854,4 +878,36 @@
 
 #accessoryModal .add-to-cart-btn:hover {
   background-color: #0056b3;
+}
+
+/* No Results Message */
+.no-results-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 50px 20px;
+  text-align: center;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  margin: 20px 0;
+  grid-column: 1 / -1;
+}
+
+.no-results-message i {
+  font-size: 48px;
+  color: #6c757d;
+  margin-bottom: 15px;
+}
+
+.no-results-message h3 {
+  font-size: 24px;
+  color: #343a40;
+  margin-bottom: 10px;
+}
+
+.no-results-message p {
+  font-size: 16px;
+  color: #6c757d;
 }
