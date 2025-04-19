@@ -8,33 +8,41 @@ $stmt = $conn->prepare("SELECT * FROM account WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Fetch cart items
-$stmt = $conn->prepare("
-    SELECT c.*, i.item_name, i.price, i.image_path 
-    FROM cart c 
-    JOIN inventory i ON c.item_code = i.item_code 
-    WHERE c.user_id = ?
-");
-$stmt->execute([$_SESSION['user_id']]);
-$cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$total_amount = 0;
-foreach ($cart_items as $item) {
-    $total_amount += $item['price'] * $item['quantity'];
-}
-
 // Get the cart items and included items from the form
 $cart_items = json_decode($_POST['cart_items'], true);
 $included_items = json_decode($_POST['included_items'], true);
 $total_amount = $_POST['total_amount'];
 
-// Filter cart items to only include selected items
-$selected_items = array_filter($cart_items, function($item) use ($included_items) {
-    return in_array($item['id'], $included_items);
-});
+// If cart_items is empty, fetch them from the database
+if (empty($cart_items)) {
+    // Fetch cart items
+    $stmt = $conn->prepare("
+        SELECT c.*, i.item_name, i.price, i.image_path 
+        FROM cart c 
+        JOIN inventory i ON c.item_code = i.item_code 
+        WHERE c.user_id = ?
+    ");
+    $stmt->execute([$_SESSION['user_id']]);
+    $cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Reindex the array
-$selected_items = array_values($selected_items);
+    // Calculate total
+    $total_amount = 0;
+    foreach ($cart_items as $item) {
+        $total_amount += $item['price'] * $item['quantity'];
+    }
+}
+
+// Filter cart items to only include selected items if included_items is provided
+if (!empty($included_items)) {
+    $selected_items = array_filter($cart_items, function($item) use ($included_items) {
+        return in_array($item['id'], $included_items);
+    });
+    
+    // Reindex the array
+    $selected_items = array_values($selected_items);
+} else {
+    $selected_items = $cart_items;
+}
 
 // Store the selected items in session for later use
 $_SESSION['checkout_items'] = $selected_items;

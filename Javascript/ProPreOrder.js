@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
         row
           .querySelector("td:nth-child(4)")
           .textContent.replace("₱", "")
-          .replace(",", "")
+          .replace(/,/g, "")
       );
       const quantity = parseInt(row.querySelector(".qty-input").value);
       const isIncluded = row
@@ -19,11 +19,18 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
+    // Format number with commas for display
+    const formattedTotal = total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    
     // Update total amount display
-    document.querySelector(".total-table td").textContent =
-      "₱" + total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    // Update hidden input
-    document.querySelector('input[name="total_amount"]').value = total;
+    document.querySelector(".total-table td").textContent = "₱" + formattedTotal;
+    
+    // Update hidden input with raw number
+    if (document.querySelector('input[name="total_amount"]')) {
+      document.querySelector('input[name="total_amount"]').value = total;
+    }
+    
+    return total;
   }
 
   // Initialize active states
@@ -107,13 +114,43 @@ document.addEventListener("DOMContentLoaded", function () {
       e.preventDefault(); // Prevent default form submission
 
       const includedItems = [];
+      const cartItems = [];
+      let totalAmount = 0;
+
       document.querySelectorAll(".products-table tbody tr").forEach((row) => {
-        if (
-          row
-            .querySelector(".toggle-checkout-btn.check")
-            .classList.contains("active")
-        ) {
-          includedItems.push(row.dataset.itemId);
+        const itemId = row.dataset.itemId;
+        const isIncluded = row
+          .querySelector(".toggle-checkout-btn.check")
+          .classList.contains("active");
+        
+        if (isIncluded) {
+          includedItems.push(itemId);
+          
+          // Get current item data
+          const price = parseFloat(
+            row
+              .querySelector("td:nth-child(4)")
+              .textContent.replace("₱", "")
+              .replace(/,/g, "")
+          );
+          const quantity = parseInt(row.querySelector(".qty-input").value);
+          const name = row.querySelector("td:nth-child(2)").textContent;
+          const size = row.querySelector("td:nth-child(3)").textContent;
+          const imagePath = row.querySelector("td:nth-child(1) img").getAttribute("src").split('/').pop();
+          const itemCode = row.querySelector(".qty-input").dataset.itemCode || '';
+          
+          // Add to cart items
+          cartItems.push({
+            id: itemId,
+            item_code: itemCode,
+            item_name: name,
+            size: size,
+            price: price,
+            quantity: quantity,
+            image_path: imagePath
+          });
+          
+          totalAmount += price * quantity;
         }
       });
 
@@ -122,8 +159,11 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      document.getElementById("includedItems").value =
-        JSON.stringify(includedItems);
+      // Update hidden inputs with current values
+      document.getElementById("includedItems").value = JSON.stringify(includedItems);
+      document.getElementById("cartItemsInput").value = JSON.stringify(cartItems);
+      document.getElementById("totalAmountInput").value = totalAmount;
+      
       this.submit(); // Submit the form if we have included items
     });
 

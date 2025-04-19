@@ -99,7 +99,8 @@
                                             <button type="button" class="qty-btn minus">-</button>
                                             <input type="number" value="<?php echo $item['quantity']; ?>" 
                                                    min="1" class="qty-input" 
-                                                   data-item-id="<?php echo $item['id']; ?>">
+                                                   data-item-id="<?php echo $item['id']; ?>"
+                                                   data-item-code="<?php echo $item['item_code']; ?>">
                                             <button type="button" class="qty-btn plus">+</button>
                                         </div>
                                     </td>
@@ -141,8 +142,8 @@
 
                 <?php if (!empty($final_cart_items)): ?>
                 <form action="ProCheckout.php" method="POST" id="checkoutForm">
-                    <input type="hidden" name="cart_items" value='<?php echo json_encode($final_cart_items); ?>'>
-                    <input type="hidden" name="total_amount" value="<?php echo $included_total; ?>">
+                    <input type="hidden" name="cart_items" id="cartItemsInput" value=''>
+                    <input type="hidden" name="total_amount" id="totalAmountInput" value="<?php echo $included_total; ?>">
                     <input type="hidden" name="included_items" id="includedItems" value="">
                     <button type="submit" class="proceed-btn">Proceed to Checkout</button>
                 </form>
