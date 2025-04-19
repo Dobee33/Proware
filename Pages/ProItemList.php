@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Smooch+Sans:wght@100..900&display=swap"
         rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <title>PAMO - Product List</title>
+    <title>Product List</title>
 </head>
 
 <body>

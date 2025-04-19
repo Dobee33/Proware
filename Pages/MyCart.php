@@ -233,6 +233,7 @@ $cart_total = 0;
             margin: 0 0 0.5rem 0;
             color: var(--primary-color);
             font-size: 1.2rem;
+            font-weight: 100;
         }
 
         .item-meta {
@@ -322,9 +323,9 @@ $cart_total = 0;
         }
 
         .checkout-btn:hover {
-            background: yellow;
-            color: black;
+            background: darkblue;
             transform: translateY(-2px);
+            color: yellow !important;
         }
 
         .continue-shopping {
@@ -332,18 +333,20 @@ $cart_total = 0;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            width: 100%;
+            width: 60%;
             padding: 1rem;
-            background: #f8f9fa;
+            background: #a6d1e6;
             color: var(--primary-color);
             text-decoration: none;
             border-radius: 8px;
             font-weight: 500;
             transition: all 0.3s ease;
+            margin-left: 16%;
         }
 
         .continue-shopping:hover {
-            background: #e9ecef;
+            background: #89c4e1;
+            transform: translateY(-2px);
         }
 
         .empty-cart {
