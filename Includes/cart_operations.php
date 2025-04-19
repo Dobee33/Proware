@@ -103,6 +103,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                         // Remove any size suffix from item name (e.g., "Item Name S" -> "Item Name")
                         $item['item_name'] = rtrim($item['item_name'], " SMLX234567");
+                        
+                        // Make sure size is included in response (even if it's null)
+                        if (!isset($item['size'])) {
+                            $item['size'] = null;
+                        }
+                        
                         $final_cart_items[] = $item;
                     } else {
                         // Try one more time with a broader search

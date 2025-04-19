@@ -19,7 +19,7 @@ foreach ($cart_items as $cart_item) {
     error_log("Cart Item Code: " . $cart_item['item_code']);
     
     // Try to get inventory details for each cart item
-    $stmt = $conn->prepare("SELECT item_name, price, image_path FROM inventory WHERE item_code = ?");
+    $stmt = $conn->prepare("SELECT item_name, price, image_path, category FROM inventory WHERE item_code = ?");
     $stmt->execute([$cart_item['item_code']]);
     $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -32,7 +32,7 @@ foreach ($cart_items as $cart_item) {
         error_log("No matching inventory item found for: " . $cart_item['item_code']);
         
         // Try to find the item with a LIKE query to catch potential formatting differences
-        $stmt = $conn->prepare("SELECT item_name, price, image_path FROM inventory WHERE item_code LIKE ?");
+        $stmt = $conn->prepare("SELECT item_name, price, image_path, category FROM inventory WHERE item_code LIKE ?");
         $stmt->execute(['%' . $cart_item['item_code'] . '%']);
         $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
         
@@ -43,7 +43,8 @@ foreach ($cart_items as $cart_item) {
             $final_cart_items[] = array_merge($cart_item, [
                 'item_name' => 'Item no longer available',
                 'price' => 0,
-                'image_path' => 'default.jpg'
+                'image_path' => 'default.jpg',
+                'category' => ''
             ]);
         }
     }
@@ -84,31 +85,59 @@ $cart_total = 0;
         <div class="cart-content">
             <?php if (!empty($final_cart_items)): ?>
                 <div class="cart-grid">
-                    <div class="cart-items">
-                        <?php foreach ($final_cart_items as $item):
-                            $subtotal = $item['price'] * $item['quantity'];
-                            $cart_total += $subtotal;
-                        ?>
-                            <div class="cart-item">
-                                <div class="item-image">
-                                    <img src="../uploads/itemlist/<?php echo htmlspecialchars($item['image_path']); ?>" 
-                                         alt="<?php echo htmlspecialchars($item['item_name']); ?>">
-                                </div>
-                                <div class="item-details">
-                                    <h3><?php echo htmlspecialchars($item['item_name']); ?></h3>
-                                    <div class="item-meta">
+                    <div class="cart-items-container">
+                        <table class="cart-table">
+                            <thead>
+                                <tr>
+                                    <th class="image-col">Image</th>
+                                    <th class="item-col">Item Name</th>
+                                    <th class="size-col">Size</th>
+                                    <th class="price-col">Price</th>
+                                    <th class="quantity-col">Quantity</th>
+                                    <th class="subtotal-col">Subtotal</th>
+                                    <th class="action-col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($final_cart_items as $item):
+                                    $subtotal = $item['price'] * $item['quantity'];
+                                    $cart_total += $subtotal;
+                                ?>
+                                <tr class="cart-row">
+                                    <td class="image-col">
+                                        <div class="item-image">
+                                            <img src="../uploads/itemlist/<?php echo htmlspecialchars($item['image_path']); ?>" 
+                                                alt="<?php echo htmlspecialchars($item['item_name']); ?>">
+                                        </div>
+                                    </td>
+                                    <td class="item-col">
+                                        <div class="item-name"><?php echo htmlspecialchars($item['item_name']); ?></div>
+                                    </td>
+                                    <td class="size-col">
+                                        <?php if (!empty($item['size'])): ?>
+                                            <span class="item-size"><?php echo htmlspecialchars($item['size']); ?></span>
+                                        <?php else: ?>
+                                            <span class="item-size-na">-</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="price-col">
                                         <span class="item-price">₱<?php echo number_format($item['price'], 2); ?></span>
-                                        <span class="item-quantity">× <?php echo $item['quantity']; ?></span>
-                                    </div>
-                                    <div class="item-subtotal">
-                                        Subtotal: ₱<?php echo number_format($subtotal, 2); ?>
-                                    </div>
-                                </div>
-                                <button onclick="removeFromCart('<?php echo $item['item_code']; ?>')" class="remove-btn" title="Remove item">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        <?php endforeach; ?>
+                                    </td>
+                                    <td class="quantity-col">
+                                        <span class="item-quantity"><?php echo $item['quantity']; ?></span>
+                                    </td>
+                                    <td class="subtotal-col">
+                                        <span class="item-subtotal">₱<?php echo number_format($subtotal, 2); ?></span>
+                                    </td>
+                                    <td class="action-col">
+                                        <button onclick="removeFromCart(<?php echo $item['id']; ?>)" class="remove-btn" title="Remove item">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
                     <div class="cart-summary">
                         <h2>Order Summary</h2>
@@ -189,34 +218,86 @@ $cart_total = 0;
             margin-bottom: 2rem;
         }
 
-        .cart-items {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .cart-item {
+        .cart-items-container {
+            overflow-x: auto;
             background: white;
             border-radius: 12px;
-            padding: 1.5rem;
-            display: flex;
-            gap: 2rem;
-            align-items: center;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .cart-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .cart-table td {
+            padding: 1rem;
+            text-align: center;
+            vertical-align: middle;
+            height: 100px; /* Set a consistent height for all cells */
+        }
+
+        .cart-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            text-align: center;
+            padding: 1.5rem 1rem;
+        }
+
+        .cart-row {
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s ease;
+        }
+
+        .cart-row:hover {
+            background-color: #f9f9f9;
+        }
+
+        .cart-row:last-child {
+            border-bottom: none;
+        }
+
+        .image-col {
+            width: 120px;
+        }
+
+        .item-col {
+            width: 300px;
+        }
+
+        .size-col {
+            width: 100px;
+            text-align: center;
+        }
+
+        .price-col {
+            width: 120px;
+            text-align: center;
+        }
+
+        .quantity-col {
+            width: 80px;
+            text-align: center;
+        }
+
+        .subtotal-col {
+            width: 150px;
+            text-align: center;
+        }
+
+        .action-col {
+            width: 50px;
+            text-align: center;
         }
 
         .item-image {
-            width: 120px;
-            height: 120px;
+            width: 80px;
+            height: 80px;
             border-radius: 8px;
             overflow: hidden;
-            flex-shrink: 0;
+            margin: 0 auto; /* Center the image */
         }
 
         .item-image img {
@@ -225,33 +306,54 @@ $cart_total = 0;
             object-fit: cover;
         }
 
-        .item-details {
-            flex: 1;
-        }
-
-        .item-details h3 {
-            margin: 0 0 0.5rem 0;
+        .item-col h3 {
+            margin: 0;
             color: var(--primary-color);
-            font-size: 1.2rem;
-            font-weight: 100;
-        }
-
-        .item-meta {
+            font-size: 1.1rem;
+            font-weight: 500;
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 0.5rem;
-            color: #666;
-            margin-bottom: 0.5rem;
+            height: 100%;
+        }
+        
+        .item-name {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            font-weight: 500;
         }
 
-        .item-price {
+        .item-price, .item-quantity, .item-subtotal {
+            display: inline-block;
             font-weight: 600;
+            color: #444;
+        }
+        
+        .item-size {
+            display: inline-block;
+            font-weight: 500;
+            background-color: #e6f2ff;
+            color: #0066cc;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .item-size-na {
+            color: #999;
+            font-style: italic;
+        }
+
+        .item-quantity {
+            font-weight: 500;
+            background-color: #f5f5f5;
+            padding: 4px 10px;
+            border-radius: 4px;
         }
 
         .item-subtotal {
-            color: var(--primary-color);
             font-weight: 600;
-            font-size: 1.1rem;
+            color: var(--primary-color);
         }
 
         .remove-btn {
@@ -417,38 +519,30 @@ $cart_total = 0;
             .cart-content {
                 padding: 1rem;
             }
-
-            .cart-item {
-                flex-direction: column;
-                text-align: center;
-                padding: 1rem;
+            
+            .cart-table {
+                min-width: 650px; /* Force horizontal scroll on mobile */
+            }
+            
+            .cart-items-container {
+                margin-bottom: 2rem;
             }
 
-            .item-image {
-                width: 100px;
-                height: 100px;
-                margin: 0 auto;
-            }
-
-            .item-meta {
-                justify-content: center;
-            }
-
-            .remove-btn {
-                margin-top: 1rem;
+            .cart-summary {
+                width: 100%;
             }
         }
     </style>
 
     <script>
-        function removeFromCart(itemCode) {
+        function removeFromCart(itemId) {
             if (confirm('Are you sure you want to remove this item from your cart?')) {
                 fetch('remove_from_cart.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: `item_code=${itemCode}`
+                    body: `item_id=${itemId}`
                 })
                 .then(response => response.json())
                 .then(data => {

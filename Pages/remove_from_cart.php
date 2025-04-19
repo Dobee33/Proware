@@ -8,18 +8,18 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['item_code'])) {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['item_id'])) {
     echo json_encode(['success' => false, 'error' => 'Invalid request']);
     exit;
 }
 
-$item_code = $_POST['item_code'];
+$item_id = $_POST['item_id'];
 $user_id = $_SESSION['user_id'];
 
 try {
-    // Prepare and execute the delete query
-    $stmt = $conn->prepare("DELETE FROM cart WHERE user_id = ? AND item_code = ?");
-    $result = $stmt->execute([$user_id, $item_code]);
+    // Prepare and execute the delete query by ID for precise removal
+    $stmt = $conn->prepare("DELETE FROM cart WHERE user_id = ? AND id = ?");
+    $result = $stmt->execute([$user_id, $item_id]);
 
     if ($result && $stmt->rowCount() > 0) {
         echo json_encode(['success' => true]);
