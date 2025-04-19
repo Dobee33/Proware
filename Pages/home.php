@@ -12,151 +12,163 @@
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Smooch+Sans:wght@100..900&display=swap"
         rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <title>Homepage</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>STI College Lucena - Campus Store</title>
 </head>
 
 <body>
     <?php
-    include("../Includes/header.php");
+    include("../Includes/Header.php");
     ?>
+    
+    <!-- Hero Section -->
     <section class="Hero">
         <div class="hero-slideshow">
             <div class="hero-slide"
-                style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../Images/STI-LOGIN.jpg')">
+                style="background-image:url('../Images/ACS ALL.jpg')">
             </div>
             <div class="hero-slide"
-                style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../Images/ACS ALL.jpg')">
+                style="background-image:url('../Images/college1.jpg')">
             </div>
             <div class="hero-slide"
-                style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../Images/ACS TM.jpg')">
+                style="background-image:url('../Images/SHS2.jpg')">
+            </div>
+            <div class="hero-slide"
+                style="background-image:url('../Images/SHS_cover_photo.jpg')">
+            </div>
+            <div class="hero-slide"
+                style="background-image:url('../Images/college2.jpg')">
             </div>
         </div>
         <div class="hero-content">
-            <h1>UNLOCK YOUR FUTURE <br> WITH PRE-ORDER <br> SAVINGS</h1>
-            <p>At PAMO, we streamline your Purchasing and Asset Management needs with ease. <br> Explore our inventory
-                and discover the resources available <br> right at your fingertips.</p>
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="ProItemList.php"><button class="pre-order-button">Pre Order</button></a>
-            <?php else: ?>
-                <a href="login.php"><button class="pre-order-button">Pre Order</button></a>
-            <?php endif; ?>
+            <h1>GEAR UP</h1>
+            <p>Your one-stop shop for all STI College Lucena essentials</p>
+            <a href="ProItemList.php"><button class="shop-now-button">Shop Now</button></a>
         </div>
     </section>
 
-    <section class="Explore">
-        <div class="Explore-description">
-            <h1>Explore Our Categories</h1>
-            <p>Discover high-quality products tailored for your needs. Browse our Uniforms, stylish Accessories, and
-                comfortable School T-Shirts to find everything you need in one place!</p>
+    <!-- New Arrivals Section -->
+    <section class="New-Arrivals">
+        <div class="section-header">
+            <h2>New Arrivals</h2>
+            <p class="section-subtitle">Check out our latest products</p>
         </div>
-        <div class="container">
-            <div class="card" class="code code--small code--left aos-init aos-animate" data-aos="zoom-in-down">
-                <div class="product-image">
-                    <img src="../Images/ACS IT.jpg" alt="STI Uniform" draggable="false" />
-                </div>
-                <div class="product-info">
-                    <h2>STI Uniform</h2>
-                    <p>Comfortable and professional attire for STI students, for daily use.</p>
-                </div>
-                <div class="btn">
-                    <?php if (isset($_SESSION['user_id'])): ?>
-                        <a href="ProItemList.php"><button class="buy-btn">Pre Order</button></a>
-                    <?php else: ?>
-                        <a href="login.php"><button class="buy-btn">Pre Order</button></a>
-                    <?php endif; ?>
+        
+        <div class="new-arrivals-container">
+            <!-- New Arrival 1 -->
+            <div class="new-arrival-card" data-aos="fade-up">
+                <div class="new-arrival-image">
+                    <img src="../Images/new1.png" alt="STI GRIT Collection" draggable="false" />
+                    <div class="new-arrival-overlay">
+                    </div>
                 </div>
             </div>
-            <div class="card" class="code code--small code--left aos-init aos-animate" data-aos="zoom-in">
-                <div class="product-image">
-                    <img src="../Images/ACS ARTS SCIENCE.jpg" alt="STI Shirt" draggable="false" />
-                </div>
-                <div class="product-info">
-                    <h2>STI Shirt</h2>
-                    <p>Trendy and versatile shirt with the STI logo, ideal for events and casual wear.</p>
-                </div>
-                <div class="btn">
-                    <?php if (isset($_SESSION['user_id'])): ?>
-                        <a href="ProItemList.php"><button class="buy-btn">Pre Order</button></a>
-                    <?php else: ?>
-                        <a href="login.php"><button class="buy-btn">Pre Order</button></a>
-                    <?php endif; ?>
+            
+            <!-- New Arrival 2 -->
+            <div class="new-arrival-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="new-arrival-image">
+                    <img src="../Images/new3.png" alt="ICT Program Uniform" draggable="false" />
+                    <div class="new-arrival-overlay">
+                    </div>
                 </div>
             </div>
-            <div class="card" class="code code--small code--right aos-init aos-animate" data-aos="zoom-in-left">
-                <div class="product-image">
-                    <img src="../Images/ACS TM.jpg" alt="STI Accessories" draggable="false" />
-                </div>
-                <div class="product-info">
-                    <h2>Accessories</h2>
-                    <p>Stylish lanyards, pins, and bags to showcase school pride and functionality.</p>
-                </div>
-                <div class="btn">
-                    <?php if (isset($_SESSION['user_id'])): ?>
-                        <a href="ProItemList.php"><button class="buy-btn">Pre Order</button></a>
-                    <?php else: ?>
-                        <a href="login.php"><button class="buy-btn">Pre Order</button></a>
-                    <?php endif; ?>
+            
+            <!-- New Arrival 3 -->
+            <div class="new-arrival-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="new-arrival-image">
+                    <img src="../Images/new2.png" alt="Hospitality Management Uniform" draggable="false" />
+                    <div class="new-arrival-overlay">
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <secion class="tagline">
+    <!-- Best Sellers Section -->
+    <section class="Best-Sellers">
+        <div class="section-header">
+            <h2>Best Sellers</h2>
+        </div>
+        <div class="best-sellers-grid">
+            <div class="best-seller-card" data-aos="fade-up">
+                <div class="best-seller-badge">TOP SELLER</div>
+                <div class="product-image">
+                    <img src="../Images/STI-TM.jpg" alt="STI TM Uniform" draggable="false" />
+                    <div class="product-overlay">
+                        <button class="add-to-cart-btn">Add to Cart</button>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3>STI TM Uniform</h3>
+                    <p class="product-description">Professional uniform for Tourism Management students</p>
+                    <p class="product-price">₱599.00</p>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span>(42)</span>
+                    </div>
+                </div>
+                <div class="best-seller-stock">In Stock</div>
+            </div>
+            <!-- Additional best seller cards here -->
+            <!-- ... Rest of the best seller cards ... -->
+        </div>
+    </section>
+    
+    <!-- Tagline Section -->
+    <section class="tagline">
         <div class="tag">
             <h1>Be future-ready. Be STI.</h1>
             <p>Explore our wide range of products and check stock availability right from your device.</p>
         </div>
-    </secion>
+    </section>
 
-    <section class="Featured">
-        <div class="featured-description">
-            <h1 data-aos="fade-up" data-aos-offset="30" data-aos-delay="50" data-aos-duration="1000"
-                data-aos-easing="ease-out" data-aos-mirror="true" data-aos-once="false"
-                data-aos-anchor-placement="top-center">Explore Our Featured <br>
-                Products for <br> Purchase</h1>
-            <p>Explore a wide selection of essential items, updated <br> regularly to meet your needs.</p>
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="ProItemList.php"><button class="pre-order-button">Pre Order</button></a>
-            <?php else: ?>
-                <a href="login.php"><button class="pre-order-button">Pre Order</button></a>
-            <?php endif; ?>
+    <!-- Featured Products Section -->
+    <section class="Featured-Products">
+        <div class="section-header">
+            <h2>Featured Products</h2>
+            <p class="section-subtitle">Discover our most popular items</p>
         </div>
-        <div class="slideshow">
-            <img src="../Images/ACS ALL.jpg" alt="Featured Product 1">
-            <img src="../Images/ACS TM.jpg" alt="Featured Product 2">
-            <img src="../Images/ACS ENG.jpg" alt="Featured Product 3">
+        
+        <div class="featured-carousel-container">
+            <div class="featured-carousel">
+                <div class="featured-carousel-track">
+                    <!-- Featured product items here -->
+                    <!-- ... Rest of the featured products ... -->
+                </div>
+            </div>
         </div>
     </section>
 
-    <script>
-        let slideIndex = 0;
-        const slides = document.querySelectorAll('.slideshow img');
-
-        function showSlides() {
-            slides.forEach((slide, index) => {
-                slide.style.display = index === slideIndex ? 'block' : 'none';
-            });
-            slideIndex = (slideIndex + 1) % slides.length;
-        }
-
-        setInterval(showSlides, 2000);
-        showSlides();
-    </script>
-
-    <section class="about">
-        <div class="last">
-            <h1>ABOUT</h1>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-                deserunt mollit anim id est laborum.</p>
+    <!-- Display Section -->
+    <section class="Display">
+        <div class="container">
+            <div class="section-header">
+                <h2>Welcome to STI</h2>
+                <p>Discover our latest collection</p>
+            </div>
+            
+            <div class="sti-frames">
+                <div id="letter-s" class="frame"></div>
+                <div id="letter-s1" class="frame"></div>
+                <div id="letter-s2" class="frame"></div>
+                <div id="letter-s3" class="frame"></div>
+            </div>
+            
+            <div class="display-content">
+                <!-- Display content here -->
+                <!-- ... Rest of the display content ... -->
+            </div>
         </div>
     </section>
 
     <?php
     include("../Includes/footer.php");
     ?>
+    
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         AOS.init();
@@ -176,6 +188,42 @@
         heroSlides[0].classList.add('active');
         // Change slide every 5 seconds
         setInterval(showHeroSlides, 5000);
+    </script>
+    <script>
+        // Featured carousel functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const track = document.querySelector('.featured-carousel-track');
+            if (!track) return;
+
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            track.addEventListener('mousedown', (e) => {
+                isDown = true;
+                track.classList.add('active');
+                startX = e.pageX - track.offsetLeft;
+                scrollLeft = track.scrollLeft;
+            });
+
+            track.addEventListener('mouseleave', () => {
+                isDown = false;
+                track.classList.remove('active');
+            });
+
+            track.addEventListener('mouseup', () => {
+                isDown = false;
+                track.classList.remove('active');
+            });
+
+            track.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - track.offsetLeft;
+                const walk = (x - startX) * 2;
+                track.scrollLeft = scrollLeft - walk;
+            });
+        });
     </script>
 </body>
 

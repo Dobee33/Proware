@@ -256,9 +256,11 @@
   gap: 2rem;
   padding: 2rem;
   justify-content: center;
+  min-height: 200px; /* Minimum height to prevent layout shifts */
+  transition: height 0.5s ease-in-out;
 }
 
-/* Product Card */
+/* Product Container Animation */
 .product-container {
   border-radius: 13px;
   position: relative;
@@ -269,8 +271,27 @@
   background-repeat: no-repeat;
   cursor: pointer;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  transition: all 0.5s ease-in-out;
   overflow: hidden;
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Hide animation classes */
+.product-container.hiding {
+  opacity: 0;
+  transform: scale(0.8);
+  pointer-events: none;
+}
+
+.product-container.hidden {
+  display: none;
+}
+
+/* Show animation classes */
+.product-container.showing {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .product-container img {

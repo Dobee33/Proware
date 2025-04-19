@@ -240,28 +240,71 @@ document.addEventListener('DOMContentLoaded', function() {
     function filterProducts(category) {
         let visibleCount = 0;
         
+        // First, mark all products for animation
         productContainers.forEach(container => {
             const productCategory = container.dataset.category;
             if (productCategory === category) {
-                container.style.display = 'block';
+                // Will be shown
+                if (container.style.display === 'none') {
+                    container.style.display = 'block';
+                    container.classList.add('showing');
+                    setTimeout(() => {
+                        container.classList.remove('showing');
+                    }, 500);
+                }
                 visibleCount++;
             } else {
-                container.style.display = 'none';
+                // Will be hidden
+                container.classList.add('hiding');
             }
         });
 
-        // Show/hide no results message
+        // After animation delay, hide the elements
+        setTimeout(() => {
+            productContainers.forEach(container => {
+                const productCategory = container.dataset.category;
+                if (productCategory !== category) {
+                    container.style.display = 'none';
+                    container.classList.remove('hiding');
+                }
+            });
+        }, 500);
+
+        // Show/hide no results message with fade
         if (noResultsMessage) {
-            noResultsMessage.style.display = visibleCount === 0 ? 'flex' : 'none';
+            if (visibleCount === 0) {
+                noResultsMessage.style.opacity = '0';
+                noResultsMessage.style.display = 'flex';
+                setTimeout(() => {
+                    noResultsMessage.style.opacity = '1';
+                }, 10);
+            } else {
+                noResultsMessage.style.opacity = '0';
+                setTimeout(() => {
+                    noResultsMessage.style.display = 'none';
+                }, 500);
+            }
         }
     }
 
     function showAllProducts() {
+        // Show all products with animation
         productContainers.forEach(container => {
-            container.style.display = 'block';
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+                container.classList.add('showing');
+                setTimeout(() => {
+                    container.classList.remove('showing');
+                }, 500);
+            }
         });
+
+        // Hide no results message with fade
         if (noResultsMessage) {
-            noResultsMessage.style.display = 'none';
+            noResultsMessage.style.opacity = '0';
+            setTimeout(() => {
+                noResultsMessage.style.display = 'none';
+            }, 500);
         }
     }
 });
