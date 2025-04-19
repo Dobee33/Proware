@@ -1,4 +1,3 @@
-/* Modern and Clean Design for My Orders Page */
 :root {
   --primary-color: #2196f3;
   --secondary-color: #1976d2;
@@ -515,7 +514,7 @@ body {
 .order-info h3 {
   margin: 0;
   color: var(--primary-color);
-  font-size: 1.2rem;
+  font-weight: 100;
   margin-bottom: 0.5rem;
 }
 

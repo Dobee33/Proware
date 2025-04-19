@@ -115,27 +115,51 @@
                             'prices' => [$itemPrice],
                             'category' => $itemCategory,
                             'sizes' => $sizes,
-                            'stock' => $row['actual_quantity']
+                            'stock' => $row['actual_quantity'],
+                            'variants' => [
+                                [
+                                    'item_code' => $itemCode,
+                                    'size' => isset($sizes[0]) ? $sizes[0] : '',
+                                    'price' => $itemPrice,
+                                    'stock' => $row['actual_quantity']
+                                ]
+                            ]
                         ];
                     } else {
                         $products[$baseItemCode]['sizes'] = array_unique(array_merge($products[$baseItemCode]['sizes'], $sizes));
                         $products[$baseItemCode]['prices'][] = $itemPrice;
                         $products[$baseItemCode]['stock'] += $row['actual_quantity'];
+                        $products[$baseItemCode]['variants'][] = [
+                            'item_code' => $itemCode,
+                            'size' => isset($sizes[0]) ? $sizes[0] : '',
+                            'price' => $itemPrice,
+                            'stock' => $row['actual_quantity']
+                        ];
                     }
                 }
 
-                foreach ($products as $itemCode => $product):
+                foreach ($products as $baseItemCode => $product):
                     $availableSizes = $product['sizes'];
                     $prices = $product['prices'];
-                    $stocks = isset($product['stocks']) ? $product['stocks'] : array_fill(0, count($availableSizes), $product['stock']);
+                    
+                    // Create stocksBySize array with item_code for each size
+                    $stocksBySize = [];
+                    $itemCodesBySize = [];
+                    foreach ($product['variants'] as $variant) {
+                        $size = $variant['size'];
+                        $stocksBySize[$size] = $variant['stock'];
+                        $itemCodesBySize[$size] = $variant['item_code'];
+                    }
+                    
                     ?>
                     <div class="product-container" 
                         data-sizes="<?php echo implode(',', $availableSizes); ?>"
                         data-prices="<?php echo implode(',', $prices); ?>" 
-                        data-stocks="<?php echo implode(',', $stocks); ?>"
+                        data-stocks="<?php echo implode(',', array_values($stocksBySize)); ?>"
+                        data-item-codes="<?php echo implode(',', array_values($itemCodesBySize)); ?>"
                         data-stock="<?php echo $product['stock']; ?>"
                         data-category="<?php echo htmlspecialchars($product['category']); ?>"
-                        data-item-code="<?php echo htmlspecialchars($itemCode); ?>"
+                        data-item-code="<?php echo htmlspecialchars($baseItemCode); ?>"
                         data-item-name="<?php echo htmlspecialchars($product['name']); ?>">
                         <img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>">
                         <div class="product-overlay">
@@ -152,7 +176,7 @@
                             <div class="items stock">
                                 <p>Stock: <?php echo $product['stock']; ?></p>
                             </div>
-                            <div class="items cart" onclick="handleAddToCart(this)" data-item-code="<?php echo htmlspecialchars($itemCode); ?>">
+                            <div class="items cart" onclick="handleAddToCart(this)" data-item-code="<?php echo htmlspecialchars($baseItemCode); ?>">
                                 <i class="fa fa-shopping-cart"></i>
                                 <span>ADD TO CART</span>
                             </div>
@@ -528,6 +552,8 @@
                 name: productContainer.dataset.itemName,
                 sizes: productContainer.dataset.sizes.split(','),
                 prices: productContainer.dataset.prices.split(','),
+                stocks: productContainer.dataset.stocks.split(','),
+                itemCodes: productContainer.dataset.itemCodes ? productContainer.dataset.itemCodes.split(',') : [],
                 image: productContainer.querySelector('img').src,
                 category: category
             };
@@ -536,15 +562,32 @@
             document.getElementById('modalProductImage').src = currentProduct.image;
             document.getElementById('modalProductName').textContent = currentProduct.name;
             document.getElementById('modalProductPrice').textContent = `Price Range: ₱${Math.min(...currentProduct.prices.map(Number)).toFixed(2)} - ₱${Math.max(...currentProduct.prices.map(Number)).toFixed(2)}`;
-            document.getElementById('modalProductStock').textContent = `Stock: ${currentProduct.stock}`;
+            document.getElementById('modalProductStock').textContent = `Total Stock: ${currentProduct.stock}`;
 
             // Generate size options
             const sizeOptionsContainer = document.querySelector('.size-options');
             sizeOptionsContainer.innerHTML = '';
-            currentProduct.sizes.forEach(size => {
+            
+            currentProduct.sizes.forEach((size, index) => {
                 const sizeBtn = document.createElement('div');
                 sizeBtn.className = 'size-option';
                 sizeBtn.textContent = size;
+                
+                // Add stock and individual item code as data attributes
+                const stock = currentProduct.stocks[index] || 0;
+                const itemCode = currentProduct.itemCodes[index] || currentProduct.itemCode;
+                
+                sizeBtn.dataset.stock = stock;
+                sizeBtn.dataset.itemCode = itemCode;
+                sizeBtn.dataset.price = currentProduct.prices[index];
+                
+                // Add available class if stock > 0
+                if (parseInt(stock) > 0) {
+                    sizeBtn.classList.add('available');
+                } else {
+                    sizeBtn.classList.add('unavailable');
+                }
+                
                 sizeBtn.onclick = () => selectSize(sizeBtn);
                 sizeOptionsContainer.appendChild(sizeBtn);
             });
@@ -553,8 +596,24 @@
         }
 
         function selectSize(element) {
+            // Only allow selection if size is available
+            if (element.classList.contains('unavailable')) {
+                return;
+            }
+            
             document.querySelectorAll('.size-option').forEach(btn => btn.classList.remove('selected'));
             element.classList.add('selected');
+            
+            // Update stock display for the selected size
+            const stock = element.dataset.stock;
+            const price = element.dataset.price;
+            
+            document.getElementById('modalProductStock').textContent = `Stock: ${stock}`;
+            document.getElementById('modalProductPrice').textContent = `Price: ₱${parseFloat(price).toFixed(2)}`;
+            
+            // Update max quantity
+            document.getElementById('quantity').max = stock;
+            document.getElementById('quantity').value = 1;
         }
 
         function incrementQuantity() {
@@ -578,10 +637,13 @@
 
             const quantity = document.getElementById('quantity').value;
             const size = currentProduct.category?.toLowerCase().includes('accessories') ? 'One Size' : selectedSize.textContent;
+            
+            // Get the specific item code for the selected size
+            const itemCode = selectedSize ? selectedSize.dataset.itemCode : currentProduct.itemCode;
 
             // Add to cart with size and quantity
             addToCart(null, {
-                itemCode: currentProduct.itemCode,
+                itemCode: itemCode,
                 size: size,
                 quantity: quantity
             });
