@@ -14,8 +14,6 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-/* Global Styles */
-
 .container {
   display: grid;
   grid-template-columns: 300px 1fr;
@@ -658,203 +656,202 @@
   opacity: 1;
 }
 
-/* Modal Styles - Moved from ProItemList.php */
+/* Modal Styles */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .modal-content {
-    background-color: #fff;
-    position: relative;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 500px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+  background-color: #fff;
+  position: relative;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 500px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .close {
-    position: absolute;
-    right: 20px;
-    top: 10px;
-    font-size: 28px;
-    cursor: pointer;
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  font-size: 28px;
+  cursor: pointer;
 }
 
 .product-info {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .product-info img {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    margin-right: 20px;
-    position: static; /* Override the absolute positioning from .product-container img */
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-right: 20px;
 }
 
 .size-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
-    justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
 }
 
 .size-option {
-    padding: 10px 20px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    min-width: 60px;
-    text-align: center;
+  padding: 10px 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 60px;
+  text-align: center;
 }
 
 .size-option.available {
-    opacity: 1;
-    background-color: #fff;
-    border-color: #007bff;
-    color: #007bff;
+  opacity: 1;
+  background-color: #fff;
+  border-color: #007bff;
+  color: #007bff;
 }
 
 .size-option.unavailable {
-    opacity: 1;
-    background-color: #f5f5f5;
-    cursor: not-allowed;
-    border-color: #ddd;
-    color: #999;
+  opacity: 1;
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  border-color: #ddd;
+  color: #999;
 }
 
 .size-option.selected {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
-    opacity: 1;
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+  opacity: 1;
 }
 
 .size-option.available:hover {
-    background-color: #e6f2ff;
+  background-color: #e6f2ff;
 }
 
 .quantity-selector {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 .quantity-controls {
-    display: flex;
-    align-items: center;
-    gap: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .quantity-controls button {
-    padding: 5px 10px;
-    border: 1px solid #ddd;
-    background: #f0f0f0;
-    cursor: pointer;
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  background: #f0f0f0;
+  cursor: pointer;
 }
 
 .quantity-controls input {
-    width: 50px;
-    text-align: center;
-    padding: 5px;
+  width: 50px;
+  text-align: center;
+  padding: 5px;
 }
 
 .add-to-cart-btn {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .add-to-cart-btn:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 .add-to-cart-btn:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
 .price-display, .stock-display {
-    font-size: 1.1em;
-    margin: 5px 0;
+  font-size: 1.1em;
+  margin: 5px 0;
 }
 
 .price-display {
-    color: #007bff;
-    font-weight: bold;
+  color: #007bff;
+  font-weight: bold;
 }
 
 .stock-display {
-    color: #28a745;
+  color: #28a745;
 }
 
 .low-stock {
-    color: #dc3545;
+  color: #dc3545;
 }
 
 /* Add specific styles for accessory modal */
 #accessoryModal .quantity-selector {
-    margin: 20px 0;
+  margin: 20px 0;
 }
 
 #accessoryModal .quantity-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 #accessoryModal .quantity-controls button {
-    padding: 5px 15px;
-    font-size: 18px;
-    border: 1px solid #ddd;
-    background: #f8f8f8;
-    cursor: pointer;
-    border-radius: 4px;
+  padding: 5px 15px;
+  font-size: 18px;
+  border: 1px solid #ddd;
+  background: #f8f8f8;
+  cursor: pointer;
+  border-radius: 4px;
 }
 
 #accessoryModal .quantity-controls input {
-    width: 60px;
-    text-align: center;
-    padding: 5px;
-    font-size: 16px;
-    border: 1px solid #000000;
-    border-radius: 4px;
+  width: 60px;
+  text-align: center;
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
 #accessoryModal .add-to-cart-btn {
-    width: 100%;
-    padding: 12px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
 }
 
 #accessoryModal .add-to-cart-btn:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }

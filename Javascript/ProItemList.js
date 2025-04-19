@@ -36,14 +36,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Mobile sidebar toggle
     if (document.querySelector('.sort-container')) {
-        const sidebarToggle = document.createElement('button');
-        sidebarToggle.className = 'sidebar-toggle';
-        sidebarToggle.innerHTML = '<i class="fas fa-filter"></i>';
-        document.querySelector('.sort-container').prepend(sidebarToggle);
+    const sidebarToggle = document.createElement('button');
+    sidebarToggle.className = 'sidebar-toggle';
+    sidebarToggle.innerHTML = '<i class="fas fa-filter"></i>';
+    document.querySelector('.sort-container').prepend(sidebarToggle);
 
-        sidebarToggle.addEventListener('click', () => {
-            document.querySelector('.sidebar').classList.toggle('active');
-        });
+    sidebarToggle.addEventListener('click', () => {
+        document.querySelector('.sidebar').classList.toggle('active');
+    });
     }
 
     // Quantity buttons functionality
@@ -215,8 +215,8 @@ function showAccessoryModal(element) {
     // Set max quantity
     const accessoryQuantityInput = document.getElementById('accessoryQuantity');
     accessoryQuantityInput.max = currentProduct.stock;
-    accessoryQuantityInput.value = ''; // Set empty value initially
-    accessoryQuantityInput.placeholder = "0"; // Add placeholder
+    accessoryQuantityInput.value = ''; // Start with empty value
+    accessoryQuantityInput.placeholder = '0'; // Add placeholder text
     
     // Add input validation
     accessoryQuantityInput.addEventListener('input', function() {
@@ -246,21 +246,16 @@ function showAccessoryModal(element) {
 }
 
 function validateAccessoryQuantity(input, enforceMax = false) {
-    // Only validate non-empty values
-    if (input.value === '') {
-        return; // Allow empty value during input
-    }
-    
-    // Make sure it's a positive integer
+    // Make sure it's a positive integer or empty
     input.value = input.value.replace(/[^0-9]/g, '');
     
-    // Make sure it's at least 1 if there's a value
-    if (input.value !== '' && parseInt(input.value) < 1) {
-        input.value = 1;
+    // If it's empty, that's fine - allow user to type
+    if (input.value === '') {
+        return;
     }
     
     // Check against max stock
-    if (enforceMax && input.value !== '') {
+    if (enforceMax) {
         const maxStock = parseInt(currentProduct.stock);
         if (parseInt(input.value) > maxStock) {
             input.value = maxStock;
@@ -277,8 +272,7 @@ function closeAccessoryModal() {
 function incrementAccessoryQuantity() {
     const input = document.getElementById('accessoryQuantity');
     const max = parseInt(currentProduct.stock);
-    const currentValue = input.value === '' ? 0 : parseInt(input.value);
-    
+    const currentValue = parseInt(input.value);
     if (currentValue < max) {
         input.value = currentValue + 1;
     } else {
@@ -288,23 +282,17 @@ function incrementAccessoryQuantity() {
 
 function decrementAccessoryQuantity() {
     const input = document.getElementById('accessoryQuantity');
-    const currentValue = input.value === '' ? 0 : parseInt(input.value);
-    
-    if (currentValue > 1) {
-        input.value = currentValue - 1;
-    } else if (currentValue === 0) {
-        input.value = ''; // Keep it empty if it was empty
-    } else {
-        input.value = 1; // Minimum is 1 if it had a value
+    if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
     }
 }
 
 function addAccessoryToCart() {
     const quantityInput = document.getElementById('accessoryQuantity');
     
-    // Validate that quantity is not empty
-    if (quantityInput.value === '') {
-        alert('Please enter a quantity');
+    // Check if quantity is empty or zero
+    if (!quantityInput.value || quantityInput.value === '0') {
+        alert('Please enter a valid quantity');
         return;
     }
     
@@ -384,8 +372,8 @@ function showSizeModal(element) {
     
     // Get the quantity input
     const quantityInput = document.getElementById('quantity');
-    quantityInput.value = ''; // Set empty value initially
-    quantityInput.placeholder = "Enter quantity"; // Add placeholder
+    quantityInput.value = ''; // Start with empty value instead of 1
+    quantityInput.placeholder = '0'; // Add placeholder text
     
     // Clear previous event listeners
     const oldInput = quantityInput.cloneNode(true);
@@ -405,22 +393,17 @@ function showSizeModal(element) {
 }
 
 function validateQuantityInput(input, enforceMax = false) {
-    // Only validate non-empty values
-    if (input.value === '') {
-        return; // Allow empty value during input
-    }
-    
-    // Make sure it's a positive integer
+    // Make sure it's a positive integer or empty
     input.value = input.value.replace(/[^0-9]/g, '');
     
-    // Make sure it's at least 1 if there's a value
-    if (input.value !== '' && parseInt(input.value) < 1) {
-        input.value = 1;
+    // If it's empty, that's fine - allow user to type
+    if (input.value === '') {
+        return;
     }
     
     // If a size is selected, check against max stock
     const selectedSize = document.querySelector('.size-option.selected');
-    if (selectedSize && enforceMax && input.value !== '') {
+    if (selectedSize && enforceMax) {
         const maxStock = parseInt(selectedSize.dataset.stock);
         if (parseInt(input.value) > maxStock) {
             input.value = maxStock;
@@ -467,7 +450,7 @@ function incrementQuantity() {
     }
     
     const max = parseInt(selectedSize.dataset.stock);
-    const currentValue = input.value === '' ? 0 : parseInt(input.value);
+    const currentValue = parseInt(input.value);
     
     if (currentValue < max) {
         input.value = currentValue + 1;
@@ -478,14 +461,8 @@ function incrementQuantity() {
 
 function decrementQuantity() {
     const input = document.getElementById('quantity');
-    const currentValue = input.value === '' ? 0 : parseInt(input.value);
-    
-    if (currentValue > 1) {
-        input.value = currentValue - 1;
-    } else if (currentValue === 0) {
-        input.value = ''; // Keep it empty if it was empty
-    } else {
-        input.value = 1; // Minimum is 1 if it had a value
+    if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
     }
 }
 
@@ -498,9 +475,9 @@ function addToCartWithSize() {
 
     const quantityInput = document.getElementById('quantity');
     
-    // Validate that quantity is not empty
-    if (quantityInput.value === '') {
-        alert('Please enter a quantity');
+    // Check if quantity is empty or zero
+    if (!quantityInput.value || quantityInput.value === '0') {
+        alert('Please enter a valid quantity');
         return;
     }
     

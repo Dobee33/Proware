@@ -206,7 +206,7 @@
                 <label for="quantity">Quantity:</label>
                 <div class="quantity-controls">
                     <button type="button" onclick="decrementQuantity()">-</button>
-                    <input type="number" id="quantity" placeholder="Enter quantity" min="1">
+                    <input type="number" id="quantity" value="1" min="1">
                     <button type="button" onclick="incrementQuantity()">+</button>
                 </div>
             </div>
@@ -231,7 +231,7 @@
                 <label for="accessoryQuantity">Quantity:</label>
                 <div class="quantity-controls">
                     <button type="button" onclick="decrementAccessoryQuantity()">-</button>
-                    <input type="number" id="accessoryQuantity" placeholder="Enter quantity" min="1">
+                    <input type="number" id="accessoryQuantity" value="1" min="1">
                     <button type="button" onclick="incrementAccessoryQuantity()">+</button>
                 </div>
             </div>
