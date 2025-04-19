@@ -209,6 +209,61 @@ document.addEventListener('DOMContentLoaded', function() {
     if (accessoryModalClose) {
         accessoryModalClose.addEventListener('click', closeAccessoryModal);
     }
+
+    // Add category filtering functionality
+    const categoryLinks = document.querySelectorAll('.category-link');
+    const productContainers = document.querySelectorAll('.product-container');
+    const noResultsMessage = document.getElementById('no-results-message');
+    let activeCategory = null;
+
+    categoryLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const category = this.dataset.category;
+            
+            // Toggle active state of links
+            categoryLinks.forEach(l => l.classList.remove('active'));
+            
+            if (activeCategory === category) {
+                // If clicking the same category, show all products
+                activeCategory = null;
+                showAllProducts();
+            } else {
+                // Set new active category and filter
+                activeCategory = category;
+                this.classList.add('active');
+                filterProducts(category);
+            }
+        });
+    });
+
+    function filterProducts(category) {
+        let visibleCount = 0;
+        
+        productContainers.forEach(container => {
+            const productCategory = container.dataset.category;
+            if (productCategory === category) {
+                container.style.display = 'block';
+                visibleCount++;
+            } else {
+                container.style.display = 'none';
+            }
+        });
+
+        // Show/hide no results message
+        if (noResultsMessage) {
+            noResultsMessage.style.display = visibleCount === 0 ? 'flex' : 'none';
+        }
+    }
+
+    function showAllProducts() {
+        productContainers.forEach(container => {
+            container.style.display = 'block';
+        });
+        if (noResultsMessage) {
+            noResultsMessage.style.display = 'none';
+        }
+    }
 });
 
 // Handle cart interaction - ONLY processing cart icon clicks

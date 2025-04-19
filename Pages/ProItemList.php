@@ -36,52 +36,39 @@
     <div class="container">
         <aside class="sidebar" data-aos="fade-right">
             <div class="filter-header">
-                <h2>Filters</h2>
-                <button class="clear-filters">
-                    <i class="fas fa-undo"></i> Reset
-                </button>
+                <span class="filter-label">FILTER</span>
+                <span class="category-title">Product categories</span>
             </div>
 
-            <div class="filter-group">
-                <h3>Categories</h3>
-                <input type="checkbox" id="tertiary" class="category-checkbox">
-                <label for="tertiary" style = "font-size: 30px; font-weight: 500;">Tertiary</label>
-                <div class="subcategory" id="tertiary-sub">
-                    <label><input type="checkbox"> BS in Information Technology (BSIT)</label><br>
-                    <label><input type="checkbox"> BS in Computer Science (BSCS)</label><br>
-                    <label><input type="checkbox"> BS in Business Administration (BSBA)</label><br>
-                    <label><input type="checkbox"> BS in Tourism Management (BSTM)</label><br>
-                    <label><input type="checkbox"> Bachelor of Multimedia Arts (BMMA)</label><br>
-                    <label><input type="checkbox"> BS in Computer Engineering (BSCpE)</label><br>
+            <div class="category-list">
+                <!-- Tertiary Uniforms -->
+                <div class="category-item">
+                    <a href="#" class="category-link" data-category="tertiary-uniform">Tertiary Uniform</a>
                 </div>
-            </div>
 
-            <div class="category">
-                <input type="checkbox" id="senior-high" class="category-checkbox">
-                <label for="senior-high" style = "font-size: 30px; font-weight: 500;">Senior High School</label>
-                <div class="subcategory" id="senior-high-sub">
-                    <label><input type="checkbox"> SHS Uniform</label><br>
-                    <label><input type="checkbox"> Senior High School PE</label><br>
+                <!-- SHS Uniforms -->
+                <div class="category-item">
+                    <a href="#" class="category-link" data-category="shs-uniform">SHS Uniform</a>
                 </div>
-            </div>
 
-            <div class="category">
-                <input type="checkbox" id="accessories" class="category-checkbox">
-                <label for="accessories" style = "font-size: 30px; font-weight: 500;">Accessories</label>
-                <div class="subcategory" id="accessories-sub">
-                    <label><input type="checkbox"> Pins</label><br>
-                    <label><input type="checkbox"> Lace</label><br>
-                    <label><input type="checkbox"> Aquaflasks</label><br>
+                <!-- STI Accessories -->
+                <div class="category-item">
+                    <a href="#" class="category-link" data-category="sti-accessories">STI Accessories</a>
                 </div>
-            </div>
 
-            <div class="category">
-                <input type="checkbox" id="shirts" class="category-checkbox">
-                <label for="shirts" style = "font-size: 30px; font-weight: 500;">Shirts</label>
-                <div class="subcategory" id="shirts-sub">
-                    <label><input type="checkbox"> Anniversary Shirts</label><br>
-                    <label><input type="checkbox"> Proware Shirts</label><br>
-                    <label><input type="checkbox"> Org Shirts</label><br>
+                <!-- STI Shirt -->
+                <div class="category-item">
+                    <a href="#" class="category-link" data-category="sti-shirt">STI Shirt</a>
+                </div>
+
+                <!-- SHS PE -->
+                <div class="category-item">
+                    <a href="#" class="category-link" data-category="shs-pe">SHS PE</a>
+                </div>
+
+                <!-- Tertiary PE -->
+                <div class="category-item">
+                    <a href="#" class="category-link" data-category="tertiary-pe">Tertiary PE</a>
                 </div>
             </div>
         </aside>
@@ -155,12 +142,12 @@
                     
                     ?>
                     <div class="product-container" 
+                        data-category="<?php echo strtolower(str_replace(' ', '-', $product['category'])); ?>"
                         data-sizes="<?php echo implode(',', $availableSizes); ?>"
                         data-prices="<?php echo implode(',', $prices); ?>" 
                         data-stocks="<?php echo implode(',', array_values($stocksBySize)); ?>"
                         data-item-codes="<?php echo implode(',', array_values($itemCodesBySize)); ?>"
                         data-stock="<?php echo $product['stock']; ?>"
-                        data-category="<?php echo htmlspecialchars($product['category']); ?>"
                         data-item-code="<?php echo htmlspecialchars($baseItemCode); ?>"
                         data-item-name="<?php echo htmlspecialchars($product['name']); ?>">
                         <img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>">

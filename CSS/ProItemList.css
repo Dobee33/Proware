@@ -93,16 +93,102 @@
 
 /* Sidebar Styles */
 .sidebar {
-  background: var(--primary-color);
-  padding: 1.5rem;
-  border-radius: 1rem;
-  box-shadow: var(--shadow-md);
-  height: calc(100vh - 4rem); /* Set height to viewport height minus padding */
+  border-radius: 0;
+  border-right: 2px solid gray;
+  height: calc(100vh - 4rem);
   position: sticky;
   top: 2rem;
-  color: var(--secondary-color);
-  overflow-y: auto; /* Enable vertical scrolling */
-  max-height: 100vh; /* Ensure it doesn't exceed viewport height */
+  overflow-y: auto;
+  max-height: 100vh;
+  padding-left: 0; /* Remove left padding */
+}
+
+.filter-header {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-left: 0; /* Remove left padding */
+}
+
+.filter-label {
+  font-size: 40px;
+  color: #333;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  padding-left: 0; /* Remove left padding */
+}
+
+.category-title {
+  font-size: 28px;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  padding-left: 0; /* Remove left padding */
+}
+
+/* Product Categories Styles */
+.category-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.category-item {
+  margin-bottom: 1.5rem;
+  padding-left: 0; /* Remove left padding */
+}
+
+.category-link {
+  display: block;
+  padding: 0.5rem 0;
+  color: #333;
+  text-decoration: none;
+  font-size: 24px;
+  transition: color 0.3s ease;
+  font-weight: 500;
+  padding-left: 0; /* Remove left padding */
+}
+
+.category-link:hover {
+  color: #007bff;
+}
+
+.category-link.active {
+  color: #007bff;
+  font-weight: bold;
+}
+
+/* Divider Line */
+.category-divider {
+  height: 1px;
+  background-color: #e5e5e5;
+  margin: 0.5rem 0;
+}
+
+/* Main Categories */
+.main-category {
+  font-weight: 600;
+  font-size: 28px;
+  color: #222;
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+.category-item:first-child .main-category {
+  font-size: 28px;
+  color: #222;
+  margin-bottom: 2rem;
+}
+
+/* Sub Categories */
+.sub-category {
+  padding-left: 1rem;
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
 /* Add scrollbar styling */
@@ -567,7 +653,6 @@
 
 .filter-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
 }
