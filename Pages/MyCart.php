@@ -147,13 +147,14 @@ $cart_total = 0;
         .cart-page {
             padding-top: 80px;
             min-height: 100vh;
-            background-color: #f8f9fa;
+            background-color: #f4ebb6;
         }
 
         .heading-cart {
             background: linear-gradient(135deg, var(--primary-color) 0%, #005a94 100%);
             padding: 2rem 0;
             margin-bottom: 2rem;
+            margin-top: -10px;
             color: white;
         }
 
