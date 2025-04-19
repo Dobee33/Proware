@@ -291,7 +291,6 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         .customer-info {
             margin-bottom: 1.5rem;
-            padding: 1rem;
             background: #f8f9fa;
             border-radius: 6px;
         }

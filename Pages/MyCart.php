@@ -124,9 +124,9 @@ $cart_total = 0;
                                 <span>₱<?php echo number_format($cart_total, 2); ?></span>
                             </div>
                         </div>
-                        <a href="ProCheckout.php" class="checkout-btn">
+                        <a href="ProPreOrder.php" class="checkout-btn">
                             <i class="fas fa-lock"></i>
-                            Proceed to Checkout
+                            Proceed to Pre Order
                         </a>
                         <a href="ProItemList.php" class="continue-shopping">
                             <i class="fas fa-arrow-left"></i>
