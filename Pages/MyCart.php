@@ -74,12 +74,10 @@ $cart_total = 0;
     ?>
 
     <div class="cart-page">
-        <div class="cart-header">
+        <div class="heading-cart">
             <div class="header-content">
                 <h1><i class="fas fa-shopping-cart"></i> My Cart</h1>
-                <div class="cart-count">
-                    <?php echo count($final_cart_items); ?> items
-                </div>
+                
             </div>
         </div>
 
@@ -152,7 +150,7 @@ $cart_total = 0;
             background-color: #f8f9fa;
         }
 
-        .cart-header {
+        .heading-cart {
             background: linear-gradient(135deg, var(--primary-color) 0%, #005a94 100%);
             padding: 2rem 0;
             margin-bottom: 2rem;
@@ -164,7 +162,7 @@ $cart_total = 0;
             margin: 0 auto;
             padding: 0 2rem;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
         }
 
@@ -175,13 +173,6 @@ $cart_total = 0;
             display: flex;
             align-items: center;
             gap: 1rem;
-        }
-
-        .cart-count {
-            padding: 0.8rem 1.2rem;
-            border-radius: 8px;
-            backdrop-filter: blur(5px);
-            font-weight: 500;
         }
 
         .cart-content {
