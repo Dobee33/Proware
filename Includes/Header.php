@@ -24,14 +24,25 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
             <li><a href="ProItemList.php"
                     class="<?php echo ($current_page == 'ProItemList.php') ? 'active' : ''; ?>">Item List</a></li>
             <?php if (isset($_SESSION['user_id'])): ?>
-            <li><a href="MyCart.php"
-                    class="<?php echo ($current_page == 'MyCart.php') ? 'active' : ''; ?>">My Cart</a></li>
+                <li><a href="MyCart.php"
+                        class="<?php echo ($current_page == 'MyCart.php') ? 'active' : ''; ?>">My Cart</a></li>
+            <?php else: ?>
+                <li><a href="javascript:void(0)" onclick="redirectToLogin('MyCart.php')"
+                        class="<?php echo ($current_page == 'MyCart.php') ? 'active' : ''; ?>">My Cart</a></li>
             <?php endif; ?>
-            <li><a href="ProPreOrder.php"
-                    class="<?php echo ($current_page == 'ProPreOrder.php') ? 'active' : ''; ?>">Pre Order</a></li>
             <?php if (isset($_SESSION['user_id'])): ?>
-            <li><a href="MyOrders.php"
-                    class="<?php echo ($current_page == 'MyOrders.php') ? 'active' : ''; ?>">My Orders</a></li>
+                <li><a href="ProPreOrder.php"
+                        class="<?php echo ($current_page == 'ProPreOrder.php') ? 'active' : ''; ?>">Pre Order</a></li>
+            <?php else: ?>
+                <li><a href="javascript:void(0)" onclick="redirectToLogin('ProPreOrder.php')"
+                        class="<?php echo ($current_page == 'ProPreOrder.php') ? 'active' : ''; ?>">Pre Order</a></li>
+            <?php endif; ?>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <li><a href="MyOrders.php"
+                        class="<?php echo ($current_page == 'MyOrders.php') ? 'active' : ''; ?>">My Orders</a></li>
+            <?php else: ?>
+                <li><a href="javascript:void(0)" onclick="redirectToLogin('MyOrders.php')"
+                        class="<?php echo ($current_page == 'MyOrders.php') ? 'active' : ''; ?>">My Orders</a></li>
             <?php endif; ?>
             <li><a href="about.php" class="<?php echo ($current_page == 'about.php') ? 'active' : ''; ?>">About</a></li>
             <li><a href="faq.php" class="<?php echo ($current_page == 'faq.php') ? 'active' : ''; ?>">FAQ</a></li>
@@ -101,15 +112,17 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
                     <a href="login.php" class="fas fa-sign-out-alt" title="Sign Out" onclick="signOut(event)"></a>
                 </div>
             <?php else: ?>
-                <div class="icon">
-                    <a href="login.php" class="fas fa-sign-in-alt" title="Sign In"></a>
+                <div class="login">
+                    <div class="icon">
+                        <a href="login.php" class="login-button">Login</a>
+                    </div>
                 </div>
             <?php endif; ?>
         </div>
     <?php else: ?>
         <div class="login">
             <div class="icon">
-                <a href="login.php">Log in</a>
+                <a href="login.php" class="login-button">Log in</a>
             </div>
         </div>
     <?php endif; ?>
@@ -374,6 +387,10 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
             default:
                 return '<i class="fas fa-bell" style="color: #007bff;"></i>';
         }
+    }
+
+    function redirectToLogin(destination) {
+        window.location.href = `login.php?redirect=${encodeURIComponent(destination)}`;
     }
 </script>
 
@@ -1310,6 +1327,48 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
             width: calc(100vw - 20px);
             max-width: 320px;
             margin: 0;
+        }
+    }
+
+    /* Login Button Styles */
+    .login-button {
+        display: inline-block;
+        background-color: #0078d4;
+        color: white !important;
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-weight: 600;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px rgba(0, 120, 212, 0.3);
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        border: none;
+        line-height: 1;
+    }
+    
+    .login-button:hover {
+        background-color: darkblue;
+        color: yellow !important;
+        box-shadow: 0 6px 20px rgba(0, 120, 212, 0.2);
+        text-decoration: none;
+    }
+    
+
+
+    .login {
+        margin-right: 20px;
+    }
+
+    .login .icon {
+        padding: 0;
+    }
+    
+    @media screen and (max-width: 768px) {
+        .login-button {
+            padding: 8px 20px;
+            font-size: 14px;
         }
     }
 </style>
