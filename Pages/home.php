@@ -13,7 +13,7 @@
         rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <title>STI College Lucena - Campus Store</title>
+    <title>Homepage</title>
 </head>
 
 <body>
@@ -47,10 +47,55 @@
         </div>
     </section>
 
-    <!-- New Arrivals Section -->
+    <section class="tagline">
+        <div class="tag">
+            <h1>Be future-ready. Be STI.</h1>
+            <p>Explore our wide range of products and check stock availability right from your device.</p>
+        </div>
+
+        <div class="sti-frames">
+                <div id="letter-s" class="frame"></div>
+                <div id="letter-s1" class="frame"></div>
+                <div id="letter-s2" class="frame"></div>
+                <div id="letter-s3" class="frame"></div>
+            </div>
+
+    </section>
+
+
+    <section class="Display">
+        <div class="container">
+            <div class="section-header">
+                <h2>Welcome to STI</h2>
+                <p>Discover our latest collection</p>
+            </div>
+
+            <div class="display-content">
+                <div class="display-item">
+                    <img src="../Images/STI-TM.jpg" alt="STI TM Uniform">
+                </div>
+                <div class="display-item">
+                    <img src="../Images/STI-ICT.jpg" alt="STI ICT Uniform">
+                </div>
+                <div class="display-item">
+                    <img src="../Images/STI-HM.jpg" alt="STI HM Uniform">
+                </div>
+                <div class="display-item">
+                    <img src="../Images/STI-CM.jpg" alt="STI CM Uniform">
+                </div>
+                <div class="display-item">
+                    <img src="../Images/STI-BA.jpg" alt="STI BA Uniform">
+                </div>
+                <div class="display-item">
+                    <img src="../Images/STI GRIT.png" alt="STI GRIT">
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="New-Arrivals">
         <div class="section-header">
-            <h2>New Arrivals</h2>
+            <h2>Item Categories</h2>
             <p class="section-subtitle">Check out our latest products</p>
         </div>
         
@@ -88,82 +133,96 @@
     <section class="Best-Sellers">
         <div class="section-header">
             <h2>Best Sellers</h2>
+            <p class="section-subtitle">Our most popular products</p>
         </div>
         <div class="best-sellers-grid">
-            <div class="best-seller-card" data-aos="fade-up">
-                <div class="best-seller-badge">TOP SELLER</div>
-                <div class="product-image">
-                    <img src="../Images/STI-TM.jpg" alt="STI TM Uniform" draggable="false" />
-                    <div class="product-overlay">
-                        <button class="add-to-cart-btn">Add to Cart</button>
+            <div class="best-sellers-track">
+                <!-- Original Cards -->
+                <div class="best-seller-card">
+                    <div class="best-seller-badge">TOP SELLER</div>
+                    <div class="product-image">
+                        <img src="../Images/STI-TM.jpg" alt="STI TM Uniform" draggable="false" />
+                        <div class="product-overlay">
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
                     </div>
                 </div>
-                <div class="product-info">
-                    <h3>STI TM Uniform</h3>
-                    <p class="product-description">Professional uniform for Tourism Management students</p>
-                    <p class="product-price">₱599.00</p>
-                    <div class="product-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                        <span>(42)</span>
+
+                <div class="best-seller-card">
+                    <div class="best-seller-badge">TOP SELLER</div>
+                    <div class="product-image">
+                        <img src="../Images/STI-ICT.jpg" alt="STI ICT Uniform" draggable="false" />
+                        <div class="product-overlay">
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
                     </div>
                 </div>
-                <div class="best-seller-stock">In Stock</div>
+
+                <div class="best-seller-card">
+                    <div class="best-seller-badge">TOP SELLER</div>
+                    <div class="product-image">
+                        <img src="../Images/STI-HM.jpg" alt="STI HM Uniform" draggable="false" />
+                        <div class="product-overlay">
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="best-seller-card">
+                    <div class="best-seller-badge">TOP SELLER</div>
+                    <div class="product-image">
+                        <img src="../Images/STI-CM.jpg" alt="STI CM Uniform" draggable="false" />
+                        <div class="product-overlay">
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cloned Cards for Seamless Loop -->
+                <div class="best-seller-card">
+                    <div class="best-seller-badge">TOP SELLER</div>
+                    <div class="product-image">
+                        <img src="../Images/STI-TM.jpg" alt="STI TM Uniform" draggable="false" />
+                        <div class="product-overlay">
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="best-seller-card">
+                    <div class="best-seller-badge">TOP SELLER</div>
+                    <div class="product-image">
+                        <img src="../Images/STI-ICT.jpg" alt="STI ICT Uniform" draggable="false" />
+                        <div class="product-overlay">
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="best-seller-card">
+                    <div class="best-seller-badge">TOP SELLER</div>
+                    <div class="product-image">
+                        <img src="../Images/STI-HM.jpg" alt="STI HM Uniform" draggable="false" />
+                        <div class="product-overlay">
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="best-seller-card">
+                    <div class="best-seller-badge">TOP SELLER</div>
+                    <div class="product-image">
+                        <img src="../Images/STI-CM.jpg" alt="STI CM Uniform" draggable="false" />
+                        <div class="product-overlay">
+                            <button class="add-to-cart-btn">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- Additional best seller cards here -->
-            <!-- ... Rest of the best seller cards ... -->
-        </div>
-    </section>
-    
-    <!-- Tagline Section -->
-    <section class="tagline">
-        <div class="tag">
-            <h1>Be future-ready. Be STI.</h1>
-            <p>Explore our wide range of products and check stock availability right from your device.</p>
         </div>
     </section>
 
-    <!-- Featured Products Section -->
-    <section class="Featured-Products">
-        <div class="section-header">
-            <h2>Featured Products</h2>
-            <p class="section-subtitle">Discover our most popular items</p>
-        </div>
-        
-        <div class="featured-carousel-container">
-            <div class="featured-carousel">
-                <div class="featured-carousel-track">
-                    <!-- Featured product items here -->
-                    <!-- ... Rest of the featured products ... -->
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Display Section -->
-    <section class="Display">
-        <div class="container">
-            <div class="section-header">
-                <h2>Welcome to STI</h2>
-                <p>Discover our latest collection</p>
-            </div>
-            
-            <div class="sti-frames">
-                <div id="letter-s" class="frame"></div>
-                <div id="letter-s1" class="frame"></div>
-                <div id="letter-s2" class="frame"></div>
-                <div id="letter-s3" class="frame"></div>
-            </div>
-            
-            <div class="display-content">
-                <!-- Display content here -->
-                <!-- ... Rest of the display content ... -->
-            </div>
-        </div>
-    </section>
+    <!-- Featured Products Section here -->
 
     <?php
     include("../Includes/footer.php");
