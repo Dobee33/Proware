@@ -141,38 +141,54 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Get all main category checkboxes
-    const mainCategories = document.querySelectorAll('.main-category');
-    const sizeFilter = document.querySelector('.size-filter');
+    const mainCategories = document.querySelectorAll('.main-category-header');
+    const courseHeaders = document.querySelectorAll('.course-header');
+    let activeMainCategories = new Set();
+    let activeSubcategories = new Map(); // Map to track active subcategories by main category
 
-    // Add click event listeners to main categories
-    mainCategories.forEach(category => {
-        category.addEventListener('change', function() {
-            const categoryType = this.dataset.category;
+    // Handle main category toggles
+    mainCategories.forEach(header => {
+        header.addEventListener('click', function() {
+            const subcategories = this.nextElementSibling;
+            const icon = this.querySelector('i');
+            const category = this.dataset.category;
             
-            // Show/hide subcategories based on main category selection
-            const subcategoryGroup = document.getElementById(`${categoryType}-${categoryType === 'sti-shirt' ? 'options' : categoryType === 'uniform' ? 'courses' : 'options'}`);
-            if (subcategoryGroup) {
-                subcategoryGroup.classList.toggle('hidden', !this.checked);
-            }
-
-            // Show/hide size filter for uniform and STI shirt categories
-            if (categoryType === 'uniform' || categoryType === 'sti-shirt') {
-                sizeFilter.classList.toggle('hidden', !this.checked);
-            } else if (categoryType === 'accessories') {
-                sizeFilter.classList.add('hidden');
-            }
-
-            // Uncheck other main categories
-            mainCategories.forEach(otherCategory => {
-                if (otherCategory !== this && this.checked) {
-                    otherCategory.checked = false;
-                    const otherCategoryType = otherCategory.dataset.category;
-                    const otherSubcategoryGroup = document.getElementById(`${otherCategoryType}-${otherCategoryType === 'sti-shirt' ? 'options' : otherCategoryType === 'uniform' ? 'courses' : 'options'}`);
-                    if (otherSubcategoryGroup) {
-                        otherSubcategoryGroup.classList.add('hidden');
-                    }
+            // Toggle active class for subcategories
+            this.classList.toggle('active');
+            if (subcategories) {
+                subcategories.classList.toggle('active');
+                
+                // Check if this category has direct items
+                const directItems = subcategories.querySelector(':scope > .course-items');
+                if (directItems) {
+                    directItems.classList.toggle('hidden');
                 }
-            });
+            }
+            
+            // Handle main category filtering
+            if (this.classList.contains('active')) {
+                icon.style.transform = 'rotate(180deg)';
+                activeMainCategories.add(category);
+            } else {
+                icon.style.transform = 'rotate(0deg)';
+                activeMainCategories.delete(category);
+                // Remove any active subcategories for this main category
+                activeSubcategories.delete(category);
+                // Hide all course items when main category is collapsed
+                if (subcategories) {
+                    const courseItems = subcategories.querySelectorAll('.course-items');
+                    const courseIcons = subcategories.querySelectorAll('.course-header i');
+                    courseItems.forEach(item => item.classList.add('hidden'));
+                    courseIcons.forEach(icon => icon.style.transform = 'rotate(0deg)');
+                }
+            }
+
+            // Apply filters based on all active categories
+            if (activeMainCategories.size > 0) {
+                filterByMainCategories(Array.from(activeMainCategories));
+            } else {
+                showAllProducts();
+            }
         });
     });
 
@@ -240,72 +256,288 @@ document.addEventListener('DOMContentLoaded', function() {
     function filterProducts(category) {
         let visibleCount = 0;
         
-        // First, mark all products for animation
+        // Remove animation and directly show/hide products
         productContainers.forEach(container => {
             const productCategory = container.dataset.category;
             if (productCategory === category) {
                 // Will be shown
-                if (container.style.display === 'none') {
                     container.style.display = 'block';
-                    container.classList.add('showing');
-                    setTimeout(() => {
-                        container.classList.remove('showing');
-                    }, 500);
-                }
                 visibleCount++;
             } else {
                 // Will be hidden
-                container.classList.add('hiding');
-            }
-        });
-
-        // After animation delay, hide the elements
-        setTimeout(() => {
-            productContainers.forEach(container => {
-                const productCategory = container.dataset.category;
-                if (productCategory !== category) {
                     container.style.display = 'none';
-                    container.classList.remove('hiding');
                 }
             });
-        }, 500);
 
-        // Show/hide no results message with fade
+        // Show/hide no results message without animation
         if (noResultsMessage) {
             if (visibleCount === 0) {
-                noResultsMessage.style.opacity = '0';
                 noResultsMessage.style.display = 'flex';
-                setTimeout(() => {
-                    noResultsMessage.style.opacity = '1';
-                }, 10);
             } else {
-                noResultsMessage.style.opacity = '0';
-                setTimeout(() => {
                     noResultsMessage.style.display = 'none';
-                }, 500);
             }
         }
     }
 
     function showAllProducts() {
-        // Show all products with animation
+        // Show all products without animation
         productContainers.forEach(container => {
-            if (container.style.display === 'none') {
                 container.style.display = 'block';
-                container.classList.add('showing');
-                setTimeout(() => {
-                    container.classList.remove('showing');
-                }, 500);
-            }
         });
 
-        // Hide no results message with fade
+        // Hide no results message without animation
         if (noResultsMessage) {
-            noResultsMessage.style.opacity = '0';
-            setTimeout(() => {
                 noResultsMessage.style.display = 'none';
-            }, 500);
         }
+    }
+
+    // Handle course category toggles (for nested categories only)
+    courseHeaders.forEach(header => {
+        header.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent triggering parent category
+            const courseItems = this.nextElementSibling;
+            const icon = this.querySelector('i');
+            const courseName = this.querySelector('span').textContent.trim();
+            const mainCategory = this.closest('.subcategories').previousElementSibling.dataset.category;
+            
+            if (courseItems && courseItems.classList.contains('course-items')) {
+                // Toggle visibility of course items
+                courseItems.classList.toggle('hidden');
+                
+                // Rotate icon
+                icon.style.transform = courseItems.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+                
+                // If course items are now hidden, remove this course from active subcategories
+                if (courseItems.classList.contains('hidden')) {
+                    if (activeSubcategories.has(mainCategory)) {
+                        const courses = activeSubcategories.get(mainCategory);
+                        courses.delete(courseName);
+                        if (courses.size === 0) {
+                            activeSubcategories.delete(mainCategory);
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+    // Handle checkbox changes
+    const filterCheckboxes = document.querySelectorAll('.course-items input[type="checkbox"]');
+    filterCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (activeMainCategories.size > 0) {
+                // Get the checkbox value and main category
+                const checkboxValue = this.value;
+                const mainCategory = this.closest('.subcategories').previousElementSibling.dataset.category;
+                
+                // Initialize or update active subcategories
+                if (!activeSubcategories.has(mainCategory)) {
+                    activeSubcategories.set(mainCategory, new Set());
+                }
+                
+                const courses = activeSubcategories.get(mainCategory);
+                
+                // Add or remove course based on checkbox state
+                if (this.checked) {
+                    courses.add(checkboxValue);
+                } else {
+                    courses.delete(checkboxValue);
+                    if (courses.size === 0) {
+                        activeSubcategories.delete(mainCategory);
+                    }
+                }
+                
+                // Apply filters based on active main categories and subcategories
+                applyFilters();
+            }
+        });
+    });
+
+    // Function to filter products by multiple main categories
+    function filterByMainCategories(categories) {
+        const productContainers = document.querySelectorAll('.product-container');
+        let visibleCount = 0;
+        
+        productContainers.forEach(container => {
+            const productCategory = container.dataset.category.toLowerCase();
+            const shouldShow = categories.some(category => 
+                productCategory.includes(category.toLowerCase())
+            );
+            
+            container.style.display = shouldShow ? 'block' : 'none';
+            if (shouldShow) visibleCount++;
+        });
+
+        // Show/hide no results message
+        const noResultsMessage = document.getElementById('no-results-message');
+        if (noResultsMessage) {
+            noResultsMessage.style.display = visibleCount === 0 ? 'flex' : 'none';
+        }
+    }
+
+    // Function to apply all active filters
+    function applyFilters() {
+        const productContainers = document.querySelectorAll('.product-container');
+        let visibleCount = 0;
+        
+        productContainers.forEach(container => {
+            const productCategory = container.dataset.category.toLowerCase();
+            const productName = container.dataset.itemName.toLowerCase();
+            const productItemCode = container.dataset.itemCode.toLowerCase();
+            
+            // First check if product belongs to any active main category
+            const belongsToActiveCategory = Array.from(activeMainCategories).some(category => 
+                productCategory.includes(category.toLowerCase())
+            );
+            
+            if (belongsToActiveCategory) {
+                // If no subcategories are selected, show all products from active main categories
+                if (activeSubcategories.size === 0) {
+                    container.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    // Check if product belongs to any active subcategory
+                    let belongsToActiveSubcategory = false;
+                    
+                    // Check each main category that has active subcategories
+                    for (const [mainCategory, courses] of activeSubcategories.entries()) {
+                        // Only check if this product belongs to this main category
+                        if (productCategory.includes(mainCategory.toLowerCase())) {
+                            // Check if product matches any of the active course values
+                            for (const courseValue of courses) {
+                                // Check if the product name or item code contains the course value
+                                if (productName.includes(courseValue.toLowerCase()) || 
+                                    productItemCode.includes(courseValue.toLowerCase())) {
+                                    belongsToActiveSubcategory = true;
+                                    break;
+                                }
+                            }
+                            
+                            // If no match found, try the fuzzy matching
+                            if (!belongsToActiveSubcategory) {
+                                for (const courseValue of courses) {
+                                    if (isProductInCourse(productName, courseValue.toLowerCase())) {
+                                        belongsToActiveSubcategory = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    container.style.display = belongsToActiveSubcategory ? 'block' : 'none';
+                    if (belongsToActiveSubcategory) visibleCount++;
+                }
+            } else {
+                container.style.display = 'none';
+            }
+        });
+        
+        // Update no results message
+        const noResultsMessage = document.getElementById('no-results-message');
+        if (noResultsMessage) {
+            noResultsMessage.style.display = visibleCount === 0 ? 'flex' : 'none';
+        }
+    }
+
+    // Function to determine if a product belongs to a specific course
+    function isProductInCourse(productName, courseValue) {
+        // Extract the course name and item type from the course value
+        // Format is typically like "bscm-blazer" or "bstm-polo"
+        const parts = courseValue.split('-');
+        if (parts.length < 2) return false;
+        
+        const courseCode = parts[0];
+        const itemType = parts.slice(1).join('-');
+        
+        // Direct match check for item type
+        if (productName.includes(itemType)) {
+            return true;
+        }
+        
+        // Check for common variations and abbreviations
+        const courseVariations = getCourseVariations(courseCode);
+        for (const variation of courseVariations) {
+            if (productName.includes(variation)) {
+                return true;
+            }
+        }
+        
+        // Check for keyword matching
+        const itemKeywords = getItemKeywords(itemType);
+        for (const keyword of itemKeywords) {
+            if (productName.includes(keyword)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    // Function to get common variations of course names
+    function getCourseVariations(courseCode) {
+        const variations = [];
+        
+        // Common abbreviations and variations
+        const courseMap = {
+            'bscm': ['business', 'commerce', 'management'],
+            'bstm': ['tourism', 'hospitality'],
+            'bsit': ['information', 'technology', 'it'],
+            'cpe': ['computer', 'engineering'],
+            'cs': ['computer', 'science'],
+            'bsba': ['business', 'administration'],
+            'bmma': ['multimedia', 'arts']
+        };
+        
+        // Add variations based on the course code
+        if (courseMap[courseCode]) {
+            variations.push(...courseMap[courseCode]);
+        }
+        
+        return variations;
+    }
+    
+    // Function to get keywords associated with item types
+    function getItemKeywords(itemType) {
+        const keywords = [];
+        
+        // Map of item types to their associated keywords
+        const itemKeywords = {
+            'blazer': ['blazer', 'coat', 'jacket'],
+            'polo': ['polo', 'shirt'],
+            'pants': ['pants', 'trousers'],
+            'skirt': ['skirt'],
+            'blouse': ['blouse', 'shirt'],
+            'scarf': ['scarf'],
+            'necktie': ['necktie', 'tie'],
+            'vest': ['vest'],
+            'baret': ['baret', 'hat'],
+            'long-sleeve': ['long sleeve', 'longsleeve'],
+            'white-polo': ['white polo'],
+            'gray-polo': ['gray polo', 'grey polo'],
+            'blue-polo': ['blue polo'],
+            'white-blouse': ['white blouse'],
+            'gray-blouse': ['gray blouse', 'grey blouse'],
+            'blue-blouse': ['blue blouse'],
+            'red-scarf': ['red scarf'],
+            'yellow-scarf': ['yellow scarf'],
+            'blue-scarf': ['blue scarf'],
+            'red-necktie': ['red necktie', 'red tie'],
+            'yellow-necktie': ['yellow necktie', 'yellow tie'],
+            'blue-necktie': ['blue necktie', 'blue tie'],
+            'gray-vest': ['gray vest', 'grey vest'],
+            'dark-blue-pants': ['dark blue pants', 'navy pants'],
+            'dark-blue-skirt': ['dark blue skirt', 'navy skirt'],
+            'gray-skirt': ['gray skirt', 'grey skirt'],
+            'tourism-blazer': ['tourism blazer', 'tourism coat', 'tourism jacket']
+        };
+        
+        // Add keywords based on the item type
+        if (itemKeywords[itemType]) {
+            keywords.push(...itemKeywords[itemType]);
+        }
+        
+        return keywords;
     }
 });
 

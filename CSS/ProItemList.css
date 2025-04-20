@@ -101,6 +101,7 @@
   overflow-y: auto;
   max-height: 100vh;
   padding-left: 0; /* Remove left padding */
+  padding-right: 15px;
 }
 
 .filter-header {
@@ -271,27 +272,14 @@
   background-repeat: no-repeat;
   cursor: pointer;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.5s ease-in-out;
   overflow: hidden;
   opacity: 1;
   transform: scale(1);
 }
 
 /* Hide animation classes */
-.product-container.hiding {
-  opacity: 0;
-  transform: scale(0.8);
-  pointer-events: none;
-}
-
 .product-container.hidden {
   display: none;
-}
-
-/* Show animation classes */
-.product-container.showing {
-  opacity: 1;
-  transform: scale(1);
 }
 
 .product-container img {
@@ -1016,4 +1004,123 @@
 .no-results-message p {
   font-size: 16px;
   color: #6c757d;
+}
+
+/* Category Filter Styles */
+.main-category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    cursor: pointer;
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+.main-category-header:hover {
+    color: #007bff;
+}
+
+.main-category-header i {
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+.main-category-header.active i {
+    transform: rotate(180deg);
+}
+
+.subcategories {
+    display: none;
+    padding-left: 20px;
+    border-left: 2px solid #e0e0e0;
+    margin: 10px 0 10px 10px;
+}
+
+.subcategories.active {
+    display: block;
+}
+
+.course-category {
+    margin-bottom: 15px;
+}
+
+.course-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    cursor: pointer;
+    font-size: 20px;
+    color: #333;  /* Match parent category color */
+    transition: color 0.3s ease;
+}
+
+.course-header:hover {
+    color: #007bff;
+}
+
+.course-header i {
+    font-size: 16px;
+    transition: transform 0.3s ease;
+}
+
+.course-header.active i {
+    transform: rotate(180deg);
+}
+
+.course-items {
+    padding-left: 15px;
+    margin: 8px 0;
+    display: block;
+    transition: all 0.3s ease;
+}
+
+.course-items.hidden {
+    display: none;
+}
+
+.course-items label {
+    display: block;
+    padding: 6px 0;
+    font-size: 16px;
+    color: #333;  /* Match parent category color */
+    cursor: pointer;
+    transition: color 0.3s ease;
+    margin-left: 0;
+    font-weight: 500;  /* Add some weight to match parent style */
+}
+
+.course-items label:hover {
+    color: #007bff;
+}
+
+.course-items input[type="checkbox"] {
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Ensure consistent spacing for all category items */
+.category-item {
+    margin-bottom: 1.5rem;
+    padding-left: 0;
+}
+
+/* Adjust spacing for nested items */
+.course-category .course-items {
+    margin-left: 0;
+    padding-left: 15px;
+}
+
+/* Active states for better visual hierarchy */
+.main-category-header.active,
+.course-header.active {
+    color: #007bff;
+}
+
+.course-items label input[type="checkbox"]:checked + span {
+    color: #007bff;
+    font-weight: 600;
 }

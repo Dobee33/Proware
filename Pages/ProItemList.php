@@ -41,34 +41,163 @@
             </div>
 
             <div class="category-list">
-                <!-- Tertiary Uniforms -->
+                <!-- Tertiary Uniform -->
                 <div class="category-item">
-                    <a href="#" class="category-link" data-category="tertiary-uniform">Tertiary Uniform</a>
+                    <div class="main-category-header" data-category="tertiary-uniform">
+                        <span>Tertiary Uniform</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="subcategories">
+                        <!-- BSCM -->
+                        <div class="course-category">
+                            <div class="course-header">
+                                <span>BSCM</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="course-items hidden">
+                                <label><input type="checkbox" value="bscm-blazer"> Blazer</label>
+                                <label><input type="checkbox" value="bscm-long-sleeve"> Long Sleeve Uniform</label>
+                                <label><input type="checkbox" value="bscm-pants"> Pants</label>
+                                <label><input type="checkbox" value="bscm-skirt"> Skirt</label>
+                            </div>
+                        </div>
+
+                        <!-- BSTM -->
+                        <div class="course-category">
+                            <div class="course-header">
+                                <span>BSTM</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="course-items hidden">
+                                <label><input type="checkbox" value="bstm-baret"> Baret</label>
+                                <label><input type="checkbox" value="bstm-white-blouse"> White Blouse</label>
+                                <label><input type="checkbox" value="bstm-yellow-scarf"> Yellow Scarf</label>
+                                <label><input type="checkbox" value="bstm-tourism-blazer"> Tourism Blazer</label>
+                                <label><input type="checkbox" value="bstm-gray-skirt"> Gray Skirt</label>
+                                <label><input type="checkbox" value="bstm-white-polo"> White Polo</label>
+                                <label><input type="checkbox" value="bstm-yellow-necktie"> Yellow Necktie</label>
+                                <label><input type="checkbox" value="bstm-gray-pants"> Gray Pants</label>
+                            </div>
+                        </div>
+
+                        <!-- BSIT/CPE/CS -->
+                        <div class="course-category">
+                            <div class="course-header">
+                                <span>BSIT/CPE/CS</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="course-items hidden">
+                                <label><input type="checkbox" value="bsit-pants"> Pants</label>
+                                <label><input type="checkbox" value="bsit-skirt"> Skirt</label>
+                                <label><input type="checkbox" value="bsit-gray-polo"> Gray polo with 3/4 Sleeve</label>
+                                <label><input type="checkbox" value="bsit-gray-blouse"> Gray blouse 3/4 sleeve</label>
+                            </div>
+                        </div>
+
+                        <!-- BSBA -->
+                        <div class="course-category">
+                            <div class="course-header">
+                                <span>BSBA</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="course-items hidden">
+                                <label><input type="checkbox" value="bsba-red-scarf"> Red Scarf</label>
+                                <label><input type="checkbox" value="bsba-blue-blouse"> Blue long sleeve blouse</label>
+                                <label><input type="checkbox" value="bsba-blue-polo"> Blue long sleeve polo</label>
+                                <label><input type="checkbox" value="bsba-blazer"> Blazer</label>
+                                <label><input type="checkbox" value="bsba-red-necktie"> Red necktie</label>
+                                <label><input type="checkbox" value="bsba-pants"> Pants</label>
+                                <label><input type="checkbox" value="bsba-skirt"> Skirt</label>
+                            </div>
+                        </div>
+
+                        <!-- BMMA -->
+                        <div class="course-category">
+                            <div class="course-header">
+                                <span>BMMA</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="course-items hidden">
+                                <label><input type="checkbox" value="bmma-blue-scarf"> Blue Scarf</label>
+                                <label><input type="checkbox" value="bmma-blue-necktie"> Blue necktie</label>
+                                <label><input type="checkbox" value="bmma-blue-blouse"> Blue long sleeve blouse</label>
+                                <label><input type="checkbox" value="bmma-blue-polo"> Blue long sleeve polo</label>
+                                <label><input type="checkbox" value="bmma-blazer"> Blazer</label>
+                                <label><input type="checkbox" value="bmma-skirt"> Skirt</label>
+                                <label><input type="checkbox" value="bmma-pants"> Pants</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- SHS Uniforms -->
+                <!-- SHS Uniform -->
                 <div class="category-item">
-                    <a href="#" class="category-link" data-category="shs-uniform">SHS Uniform</a>
+                    <div class="main-category-header" data-category="shs-uniform">
+                        <span>SHS Uniform</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="subcategories">
+                        <div class="course-items hidden">
+                            <label><input type="checkbox" value="shs-white-polo"> White Polo</label>
+                            <label><input type="checkbox" value="shs-gray-vest"> Gray Vest</label>
+                            <label><input type="checkbox" value="shs-necktie"> Necktie</label>
+                            <label><input type="checkbox" value="shs-dark-blue-pants"> Dark blue pants</label>
+                            <label><input type="checkbox" value="shs-white-blouse"> White Blouse</label>
+                            <label><input type="checkbox" value="shs-dark-blue-skirt"> Dark blue pencil-cut skirt</label>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- STI Accessories -->
                 <div class="category-item">
-                    <a href="#" class="category-link" data-category="sti-accessories">STI Accessories</a>
+                    <div class="main-category-header" data-category="sti-accessories">
+                        <span>STI Accessories</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="subcategories">
+                        <div class="course-items hidden">
+                            <!-- Add accessories items here -->
+                        </div>
+                    </div>
                 </div>
 
                 <!-- STI Shirt -->
                 <div class="category-item">
-                    <a href="#" class="category-link" data-category="sti-shirt">STI Shirt</a>
+                    <div class="main-category-header" data-category="sti-shirt">
+                        <span>STI Shirt</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="subcategories">
+                        <div class="course-items hidden">
+                            <!-- Add STI shirt items here -->
+                        </div>
+                    </div>
                 </div>
 
                 <!-- SHS PE -->
                 <div class="category-item">
-                    <a href="#" class="category-link" data-category="shs-pe">SHS PE</a>
+                    <div class="main-category-header" data-category="shs-pe">
+                        <span>SHS PE</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="subcategories">
+                        <div class="course-items hidden">
+                            <!-- Add SHS PE items here -->
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Tertiary PE -->
                 <div class="category-item">
-                    <a href="#" class="category-link" data-category="tertiary-pe">Tertiary PE</a>
+                    <div class="main-category-header" data-category="tertiary-pe">
+                        <span>Tertiary PE</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="subcategories">
+                        <div class="course-items hidden">
+                            <!-- Add Tertiary PE items here -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </aside>
