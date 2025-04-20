@@ -103,33 +103,34 @@ session_start();
                     <table>
                         <thead>
                             <tr>
+                                <th>Order Number</th>
                                 <th>Item Code</th>
                                 <th>Item Name</th>
-                                <th>Category</th>
-                                <th>Quantity Sold</th>
-                                <th>Price</th>
+                                <th>Size</th>
+                                <th>Quantity</th>
+                                <th>Price Per Item</th>
                                 <th>Total Amount</th>
-                                <th>Date Sold</th>
+                                <th>Sale Date</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-                            $sql = "SELECT i.item_code, i.item_name, i.category, i.sold_quantity, i.price, 
-                                   (i.sold_quantity * i.price) as total_amount, i.created_at 
-                                   FROM inventory i 
-                                   WHERE i.sold_quantity > 0 
-                                   ORDER BY i.created_at DESC";
+                            $sql = "SELECT s.*, i.item_name 
+                                   FROM sales s 
+                                   LEFT JOIN inventory i ON s.item_code = i.item_code 
+                                   ORDER BY s.sale_date DESC";
                             $result = mysqli_query($conn, $sql);
 
                             while ($row = mysqli_fetch_assoc($result)) {
                                 echo "<tr>";
+                                echo "<td>{$row['transaction_number']}</td>";
                                 echo "<td>{$row['item_code']}</td>";
                                 echo "<td>{$row['item_name']}</td>";
-                                echo "<td>{$row['category']}</td>";
-                                echo "<td>{$row['sold_quantity']}</td>";
-                                echo "<td>₱" . number_format($row['price'], 2) . "</td>";
+                                echo "<td>{$row['size']}</td>";
+                                echo "<td>{$row['quantity']}</td>";
+                                echo "<td>₱" . number_format($row['price_per_item'], 2) . "</td>";
                                 echo "<td>₱" . number_format($row['total_amount'], 2) . "</td>";
-                                echo "<td>{$row['created_at']}</td>";
+                                echo "<td>{$row['sale_date']}</td>";
                                 echo "</tr>";
                             }
                             ?>
