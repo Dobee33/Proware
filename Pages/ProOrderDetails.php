@@ -56,8 +56,8 @@ try {
 
     // Insert into pre_orders table
     $stmt = $conn->prepare("
-        INSERT INTO pre_orders (order_number, user_id, items, phone, total_amount, status) 
-        VALUES (?, ?, ?, ?, ?, 'pending')
+        INSERT INTO pre_orders (order_number, user_id, items, phone, total_amount, status, payment_date) 
+        VALUES (?, ?, ?, ?, ?, 'pending', NULL)
     ");
     $stmt->execute([
         $order_number,

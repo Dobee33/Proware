@@ -57,6 +57,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <option value="pending" <?php echo $status_filter === 'pending' ? 'selected' : ''; ?>>Pending</option>
                         <option value="approved" <?php echo $status_filter === 'approved' ? 'selected' : ''; ?>>Approved</option>
                         <option value="rejected" <?php echo $status_filter === 'rejected' ? 'selected' : ''; ?>>Rejected</option>
+                        <option value="completed" <?php echo $status_filter === 'completed' ? 'selected' : ''; ?>>Completed</option>
                     </select>
                 </div>
             </div>
@@ -76,6 +77,11 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <div class="order-date">
                                         <i class="fas fa-calendar"></i>
                                         <?php echo date('F d, Y h:i A', strtotime($order['created_at'])); ?>
+                                        <?php if ($order['status'] === 'completed' && isset($order['payment_date'])): ?>
+                                            <br>
+                                            <i class="fas fa-money-bill"></i>
+                                            <span class="payment-date">Paid: <?php echo date('F d, Y h:i A', strtotime($order['payment_date'])); ?></span>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 <span class="status-badge <?php echo $order['status']; ?>">

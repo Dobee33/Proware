@@ -58,6 +58,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <option value="pending" <?php echo $status === 'pending' ? 'selected' : ''; ?>>Pending</option>
                             <option value="approved" <?php echo $status === 'approved' ? 'selected' : ''; ?>>Approved</option>
                             <option value="rejected" <?php echo $status === 'rejected' ? 'selected' : ''; ?>>Rejected</option>
+                            <option value="completed" <?php echo $status === 'completed' ? 'selected' : ''; ?>>Completed</option>
                         </select>
                     </div>
                     <div class="notification-icon">
@@ -121,6 +122,10 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         </div>
                                         <div class="order-date">
                                             <?php echo date('F d, Y h:i A', strtotime($order['created_at'])); ?>
+                                            <?php if ($order['status'] === 'completed' && isset($order['payment_date'])): ?>
+                                                <br>
+                                                <span class="payment-date">Paid: <?php echo date('F d, Y h:i A', strtotime($order['payment_date'])); ?></span>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>
@@ -132,6 +137,12 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         </button>
                                         <button class="reject-btn" onclick="updateOrderStatus(<?php echo $order['id']; ?>, 'rejected')">
                                             <i class="fas fa-times"></i> Reject
+                                        </button>
+                                    </div>
+                                <?php elseif ($order['status'] === 'approved'): ?>
+                                    <div class="order-actions">
+                                        <button class="complete-btn" onclick="updateOrderStatus(<?php echo $order['id']; ?>, 'completed')">
+                                            <i class="fas fa-check-double"></i> Mark as Completed (After Payment)
                                         </button>
                                     </div>
                                 <?php endif; ?>
@@ -151,6 +162,8 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <script>
         // Update order status
         function updateOrderStatus(orderId, status) {
+            console.log('Updating order:', orderId, 'to status:', status);
+            
             fetch('update_order_status.php', {
                 method: 'POST',
                 headers: {
@@ -160,15 +173,17 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
             })
             .then(response => response.json())
             .then(data => {
+                console.log('Server response:', data);
                 if (data.success) {
                     location.reload();
                 } else {
-                    alert('Error updating order status');
+                    alert('Error updating order status: ' + data.message);
+                    console.error('Error details:', data.debug);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error updating order status');
+                alert('Error updating order status. Check console for details.');
             });
         }
 
