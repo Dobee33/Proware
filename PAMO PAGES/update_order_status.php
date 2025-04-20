@@ -56,49 +56,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $order_items = json_decode($order['items'], true);
             
             foreach ($order_items as $item) {
-                // Get the clean item name without size suffix
-                $clean_name = rtrim($item['item_name'], " SMLX234567");
+                // Debug log the item details
+                error_log("Processing item: " . json_encode($item));
                 
-                // Get current actual_quantity from inventory
-                $stockStmt = $conn->prepare("SELECT actual_quantity FROM inventory WHERE item_name = ?");
-                if (!$stockStmt->execute([$clean_name])) {
-                    throw new Exception('Failed to get inventory actual quantity for item: ' . $clean_name);
+                // Get current actual_quantity from inventory using item_code
+                $stockStmt = $conn->prepare("SELECT * FROM inventory WHERE item_code = ?");
+                if (!$stockStmt->execute([$item['item_code']])) {
+                    throw new Exception('Failed to get inventory for item code: ' . $item['item_code']);
                 }
                 
                 $inventory = $stockStmt->fetch(PDO::FETCH_ASSOC);
                 if (!$inventory) {
-                    throw new Exception('Item not found in inventory: ' . $clean_name);
+                    throw new Exception('Item not found in inventory: ' . $item['item_code']);
                 }
+                
+                error_log("Found inventory: " . json_encode($inventory));
                 
                 $new_quantity = $inventory['actual_quantity'] - $item['quantity'];
                 if ($new_quantity < 0) {
-                    throw new Exception('Insufficient actual quantity for item: ' . $clean_name);
+                    throw new Exception('Insufficient actual quantity for item: ' . $inventory['item_name']);
                 }
                 
                 // Update inventory actual_quantity
-                $updateStockStmt = $conn->prepare("UPDATE inventory SET actual_quantity = ? WHERE item_name = ?");
-                if (!$updateStockStmt->execute([$new_quantity, $clean_name])) {
-                    throw new Exception('Failed to update inventory actual quantity for item: ' . $clean_name);
+                $updateStockStmt = $conn->prepare("UPDATE inventory SET actual_quantity = ? WHERE item_code = ?");
+                if (!$updateStockStmt->execute([$new_quantity, $item['item_code']])) {
+                    throw new Exception('Failed to update inventory for item: ' . $inventory['item_name']);
                 }
                 
-                error_log("Updated actual quantity for {$clean_name}: {$inventory['actual_quantity']} -> {$new_quantity}");
+                error_log("Updated actual quantity for {$inventory['item_name']}: {$inventory['actual_quantity']} -> {$new_quantity}");
 
                 // Record the sale in the sales table
                 $saleStmt = $conn->prepare("INSERT INTO sales (transaction_number, item_code, size, quantity, price_per_item, total_amount, sale_date) 
                                           VALUES (?, ?, ?, ?, ?, ?, NOW())");
                                           
                 $transaction_number = $order['order_number'];
-                $item_code = $item['item_code'] ?? $clean_name; // Use item_code if available, otherwise use clean_name
-                $size = $item['size'] ?? 'N/A';
+                $size = $item['size'] ?? 'One Size';
                 $quantity = $item['quantity'];
                 $price_per_item = $item['price'];
                 $total_amount = $item['price'] * $item['quantity'];
                 
-                if (!$saleStmt->execute([$transaction_number, $item_code, $size, $quantity, $price_per_item, $total_amount])) {
-                    throw new Exception('Failed to record sale for item: ' . $clean_name);
+                if (!$saleStmt->execute([$transaction_number, $item['item_code'], $size, $quantity, $price_per_item, $total_amount])) {
+                    throw new Exception('Failed to record sale for item: ' . $inventory['item_name']);
                 }
                 
-                error_log("Recorded sale for {$clean_name} in sales table");
+                error_log("Recorded sale for {$inventory['item_name']} in sales table");
             }
         }
 
@@ -126,7 +127,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   ($status === 'rejected' ? 'rejected.' :
                   ($status === 'completed' ? 'completed. Thank you for your purchase!' : 'updated.')));
 
-        // Try to create notification, but don't fail if it doesn't work
         try {
             error_log("Creating notification for user: " . $order['user_id']);
             createNotification($conn, $order['user_id'], $message, $order['order_number'], $status);
