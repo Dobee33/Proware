@@ -71,22 +71,22 @@
             </div>
 
             <div class="display-content">
-                <div class="display-item">
+                <div class="display-item" data-aos="fade-up" data-aos-delay="0">
                     <img src="../Images/STI-TM.jpg" alt="STI TM Uniform">
                 </div>
-                <div class="display-item">
+                <div class="display-item" data-aos="fade-up" data-aos-delay="100">
                     <img src="../Images/STI-ICT.jpg" alt="STI ICT Uniform">
                 </div>
-                <div class="display-item">
+                <div class="display-item" data-aos="fade-up" data-aos-delay="200">
                     <img src="../Images/STI-HM.jpg" alt="STI HM Uniform">
                 </div>
-                <div class="display-item">
+                <div class="display-item" data-aos="fade-up" data-aos-delay="300">
                     <img src="../Images/STI-CM.jpg" alt="STI CM Uniform">
                 </div>
-                <div class="display-item">
+                <div class="display-item" data-aos="fade-up" data-aos-delay="400">
                     <img src="../Images/STI-BA.jpg" alt="STI BA Uniform">
                 </div>
-                <div class="display-item">
+                <div class="display-item" data-aos="fade-up" data-aos-delay="500">
                     <img src="../Images/STI GRIT.png" alt="STI GRIT">
                 </div>
             </div>
@@ -138,7 +138,7 @@
         <div class="best-sellers-grid">
             <div class="best-sellers-track">
                 <!-- Original Cards -->
-                <div class="best-seller-card">
+                <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="0">
                     <div class="best-seller-badge">TOP SELLER</div>
                     <div class="product-image">
                         <img src="../Images/STI-TM.jpg" alt="STI TM Uniform" draggable="false" />
@@ -148,7 +148,7 @@
                     </div>
                 </div>
 
-                <div class="best-seller-card">
+                <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="100">
                     <div class="best-seller-badge">TOP SELLER</div>
                     <div class="product-image">
                         <img src="../Images/STI-ICT.jpg" alt="STI ICT Uniform" draggable="false" />
@@ -158,7 +158,7 @@
                     </div>
                 </div>
 
-                <div class="best-seller-card">
+                <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="200">
                     <div class="best-seller-badge">TOP SELLER</div>
                     <div class="product-image">
                         <img src="../Images/STI-HM.jpg" alt="STI HM Uniform" draggable="false" />
@@ -168,7 +168,7 @@
                     </div>
                 </div>
 
-                <div class="best-seller-card">
+                <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="300">
                     <div class="best-seller-badge">TOP SELLER</div>
                     <div class="product-image">
                         <img src="../Images/STI-CM.jpg" alt="STI CM Uniform" draggable="false" />
@@ -179,7 +179,7 @@
                 </div>
 
                 <!-- Cloned Cards for Seamless Loop -->
-                <div class="best-seller-card">
+                <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="400">
                     <div class="best-seller-badge">TOP SELLER</div>
                     <div class="product-image">
                         <img src="../Images/STI-TM.jpg" alt="STI TM Uniform" draggable="false" />
@@ -189,7 +189,7 @@
                     </div>
                 </div>
 
-                <div class="best-seller-card">
+                <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="500">
                     <div class="best-seller-badge">TOP SELLER</div>
                     <div class="product-image">
                         <img src="../Images/STI-ICT.jpg" alt="STI ICT Uniform" draggable="false" />
@@ -199,7 +199,7 @@
                     </div>
                 </div>
 
-                <div class="best-seller-card">
+                <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="600">
                     <div class="best-seller-badge">TOP SELLER</div>
                     <div class="product-image">
                         <img src="../Images/STI-HM.jpg" alt="STI HM Uniform" draggable="false" />
@@ -209,7 +209,7 @@
                     </div>
                 </div>
 
-                <div class="best-seller-card">
+                <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="700">
                     <div class="best-seller-badge">TOP SELLER</div>
                     <div class="product-image">
                         <img src="../Images/STI-CM.jpg" alt="STI CM Uniform" draggable="false" />
@@ -244,7 +244,12 @@
     
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        AOS.init();
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: false,
+            mirror: true
+        });
     </script>
     <script>
         // Hero background slideshow

@@ -445,24 +445,31 @@
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.display-item.aos-animate {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .display-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .display-item:hover {
-  transform: translateY(-5px);
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-10px);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
 .display-item:hover img {
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 @media (max-width: 992px) {
@@ -769,6 +776,12 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   margin: 10px;
   overflow: hidden;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+
+.best-seller-card:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
 .best-seller-badge {
@@ -782,6 +795,16 @@
   font-weight: 600;
   font-size: 0.8rem;
   z-index: 3;
+  transform: translateY(-5px);
+  opacity: 0;
+  animation: badgeAppear 0.5s ease forwards 0.5s;
+}
+
+@keyframes badgeAppear {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .product-image {
@@ -795,7 +818,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.best-seller-card:hover .product-image img {
+  transform: scale(1.15);
 }
 
 .product-overlay {
@@ -809,15 +836,11 @@
   justify-content: center;
   align-items: center;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.5s ease;
 }
 
 .best-seller-card:hover .product-overlay {
   opacity: 1;
-}
-
-.best-seller-card:hover .product-image img {
-  transform: scale(1.1);
 }
 
 .add-to-cart-btn {
@@ -829,11 +852,23 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  transform: translateY(20px);
+  opacity: 0;
+  animation: buttonAppear 0.5s ease forwards 0.8s;
+}
+
+@keyframes buttonAppear {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .add-to-cart-btn:hover {
   background: var(--primary-color);
   color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes scroll {
@@ -865,7 +900,6 @@
     height: 220px;
   }
 }
-
 
 .product-card {
   background: rgba(255, 255, 255, 0.9);
@@ -1000,7 +1034,6 @@
   margin-right: 10px;
   font-size: 1rem;
 }
-
 
 /* Categories Section */
 .Categories {
