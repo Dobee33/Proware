@@ -222,7 +222,21 @@
         </div>
     </section>
 
-    <!-- Featured Products Section here -->
+    <!-- Video Showcase Section -->
+    <section class="video-showcase">
+        <video class="video-background" autoplay loop muted playsinline>
+            <source src="../Images/last section.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="video-overlay"></div>
+        <div class="video-content">
+            <div class="text-content">
+                <h2>Experience Our Collection</h2>
+                <p>Discover the perfect blend of style and professionalism with our exclusive STI uniforms and merchandise.</p>
+            </div>
+            <a href="ProItemList.php" class="video-btn">Shop Now</a>
+        </div>
+    </section>
 
     <?php
     include("../Includes/footer.php");
