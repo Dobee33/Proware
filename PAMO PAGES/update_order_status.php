@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // Create notification message based on status
+        // Create notification message based on status  
         $message = "Your order #{$order['order_number']} has been " . 
                   ($status === 'approved' ? 'approved! You can now proceed with the payment.' : 
                   ($status === 'rejected' ? 'rejected.' :

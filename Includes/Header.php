@@ -97,6 +97,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
                 <div class="notification-popup">
                     <div class="notification-header">
                         <h3>Notifications</h3>
+                        
                     </div>
                     <div class="notification-items">
                         <!-- Notifications will be loaded here -->
@@ -177,6 +178,46 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         const notificationIcon = document.querySelector('.notification-icon');
         const notificationPopup = document.querySelector('.notification-popup');
 
+        // Function to format time ago
+        function formatTimeAgo(timestamp) {
+            const currentTime = Math.floor(Date.now() / 1000);
+            const timeDifference = currentTime - timestamp;
+            
+            if (timeDifference < 60) {
+                return 'Just now';
+            } else if (timeDifference < 3600) {
+                const minutes = Math.floor(timeDifference / 60);
+                return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            } else if (timeDifference < 86400) {
+                const hours = Math.floor(timeDifference / 3600);
+                return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            } else if (timeDifference < 604800) {
+                const days = Math.floor(timeDifference / 86400);
+                return `${days} day${days > 1 ? 's' : ''} ago`;
+            } else {
+                return new Date(timestamp * 1000).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                });
+            }
+        }
+
+        // Function to update notification times
+        function updateNotificationTimes() {
+            const notificationItems = document.querySelectorAll('.notification-item');
+            notificationItems.forEach(item => {
+                const timestamp = parseInt(item.dataset.timestamp);
+                const timeElement = item.querySelector('.notification-time');
+                if (timestamp && timeElement) {
+                    timeElement.textContent = formatTimeAgo(timestamp);
+                }
+            });
+        }
+
         // Function to update cart popup content
         async function updateCartPopup() {
             try {
@@ -247,19 +288,24 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
                     const notificationItems = document.querySelector('.notification-items');
                     const notificationCountSpan = document.querySelector('.notification-header .notification-count');
                     const iconNotificationCount = document.querySelector('.notification-icon .notification-count');
+                    const clearButton = document.querySelector('.clear-notifications');
                     
                     if (notificationItems) {
                         if (data.notifications && data.notifications.length > 0) {
-                            notificationItems.innerHTML = data.notifications.map(notification => `
-                                <div class="notification-item ${notification.is_read ? '' : 'unread'}" 
-                                     onclick="markNotificationAsRead(${notification.id})">
-                                    <p class="notification-message">${notification.message}</p>
-                                    <span class="notification-status ${notification.type}">
-                                        ${notification.type.charAt(0).toUpperCase() + notification.type.slice(1)}
-                                    </span>
-                                    <p class="notification-time">${notification.time_ago}</p>
-                                </div>
-                            `).join('');
+                            notificationItems.innerHTML = data.notifications.map(notification => {
+                                const timestamp = Math.floor(new Date(notification.created_at).getTime() / 1000);
+                                return `
+                                    <div class="notification-item ${notification.is_read ? '' : 'unread'}" 
+                                         onclick="markNotificationAsRead(${notification.id})"
+                                         data-timestamp="${timestamp}">
+                                        <p class="notification-message">${notification.message}</p>
+                                        <span class="notification-status ${notification.type}">
+                                            ${notification.type.charAt(0).toUpperCase() + notification.type.slice(1)}
+                                        </span>
+                                        <p class="notification-time">${formatTimeAgo(timestamp)}</p>
+                                    </div>
+                                `;
+                            }).join('');
                             
                             if (notificationCountSpan) {
                                 notificationCountSpan.textContent = data.count;
@@ -268,6 +314,9 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
                                 iconNotificationCount.textContent = data.count;
                                 iconNotificationCount.style.display = data.count > 0 ? 'block' : 'none';
                             }
+                            if (clearButton) {
+                                clearButton.style.display = 'block';
+                            }
                         } else {
                             notificationItems.innerHTML = '<p class="empty-notification-message">No notifications</p>';
                             if (notificationCountSpan) {
@@ -275,6 +324,9 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
                             }
                             if (iconNotificationCount) {
                                 iconNotificationCount.style.display = 'none';
+                            }
+                            if (clearButton) {
+                                clearButton.style.display = 'none';
                             }
                         }
                     }
@@ -307,6 +359,33 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
                 console.error('Error:', error);
             }
         };
+
+        // Function to clear all notifications
+        async function clearAllNotifications() {
+            if (!confirm('Are you sure you want to clear all notifications?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('../Includes/notification_operations.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'action=clear_all'
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    updateNotificationPopup();
+                } else {
+                    alert('Failed to clear notifications: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to clear notifications');
+            }
+        }
 
         // Cart icon click event
         if (cartIcon) {
@@ -341,6 +420,16 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
             });
         }
 
+        // Add clear button to notification header
+        const notificationHeader = document.querySelector('.notification-header');
+        if (notificationHeader) {
+            const clearButton = document.createElement('button');
+            clearButton.className = 'clear-notifications';
+            clearButton.textContent = 'Clear All';
+            clearButton.onclick = clearAllNotifications;
+            notificationHeader.appendChild(clearButton);
+        }
+
         // Close popups when clicking outside
         document.addEventListener('click', function(e) {
             if (cartPopup && !cartIcon.contains(e.target) && !cartPopup.contains(e.target)) {
@@ -370,6 +459,9 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
 
         // Refresh notifications every 30 seconds
         setInterval(updateNotificationPopup, 30000);
+        
+        // Update notification times every minute
+        setInterval(updateNotificationTimes, 60000);
     });
 
     function getNotificationIcon(type) {
@@ -880,6 +972,26 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         font-weight: 600;
     }
 
+    .clear-notifications {
+        background: none;
+        border: none;
+        color: #dc3545;
+        font-size: 0.9rem;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+
+    .clear-notifications:hover {
+        background-color: #fff5f5;
+    }
+
+    .clear-notifications:disabled {
+        color: #6c757d;
+        cursor: not-allowed;
+    }
+
     .notification-items {
         max-height: 400px;
         overflow-y: auto;
@@ -911,9 +1023,11 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         cursor: pointer;
         transition: all 0.2s ease;
         border-radius: 8px;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.8rem;
         width: 100%;
         box-sizing: border-box;
+        position: relative;
+        background-color: #ffffff;
     }
 
     .notification-item:last-child {
@@ -927,8 +1041,48 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     }
 
     .notification-item.unread {
-        background-color: #f0f7ff;
-        border-left: 4px solid var(--primary-color);
+        background-color: #e3f2fd;
+        border: 2px solid #1976d2;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(25, 118, 210, 0.1);
+        margin-left: -10px;
+        margin-right: 5px;
+        padding-left: 15px;
+    }
+
+    .notification-item.unread::before {
+        content: 'NEW';
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background-color: #ff4444;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-3px);
+        }
+    }
+
+    .notification-item.unread .notification-message {
+        color: #1a1a1a;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .notification-item.unread .notification-time {
+        color: #1976d2;
+        font-weight: 600;
     }
 
     .notification-message {
@@ -936,7 +1090,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         color: #2c3e50;
         font-size: 0.95rem;
         line-height: 1.5;
-        font-weight: 500;
         word-wrap: break-word;
         overflow-wrap: break-word;
     }
@@ -949,15 +1102,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         gap: 0.5rem;
     }
 
-    .notification-time::before {
-        content: '';
-        display: inline-block;
-        width: 6px;
-        height: 6px;
-        background-color: #6c757d;
-        border-radius: 50%;
-    }
-
     .notification-status {
         display: inline-block;
         padding: 0.25rem 0.75rem;
@@ -967,14 +1111,19 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         margin-top: 0.5rem;
     }
 
-    .notification-status.approved {
+    .notification-item.unread .notification-status {
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .notification-status.completed {
         background-color: #e8f5e9;
         color: #2e7d32;
     }
 
-    .notification-status.rejected {
-        background-color: #ffebee;
-        color: #c62828;
+    .notification-status.approved {
+        background-color: #e3f2fd;
+        color: #1565c0;
     }
 
     .notification-status.processing {
@@ -982,14 +1131,9 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         color: #ef6c00;
     }
 
-    .notification-status.ready {
-        background-color: #e3f2fd;
-        color: #1565c0;
-    }
-
-    .notification-status.completed {
-        background-color: #e8f5e9;
-        color: #2e7d32;
+    .notification-status.rejected {
+        background-color: #ffebee;
+        color: #c62828;
     }
 
     .empty-notification-message {

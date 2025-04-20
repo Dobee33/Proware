@@ -56,4 +56,17 @@ function getNotificationCount($conn, $user_id) {
         return 0;
     }
 }
+
+function clearAllNotifications($conn, $user_id) {
+    try {
+        $stmt = $conn->prepare("
+            DELETE FROM notifications 
+            WHERE user_id = ?
+        ");
+        return $stmt->execute([$user_id]);
+    } catch (PDOException $e) {
+        error_log("Error clearing notifications: " . $e->getMessage());
+        return false;
+    }
+}
 ?> 

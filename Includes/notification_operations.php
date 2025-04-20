@@ -50,6 +50,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     break;
 
+                case 'clear_all':
+                    if (clearAllNotifications($conn, $_SESSION['user_id'])) {
+                        $response['success'] = true;
+                        $response['message'] = 'All notifications cleared';
+                    } else {
+                        throw new Exception('Failed to clear notifications');
+                    }
+                    break;
+
                 default:
                     throw new Exception('Invalid action');
             }
