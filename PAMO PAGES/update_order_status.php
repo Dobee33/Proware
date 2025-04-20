@@ -82,6 +82,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 
                 error_log("Updated actual quantity for {$clean_name}: {$inventory['actual_quantity']} -> {$new_quantity}");
+
+                // Record the sale in the sales table
+                $saleStmt = $conn->prepare("INSERT INTO sales (transaction_number, item_code, size, quantity, price_per_item, total_amount, sale_date) 
+                                          VALUES (?, ?, ?, ?, ?, ?, NOW())");
+                                          
+                $transaction_number = $order['order_number'];
+                $item_code = $item['item_code'] ?? $clean_name; // Use item_code if available, otherwise use clean_name
+                $size = $item['size'] ?? 'N/A';
+                $quantity = $item['quantity'];
+                $price_per_item = $item['price'];
+                $total_amount = $item['price'] * $item['quantity'];
+                
+                if (!$saleStmt->execute([$transaction_number, $item_code, $size, $quantity, $price_per_item, $total_amount])) {
+                    throw new Exception('Failed to record sale for item: ' . $clean_name);
+                }
+                
+                error_log("Recorded sale for {$clean_name} in sales table");
             }
         }
 
