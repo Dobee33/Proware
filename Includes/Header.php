@@ -581,21 +581,20 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     .cart-count {
         position: absolute;
         top: -5px;
-        right: -20px;
+        right: -12px;
         background-color: #ff4444;
         color: white;
         font-size: 0.65rem;
-        font-weight: bold;
-        padding: 1px 4px;
+        font-weight: 500;
+        padding: 2px;
         border-radius: 8px;
-        min-width: 12px;
-        height: 12px;
+        min-width: 15px;
+        height: 15px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 1.5px solid white;
+        border: 1px solid white;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        z-index: 1002; /* Ensure the badge is always on top */
     }
 
     /* Active state for icons */
@@ -613,6 +612,11 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
             padding: 0.5rem;
         }
 
+        .logo-container {
+            width: auto;
+            padding-left: 10px;
+        }
+
         .nav-links {
             display: none;
             position: absolute;
@@ -628,37 +632,56 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
             background-color: white;
             padding: 1rem 0;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .logo-container {
-            width: auto;
-        }
-
-        .hamburger {
-            display: block !important;
-            z-index: 1001;
-        }
-
-        .icons {
-            order: 2;
-        }
-
-        /* When menu is active */
-        .nav-links.active {
-            display: flex;
-            position: absolute;
-            top: 70px;
-            left: 0;
-            width: 100%;
-            flex-direction: column;
-            background-color: white;
-            padding: 1rem 0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
         }
 
         .nav-links li {
-            margin: 1rem 0;
+            margin: 0.5rem 0;
             text-align: center;
+        }
+
+        .icons {
+            padding-right: 10px;
+            gap: 0.5rem;
+        }
+
+        .icon {
+            padding: 4px;
+        }
+
+        .icon a {
+            width: 32px;
+            height: 32px;
+            font-size: 1rem;
+        }
+
+        .cart-count, .notification-count {
+            top: -3px;
+            right: -8px;
+            font-size: 0.6rem;
+            min-width: 12px;
+            height: 12px;
+            padding: 1px;
+        }
+
+        .login-button {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+
+        /* Ensure all icons are visible */
+        .icons {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex-wrap: nowrap;
+            min-width: fit-content;
+        }
+
+        /* Adjust hamburger position */
+        .hamburger {
+            display: block !important;
+            z-index: 1001;
         }
 
         /* Hamburger animation */
@@ -673,22 +696,43 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         .hamburger.active .bar:nth-child(3) {
             transform: translateY(-8px) rotate(-45deg);
         }
+    }
 
-        .dropdown-menu {
-            position: static;
-            width: 100%;
-            background-color: #f9f9f9;
-            box-shadow: none;
-            display: none;
+    /* Additional breakpoint for very small screens */
+    @media screen and (max-width: 375px) {
+        .icons {
+            gap: 0.3rem;
         }
 
-        .dropdown.active .dropdown-menu {
-            display: block;
+        .icon {
+            padding: 3px;
         }
 
-        /* Adjust bottom padding for content to account for fixed bottom icons */
-        body {
-            padding-bottom: 70px;
+        .icon a {
+            width: 28px;
+            height: 28px;
+            font-size: 0.9rem;
+        }
+
+        .login-button {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        .logo-container {
+            padding-left: 5px;
+        }
+
+        .hamburger {
+            margin-right: 10px;
+        }
+
+        .cart-count, .notification-count {
+            top: -2px;
+            right: -6px;
+            font-size: 0.55rem;
+            min-width: 10px;
+            height: 10px;
         }
     }
 
@@ -714,7 +758,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     .hamburger {
         display: none;
         cursor: pointer;
-        margin-right: 30px;
+        margin-right: 15px;
     }
 
     .bar {
@@ -1159,21 +1203,20 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     .notification-count {
         position: absolute;
         top: -5px;
-        right: 10px;
+        right: -12px;
         background-color: #ff4444;
         color: white;
         font-size: 0.65rem;
-        font-weight: 600;
-        padding: 1px 4px;
+        font-weight: 500;
+        padding: 2px;
         border-radius: 8px;
-        min-width: 12px;
-        height: 12px;
+        min-width: 15px;
+        height: 15px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 1.5px solid white;
+        border: 1px solid white;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        z-index: 1002;
     }
 
     @media screen and (max-width: 768px) {
@@ -1433,20 +1476,20 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     /* Count Badges */
     .cart-count, .notification-count {
         position: absolute;
-        top: -8px;
-        right: -20px;
+        top: -5px;
+        right: -12px;
         background-color: #ff4444;
         color: white;
-        font-size: 0.75rem;
+        font-size: 0.65rem;
         font-weight: 500;
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-        min-width: 20px;
-        height: 20px;
+        padding: 2px;
+        border-radius: 8px;
+        min-width: 15px;
+        height: 15px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 2px solid white;
+        border: 1px solid white;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
 
