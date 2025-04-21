@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['last_name'] = $user['last_name'];
 
             if ($user['role_category'] === 'COLLEGE STUDENT' || $user['role_category'] === 'SHS') {
-                header("Location: Home.php");
+                header("Location: home.php");
                 exit();
             } else if ($user['program_or_position'] === 'PAMO') {
                 header("Location: ../PAMO PAGES/dashboard.php");

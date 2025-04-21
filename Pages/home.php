@@ -41,6 +41,12 @@
             </div>
         </div>
         <div class="hero-content">
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <div class="welcome-message" id="welcomeMessage">
+                    Welcome, <?php echo htmlspecialchars($_SESSION['last_name']); ?>
+                    (<?php echo htmlspecialchars($_SESSION['role_category']); ?>)
+                </div>
+            <?php endif; ?>
             <h1>GEAR UP</h1>
             <p>Your one-stop shop for all STI College Lucena essentials</p>
             <a href="ProItemList.php"><button class="shop-now-button">Shop Now</button></a>
@@ -305,4 +311,4 @@
     </script>
 </body>
 
-</html> 
+</html>

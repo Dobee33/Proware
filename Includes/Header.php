@@ -49,14 +49,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         </ul>
     </div>
 
-    <!-- Welcome Message -->
-    <?php if (isset($_SESSION['user_id']) && $current_page == 'home.php'): ?>
-        <div class="welcome-message" id="welcomeMessage">
-            Welcome, <?php echo htmlspecialchars($_SESSION['last_name']); ?>
-            (<?php echo htmlspecialchars($_SESSION['role_category']); ?>)
-        </div>
-    <?php endif; ?>
-
     <!-- Hamburger Menu for Mobile -->
     <div class="hamburger">
         <span class="bar"></span>
@@ -498,9 +490,9 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: rgba(255, 255, 255, 0.8); /* Reduced opacity */
-        backdrop-filter: blur(10px); /* Glassy effect */
-        -webkit-backdrop-filter: blur(10px); /* For Safari */
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         padding: 0.5rem 0.5rem 0.5rem 0;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         z-index: 1000;
@@ -511,6 +503,8 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         display: flex;
         align-items: center;
         padding-left: 30px;
+        width: 100%;
+        justify-content: space-between;
     }
 
     .logo {
@@ -523,6 +517,8 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         list-style: none;
         margin: 0;
         padding: 0;
+        justify-content: center;
+        flex: 1;
     }
 
     .nav-links li {
@@ -533,7 +529,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     .nav-links a {
         color: var(--primary-color);
         text-decoration: none;
-        font-weight: 500;
+        font-weight: 100;
         padding: 0.5rem 1rem;
         font-family: var(--primary-font-family);
         font-size: 16px; /* Reduced font size */
@@ -579,8 +575,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
 
     /* Add hover effect for glassy look */
     .nav-links a:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 4px;
         color: darkblue;
     }
 
@@ -1181,15 +1175,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     .logo-image {
         width: 50px;
         height: 50px;
-    }
-
-    .welcome-message {
-        color: var(--primary-color);
-        padding: 10px 15px;
-        font-size: 20px; /* Reduced font size */
-        position: relative;
-        opacity: 1;
-        transition: opacity 1s ease-out;
     }
 
     .nav-links a.active {
