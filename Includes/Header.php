@@ -240,9 +240,12 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
                                 </div>
                             `).join('');
                             
+                            // Calculate total quantity
+                            const totalQuantity = data.cart_items.reduce((sum, item) => sum + parseInt(item.quantity), 0);
+                            
                             // Update cart count in header
                             if (cartCountSpan) {
-                                cartCountSpan.textContent = `${data.cart_items.length} items`;
+                                cartCountSpan.textContent = `${totalQuantity} items`;
                             }
                         } else {
                             cartItems.innerHTML = '<p class="empty-cart-message">Your cart is empty</p>';

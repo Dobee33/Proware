@@ -143,7 +143,13 @@ $cart_total = 0;
                         <div class="summary-details">
                             <div class="summary-row">
                                 <span>Total Items</span>
-                                <span><?php echo count($final_cart_items); ?></span>
+                                <span><?php 
+                                    $total_quantity = 0;
+                                    foreach ($final_cart_items as $item) {
+                                        $total_quantity += $item['quantity'];
+                                    }
+                                    echo $total_quantity; 
+                                ?></span>
                             </div>
                             <div class="summary-row total">
                                 <span>Total Amount</span>
