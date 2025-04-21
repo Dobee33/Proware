@@ -150,14 +150,16 @@ $cart_total = 0;
                                 <span>₱<?php echo number_format($cart_total, 2); ?></span>
                             </div>
                         </div>
-                        <a href="ProPreOrder.php" class="checkout-btn">
-                            <i class="fas fa-lock"></i>
-                            Proceed to Pre Order
-                        </a>
-                        <a href="ProItemList.php" class="continue-shopping">
-                            <i class="fas fa-arrow-left"></i>
-                            Continue Shopping
-                        </a>
+                        <div class="button-container">
+                            <a href="ProPreOrder.php" class="checkout-btn">
+                                <i class="fas fa-lock"></i>
+                                Proceed to Pre Order
+                            </a>
+                            <a href="ProItemList.php" class="continue-shopping">
+                                <i class="fas fa-arrow-left"></i>
+                                Continue Shopping
+                            </a>
+                        </div>
                     </div>
                 </div>
             <?php else: ?>
@@ -375,26 +377,26 @@ $cart_total = 0;
         .cart-summary {
             background: white;
             border-radius: 12px;
-            padding: 2rem;
-            position: sticky;
-            top: 100px;
+            padding: 1.5rem;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin: 0 0.5rem;
         }
 
         .cart-summary h2 {
-            margin: 0 0 1.5rem 0;
+            margin: 0 0 1rem 0;
             color: var(--primary-color);
-            font-size: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 600;
         }
 
         .summary-details {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .summary-row {
             display: flex;
             justify-content: space-between;
-            padding: 1rem 0;
+            padding: 0.75rem 0;
             border-bottom: 1px solid #eee;
             color: #666;
         }
@@ -402,52 +404,53 @@ $cart_total = 0;
         .summary-row.total {
             border-bottom: none;
             color: var(--primary-color);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            margin-top: 1rem;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 2px solid #000;
+            margin-bottom: 1.5rem;
         }
 
-        .checkout-btn {
+        .button-container {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
+            flex-direction: column;
+            gap: 1rem;
             width: 100%;
-            padding: 1rem;
-            background: var(--primary-color);
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            margin-bottom: 1rem;
         }
 
-        .checkout-btn:hover {
-            background: darkblue;
-            transform: translateY(-2px);
-            color: yellow !important;
-        }
-
+        .checkout-btn,
         .continue-shopping {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            width: 60%;
-            padding: 1rem;
-            background: #a6d1e6;
-            color: var(--primary-color);
-            text-decoration: none;
+            width: 100%;
+            max-width: 100%;
+            padding: 0.875rem 1rem;
+            text-align: center;
             border-radius: 8px;
             font-weight: 500;
+            text-decoration: none;
             transition: all 0.3s ease;
-            margin-left: 16%;
+            font-size: 0.95rem;
+            box-sizing: border-box;
         }
 
-        .continue-shopping:hover {
-            background: #89c4e1;
-            transform: translateY(-2px);
+        .checkout-btn {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .continue-shopping {
+            background: #a6d1e6;
+            color: var(--primary-color);
+            border: none;
+            margin: 0;
+        }
+
+        .checkout-btn i,
+        .continue-shopping i {
+            margin-right: 0.5rem;
         }
 
         .empty-cart {
@@ -500,6 +503,7 @@ $cart_total = 0;
 
             .cart-summary {
                 position: static;
+                margin: 0 0.5rem;
             }
         }
 
@@ -516,7 +520,7 @@ $cart_total = 0;
             }
 
             .cart-content {
-                padding: 1rem;
+                padding: 0.5rem;
             }
             
             .cart-table {
@@ -524,11 +528,61 @@ $cart_total = 0;
             }
             
             .cart-items-container {
-                margin-bottom: 2rem;
+                margin: 0 0.5rem 1rem;
             }
 
             .cart-summary {
-                width: 100%;
+                padding: 1.25rem;
+            }
+
+            .button-container {
+                padding: 0;
+            }
+
+            .checkout-btn,
+            .continue-shopping {
+                padding: 0.75rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .cart-content {
+                padding: 0.25rem;
+            }
+
+            .cart-summary {
+                padding: 1rem;
+            }
+
+            .cart-summary h2 {
+                font-size: 1.2rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .summary-details {
+                margin-bottom: 1rem;
+            }
+
+            .summary-row {
+                padding: 0.5rem 0;
+                font-size: 0.9rem;
+            }
+
+            .summary-row.total {
+                font-size: 1rem;
+                margin-top: 0.5rem;
+                padding-top: 0.5rem;
+            }
+
+            .button-container {
+                padding: 0;
+            }
+
+            .checkout-btn,
+            .continue-shopping {
+                padding: 0.75rem;
+                font-size: 0.9rem;
             }
         }
     </style>
