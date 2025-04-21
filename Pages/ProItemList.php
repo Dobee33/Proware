@@ -33,8 +33,12 @@
         </div>
     </section>
 
+    <!-- Add this right after the header section -->
+    
+
     <div class="container">
-        <aside class="sidebar" data-aos="fade-right">
+        <aside class="sidebar" id="sidebar" data-aos="fade-right">
+            <span class="close-sidebar" id="closeSidebar">&times;</span>
             <div class="filter-header">
                 <span class="filter-label">FILTER</span>
                 <span class="category-title">Product categories</span>
@@ -201,6 +205,10 @@
                 </div>
             </div>
         </aside>
+        <button class="filter-toggle" id="filterToggle">
+        <i class="fas fa-filter"></i>
+        <span>Filter</span>
+    </button>
 
         <main class="content">
             <div class="products-grid">
@@ -368,6 +376,83 @@
 
     <script src="../Javascript/ProItemList.js" defer></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterToggle = document.getElementById('filterToggle');
+        const sidebar = document.getElementById('sidebar');
+        const closeSidebar = document.getElementById('closeSidebar');
+
+        // Toggle sidebar on filter button click
+        filterToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+        });
+
+        // Close sidebar when close button is clicked
+        closeSidebar.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+        });
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!sidebar.contains(e.target) && !filterToggle.contains(e.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Prevent clicks inside sidebar from closing it
+        sidebar.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // Close sidebar on window resize if screen becomes large enough
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 768) {
+                sidebar.classList.remove('active');
+            }
+        });
+    });
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get modal elements
+        const modal = document.getElementById('sizeModal');
+        const closeBtn = modal.querySelector('.close');
+        
+        // Function to open modal
+        function openModal() {
+            modal.classList.add('show');
+        }
+        
+        // Function to close modal
+        function closeModal() {
+            modal.classList.remove('show');
+        }
+        
+        // Add click event to all "ADD TO CART" buttons
+        document.querySelectorAll('.cart').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                openModal();
+            });
+        });
+        
+        // Close modal when clicking the close button
+        closeBtn.addEventListener('click', closeModal);
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+        
+        // Prevent modal from closing when clicking inside modal content
+        modal.querySelector('.modal-content').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+    </script>
 </body>
 
 </html>
