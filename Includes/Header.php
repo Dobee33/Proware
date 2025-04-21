@@ -502,14 +502,12 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     .logo-container {
         display: flex;
         align-items: center;
+        width: auto;
         padding-left: 30px;
-        width: 100%;
-        justify-content: space-between;
     }
 
     .logo {
         margin-right: 20px;
-        /* Adjust spacing as needed */
     }
 
     .nav-links {
@@ -517,13 +515,14 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         list-style: none;
         margin: 0;
         padding: 0;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
         justify-content: center;
-        flex: 1;
     }
 
     .nav-links li {
         margin: 0 10px;
-        /* Adjust spacing between links */
     }
 
     .nav-links a {
@@ -532,12 +531,12 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         font-weight: 100;
         padding: 0.5rem 1rem;
         font-family: var(--primary-font-family);
-        font-size: 16px; /* Reduced font size */
+        font-size: 16px;
         transition: .3s ease-out;
         letter-spacing: 0.3px;
     }
 
-    .nav-links>li:hover {
+    .nav-links > li:hover {
         transform: scale(1.1);
     }
 
@@ -545,8 +544,8 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         display: flex;
         gap: 1rem;
         align-items: center;
-        flex: 0 0 auto;
         padding-right: 30px;
+        margin-left: auto;
     }
 
     .icon {
@@ -616,6 +615,23 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
 
         .nav-links {
             display: none;
+            position: absolute;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            transform: none;
+        }
+
+        .nav-links.active {
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo-container {
+            width: auto;
         }
 
         .hamburger {
