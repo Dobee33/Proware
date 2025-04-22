@@ -85,7 +85,7 @@
                                 // Remove size suffix from item name
                                 $clean_name = rtrim($item['item_name'], " SMLX234567");
                             ?>
-                                <tr data-item-id="<?php echo $item['id']; ?>">
+                                <tr data-item-id="<?php echo $item['id']; ?>" data-item-code="<?php echo $item['item_code']; ?>">
                                     <td>
                                         <img src="../uploads/itemlist/<?php echo htmlspecialchars($item['image_path']); ?>" 
                                              alt="<?php echo htmlspecialchars($clean_name); ?>" 
@@ -95,14 +95,7 @@
                                     <td><?php echo htmlspecialchars($item['size'] ?? 'N/A'); ?></td>
                                     <td>₱<?php echo number_format($item['price'], 2); ?></td>
                                     <td>
-                                        <div class="quantity-control">
-                                            <button type="button" class="qty-btn minus">-</button>
-                                            <input type="number" value="<?php echo $item['quantity']; ?>" 
-                                                   min="1" class="qty-input" 
-                                                   data-item-id="<?php echo $item['id']; ?>"
-                                                   data-item-code="<?php echo $item['item_code']; ?>">
-                                            <button type="button" class="qty-btn plus">+</button>
-                                        </div>
+                                        <span class="item-quantity"><?php echo $item['quantity']; ?></span>
                                     </td>
                                     <td>
                                         <div class="toggle-container">

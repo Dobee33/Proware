@@ -123,7 +123,14 @@ $cart_total = 0;
                                         <span class="item-price">₱<?php echo number_format($item['price'], 2); ?></span>
                                     </td>
                                     <td class="quantity-col">
-                                        <span class="item-quantity"><?php echo $item['quantity']; ?></span>
+                                        <div class="quantity-control">
+                                            <button type="button" class="qty-btn minus">-</button>
+                                            <input type="number" value="<?php echo $item['quantity']; ?>" 
+                                                   min="1" class="qty-input" 
+                                                   data-item-id="<?php echo $item['id']; ?>"
+                                                   data-item-code="<?php echo $item['item_code']; ?>">
+                                            <button type="button" class="qty-btn plus">+</button>
+                                        </div>
                                     </td>
                                     <td class="subtotal-col">
                                         <span class="item-subtotal">₱<?php echo number_format($subtotal, 2); ?></span>
@@ -591,6 +598,46 @@ $cart_total = 0;
                 font-size: 0.9rem;
             }
         }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .qty-btn {
+            background-color: #f0f0f0;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .qty-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .qty-input {
+            width: 40px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 2px;
+            font-weight: 500;
+        }
+
+        .qty-input::-webkit-inner-spin-button,
+        .qty-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
     </style>
 
     <script>
@@ -617,6 +664,62 @@ $cart_total = 0;
                 });
             }
         }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Handle quantity changes
+            document.querySelectorAll(".qty-btn").forEach((btn) => {
+                btn.addEventListener("click", function () {
+                    const input = this.parentElement.querySelector(".qty-input");
+                    const currentValue = parseInt(input.value);
+
+                    if (this.classList.contains("plus")) {
+                        input.value = currentValue + 1;
+                    } else if (this.classList.contains("minus") && currentValue > 1) {
+                        input.value = currentValue - 1;
+                    }
+
+                    // Update cart in database
+                    const itemId = input.dataset.itemId;
+                    updateCartItem(itemId, input.value);
+                });
+            });
+
+            // Handle direct quantity input
+            document.querySelectorAll(".qty-input").forEach((input) => {
+                input.addEventListener("change", function () {
+                    if (this.value < 1) this.value = 1;
+                    
+                    // Update cart in database
+                    const itemId = this.dataset.itemId;
+                    updateCartItem(itemId, this.value);
+                });
+            });
+
+            // Function to update cart item
+            async function updateCartItem(itemId, quantity) {
+                try {
+                    const response = await fetch("../Includes/cart_operations.php", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: `action=update&item_id=${itemId}&quantity=${quantity}`,
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        // Reload the page to update totals
+                        location.reload();
+                    } else {
+                        console.error("Failed to update cart:", data.message);
+                        alert("Failed to update quantity");
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error updating quantity");
+                }
+            }
+        });
     </script>
 </body>
 </html> 
