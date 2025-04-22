@@ -117,32 +117,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Add Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </body>
-
-<style>
-    .back-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        margin-top: 20px;
-        padding: 10px 20px;
-        background: lightblue;
-        border: 2px solid lightblue;
-        color: #002347;
-        text-decoration: none;
-        border-radius: 5px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-
-    .back-btn:hover {
-        background: #002347;
-        color: white;
-    }
-
-    .back-btn i {
-        font-size: 16px;
-    }
-</style>
-
 </html>
