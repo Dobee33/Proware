@@ -121,12 +121,44 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     <?php endif; ?>
 </nav>
 
+<!-- Mobile Drawers -->
+<div class="mobile-drawer cart-drawer">
+    <div class="drawer-header">
+        <h3>Shopping Cart</h3>
+        <button class="close-drawer">&times;</button>
+    </div>
+    <div class="drawer-content">
+        <div class="cart-items">
+            <p class="empty-cart-message">Your cart is empty</p>
+        </div>
+        <div class="drawer-footer">
+            <a href="MyCart.php" class="checkout-btn">View Cart</a>
+        </div>
+    </div>
+</div>
+
+<div class="mobile-drawer notification-drawer">
+    <div class="drawer-header">
+        <h3>Notifications</h3>
+        <button class="close-drawer">&times;</button>
+    </div>
+    <div class="drawer-content">
+        <div class="notification-items">
+            <!-- Notifications will be loaded here -->
+        </div>
+    </div>
+</div>
+
 <!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <!-- Cart Styles -->
 <link rel="stylesheet" href="../CSS/cart.css">
 
 <script>
+    function redirectToLogin(destination) {
+        window.location.href = `login.php?redirect=${encodeURIComponent(destination)}`;
+    }
+
     function checkLoginStatus(destination) {
         <?php if (!isset($_SESSION['user_id'])): ?>
             window.location.href = `login.php?redirect=${encodeURIComponent(destination)}`;
@@ -203,8 +235,8 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
             });
         }
 
-        // Function to update notification popup content
-        async function updateNotificationPopup() {
+        // Function to update notification content
+        async function updateNotificationContent() {
             try {
                 const response = await fetch('../Includes/notification_operations.php', {
                     method: 'POST',
@@ -217,14 +249,12 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
                 const data = await response.json();
                 
                 if (data.success) {
-                    const notificationItems = document.querySelector('.notification-items');
-                    const notificationCountSpan = document.querySelector('.notification-header .notification-count');
-                    const iconNotificationCount = document.querySelector('.notification-icon .notification-count');
-                    const clearButton = document.querySelector('.clear-notifications');
+                    const notificationItems = document.querySelectorAll('.notification-items');
+                    const notificationCount = document.querySelectorAll('.notification-count');
                     
-                    if (notificationItems) {
+                    notificationItems.forEach(container => {
                         if (data.notifications && data.notifications.length > 0) {
-                            notificationItems.innerHTML = data.notifications.map(notification => {
+                            container.innerHTML = data.notifications.map(notification => {
                                 const timestamp = Math.floor(new Date(notification.created_at).getTime() / 1000);
                                 return `
                                     <div class="notification-item ${notification.is_read ? '' : 'unread'}" 
@@ -238,38 +268,19 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
                                     </div>
                                 `;
                             }).join('');
-                            
-                            // Update notification counts
-                            if (notificationCountSpan) {
-                                notificationCountSpan.textContent = data.count;
-                            }
-                            if (iconNotificationCount) {
-                                iconNotificationCount.textContent = data.count;
-                                iconNotificationCount.style.display = data.count > 0 ? 'block' : 'none';
-                            }
-                            if (clearButton) {
-                                clearButton.style.display = 'block';
-                            }
                         } else {
-                            notificationItems.innerHTML = '<p class="empty-notification-message">No notifications</p>';
-                            if (notificationCountSpan) {
-                                notificationCountSpan.textContent = '0';
-                            }
-                            if (iconNotificationCount) {
-                                iconNotificationCount.style.display = 'none';
-                            }
-                            if (clearButton) {
-                                clearButton.style.display = 'none';
-                            }
+                            container.innerHTML = '<p class="empty-notification-message">No notifications</p>';
                         }
-                    }
+                    });
+
+                    // Update notification count
+                    notificationCount.forEach(count => {
+                        count.textContent = data.count;
+                        count.style.display = data.count > 0 ? 'block' : 'none';
+                    });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                const notificationItems = document.querySelector('.notification-items');
-                if (notificationItems) {
-                    notificationItems.innerHTML = '<p class="empty-notification-message">Error loading notifications</p>';
-                }
             }
         }
 
@@ -286,7 +297,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
 
                 const data = await response.json();
                 if (data.success) {
-                    updateNotificationPopup();
+                    updateNotificationContent();
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -310,7 +321,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
 
                 const data = await response.json();
                 if (data.success) {
-                    updateNotificationPopup();
+                    updateNotificationContent();
                 } else {
                     alert('Failed to clear notifications: ' + data.message);
                 }
@@ -342,33 +353,44 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
             });
         }
 
-        // Cart icon click event
+        // Cart icon click handler
         if (cartIcon) {
             cartIcon.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                cartPopup.classList.toggle('show');
                 
-                // Hide notification popup when cart is shown
+                if (window.innerWidth <= 768) {
+                    openDrawer(cartDrawer);
+                    updateCartContent();
+                } else {
+                    cartPopup.classList.toggle('show');
+                    if (cartPopup.classList.contains('show')) {
+                        updateCartContent();
+                    }
+                }
+                
                 if (notificationPopup) {
                     notificationPopup.classList.remove('show');
                 }
             });
         }
 
-        // Notification icon click event
+        // Notification icon click handler
         if (notificationIcon) {
             notificationIcon.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                notificationPopup.classList.toggle('show');
                 
-                // Update notifications when popup is shown
-                if (notificationPopup.classList.contains('show')) {
-                    updateNotificationPopup();
+                if (window.innerWidth <= 768) {
+                    openDrawer(notificationDrawer);
+                    updateNotificationContent();
+                } else {
+                    notificationPopup.classList.toggle('show');
+                    if (notificationPopup.classList.contains('show')) {
+                        updateNotificationContent();
+                    }
                 }
                 
-                // Hide cart popup when notifications are shown
                 if (cartPopup) {
                     cartPopup.classList.remove('show');
                 }
@@ -409,14 +431,127 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         }
 
         // Initial updates
-        if (notificationIcon) updateNotificationPopup();
+        if (notificationIcon) updateNotificationContent();
 
         // Refresh notifications every 30 seconds
-        setInterval(updateNotificationPopup, 30000);
+        setInterval(updateNotificationContent, 30000);
         
         // Update notification times every minute
         setInterval(updateNotificationTimes, 60000);
+
+        const cartDrawer = document.querySelector('.cart-drawer');
+        const notificationDrawer = document.querySelector('.notification-drawer');
+        const closeButtons = document.querySelectorAll('.close-drawer');
+        
+        // Create overlay element
+        const overlay = document.createElement('div');
+        overlay.className = 'drawer-overlay';
+        document.body.appendChild(overlay);
+
+        function openDrawer(drawer) {
+            drawer.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer(drawer) {
+            drawer.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const drawer = this.closest('.mobile-drawer');
+                closeDrawer(drawer);
+            });
+        });
+
+        overlay.addEventListener('click', function() {
+            const activeDrawer = document.querySelector('.mobile-drawer.active');
+            if (activeDrawer) {
+                closeDrawer(activeDrawer);
+            }
+        });
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeDrawer(cartDrawer);
+                closeDrawer(notificationDrawer);
+            }
+        });
     });
+
+    // Function to update cart content
+    async function updateCartContent() {
+        try {
+            const response = await fetch('../Includes/cart_operations.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'action=get_cart'
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                const cartItems = document.querySelectorAll('.cart-items');
+                const cartCount = document.querySelectorAll('.cart-count');
+                
+                cartItems.forEach(container => {
+                    if (data.cart_items && data.cart_items.length > 0) {
+                        container.innerHTML = data.cart_items.map(item => `
+                            <div class="cart-item">
+                                <img src="${item.image_path}" alt="${item.item_name}">
+                                <div class="cart-item-details">
+                                    <p class="cart-item-name">${item.item_name}</p>
+                                    <p class="cart-item-price">₱${item.price} x ${item.quantity}</p>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        container.innerHTML = '<p class="empty-cart-message">Your cart is empty</p>';
+                    }
+                });
+
+                // Update cart count
+                cartCount.forEach(count => {
+                    count.textContent = data.cart_count;
+                    count.style.display = data.cart_count > 0 ? 'block' : 'none';
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    // Update cart content when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCartContent();
+    });
+
+    // Update cart content when cart icon is clicked
+    if (cartIcon) {
+        cartIcon.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (window.innerWidth <= 768) {
+                openDrawer(cartDrawer);
+                updateCartContent();
+            } else {
+                cartPopup.classList.toggle('show');
+                if (cartPopup.classList.contains('show')) {
+                    updateCartContent();
+                }
+            }
+            
+            if (notificationPopup) {
+                notificationPopup.classList.remove('show');
+            }
+        });
+    }
 </script>
 
 <!-- Include cart functionality -->
@@ -1432,6 +1567,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         justify-content: center;
         border: 1px solid white;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        text-align: center;
     }
 
     /* Animation */
@@ -1498,6 +1634,94 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         .login-button {
             padding: 8px 20px;
             font-size: 14px;
+        }
+    }
+
+    /* Mobile Drawer Styles */
+    .mobile-drawer {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 100%;
+        height: 100vh;
+        background: white;
+        z-index: 2000;
+        transition: right 0.3s ease-in-out;
+        display: none;
+    }
+
+    .mobile-drawer.active {
+        right: 0;
+    }
+
+    .drawer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: var(--primary-color);
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .drawer-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    .close-drawer {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+
+    .drawer-content {
+        height: calc(100vh - 60px);
+        overflow-y: auto;
+        padding: 1rem;
+    }
+
+    .drawer-footer {
+        padding: 1rem;
+        border-top: 1px solid #eee;
+        position: sticky;
+        bottom: 0;
+        background: white;
+    }
+
+    /* Update existing media queries */
+    @media screen and (max-width: 768px) {
+        .cart-popup, .notification-popup {
+            display: none !important;
+        }
+        
+        .mobile-drawer {
+            display: block;
+        }
+        
+        .cart-drawer.active, .notification-drawer.active {
+            right: 0;
+        }
+        
+        /* Add overlay when drawer is active */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1999;
+            display: none;
+        }
+        
+        .drawer-overlay.active {
+            display: block;
         }
     }
 </style>

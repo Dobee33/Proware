@@ -22,6 +22,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['role_category'] = $user['role_category'];
             $_SESSION['last_name'] = $user['last_name'];
 
+            // Check if there's a redirect parameter
+            if (isset($_GET['redirect'])) {
+                $redirect = $_GET['redirect'];
+                header("Location: $redirect");
+                exit();
+            }
+
             if ($user['role_category'] === 'COLLEGE STUDENT' || $user['role_category'] === 'SHS') {
                 header("Location: home.php");
                 exit();
