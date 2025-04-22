@@ -103,26 +103,26 @@ $cart_total = 0;
                                     $cart_total += $subtotal;
                                 ?>
                                 <tr class="cart-row">
-                                    <td class="image-col">
+                                    <td class="image-col" data-label="Image">
                                         <div class="item-image">
                                             <img src="../uploads/itemlist/<?php echo htmlspecialchars($item['image_path']); ?>" 
                                                 alt="<?php echo htmlspecialchars($item['item_name']); ?>">
                                         </div>
                                     </td>
-                                    <td class="item-col">
+                                    <td class="item-col" data-label="Item Name">
                                         <div class="item-name"><?php echo htmlspecialchars($item['item_name']); ?></div>
                                     </td>
-                                    <td class="size-col">
+                                    <td class="size-col" data-label="Size">
                                         <?php if (!empty($item['size'])): ?>
                                             <span class="item-size"><?php echo htmlspecialchars($item['size']); ?></span>
                                         <?php else: ?>
                                             <span class="item-size-na">-</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="price-col">
+                                    <td class="price-col" data-label="Price">
                                         <span class="item-price">₱<?php echo number_format($item['price'], 2); ?></span>
                                     </td>
-                                    <td class="quantity-col">
+                                    <td class="quantity-col" data-label="Quantity">
                                         <div class="quantity-control">
                                             <button type="button" class="qty-btn minus">-</button>
                                             <input type="number" value="<?php echo $item['quantity']; ?>" 
@@ -132,7 +132,7 @@ $cart_total = 0;
                                             <button type="button" class="qty-btn plus">+</button>
                                         </div>
                                     </td>
-                                    <td class="subtotal-col">
+                                    <td class="subtotal-col" data-label="Subtotal">
                                         <span class="item-subtotal">₱<?php echo number_format($subtotal, 2); ?></span>
                                     </td>
                                     <td class="action-col">
@@ -537,31 +537,52 @@ $cart_total = 0;
             }
             
             .cart-table {
-                min-width: 650px; /* Force horizontal scroll on mobile */
+                min-width: 100%;
+                width: 100%;
+                display: block;
+                overflow-x: auto;
             }
-            
+
             .cart-items-container {
                 margin: 0 0.5rem 1rem;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
             }
 
-            .cart-summary {
-                padding: 1.25rem;
+            .item-size, .item-quantity, .item-price {
+                white-space: nowrap;
             }
 
-            .button-container {
-                padding: 0;
-            }
-
-            .checkout-btn,
-            .continue-shopping {
-                padding: 0.75rem;
-                font-size: 0.95rem;
+            .quantity-control {
+                min-width: 90px;
             }
         }
 
         @media (max-width: 480px) {
             .cart-content {
                 padding: 0.25rem;
+            }
+
+            .cart-table td::before {
+                width: 100px;
+                font-size: 0.9rem;
+            }
+
+            .item-image {
+                width: 80px;
+                height: 80px;
+            }
+
+            .item-name {
+                font-size: 0.95rem;
+            }
+
+            .item-size, .item-quantity {
+                font-size: 0.9rem;
+            }
+
+            .item-subtotal {
+                font-size: 1rem;
             }
 
             .cart-summary {
@@ -571,31 +592,6 @@ $cart_total = 0;
             .cart-summary h2 {
                 font-size: 1.2rem;
                 margin-bottom: 0.75rem;
-            }
-
-            .summary-details {
-                margin-bottom: 1rem;
-            }
-
-            .summary-row {
-                padding: 0.5rem 0;
-                font-size: 0.9rem;
-            }
-
-            .summary-row.total {
-                font-size: 1rem;
-                margin-top: 0.5rem;
-                padding-top: 0.5rem;
-            }
-
-            .button-container {
-                padding: 0;
-            }
-
-            .checkout-btn,
-            .continue-shopping {
-                padding: 0.75rem;
-                font-size: 0.9rem;
             }
         }
 

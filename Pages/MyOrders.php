@@ -36,7 +36,6 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../CSS/MyOrders.css">
     <link rel="stylesheet" href="../CSS/header.css">
     <link rel="stylesheet" href="../CSS/global.css">
-    <link rel="stylesheet" href="../CSS/sidebar_MyOrder.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Smooch+Sans:wght@100..900&display=swap" rel="stylesheet">
@@ -90,36 +89,32 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
 
                             <div class="order-details">
-                                <div class="items-header">
-                                    <span class="item-col image">Image</span>
-                                    <span class="item-col name">Item Name</span>
-                                    <span class="item-col">Size</span>
-                                    <span class="item-col">Quantity</span>
-                                    <span class="item-col">Price</span>
-                                </div>
                                 <?php foreach ($items as $item): 
                                     $clean_name = rtrim($item['item_name'], " SMLX234567");
                                 ?>
-                                    <div class="item">
-                                        <span class="item-col image">
+                                    <div class="order-item">
+                                        <div class="item-image">
                                             <img src="../uploads/itemlist/<?php echo htmlspecialchars($item['image_path'] ?? 'default.jpg'); ?>" 
                                                  alt="<?php echo htmlspecialchars($clean_name); ?>">
-                                        </span>
-                                        <span class="item-col name"><?php echo htmlspecialchars($clean_name); ?></span>
-                                        <span class="item-col"><?php echo htmlspecialchars($item['size'] ?? 'N/A'); ?></span>
-                                        <span class="item-col"><?php echo $item['quantity']; ?></span>
-                                        <span class="item-col">₱<?php echo number_format($item['price'] * $item['quantity'], 2); ?></span>
+                                        </div>
+                                        <div class="item-details">
+                                            <span class="item-name"><?php echo htmlspecialchars($clean_name); ?></span>
+                                        </div>
+                                        <div class="item-size"><?php echo htmlspecialchars($item['size'] ?? 'N/A'); ?></div>
+                                        <div class="item-quantity"><?php echo $item['quantity']; ?></div>
+                                        <div class="item-price">₱<?php echo number_format($item['price'] * $item['quantity'], 2); ?></div>
                                     </div>
                                 <?php endforeach; ?>
+                            </div>
 
-                                <div class="order-footer">
-                                    <div class="contact-info">
-                                        <i class="fas fa-phone"></i>
-                                        <?php echo htmlspecialchars($order['phone']); ?>
-                                    </div>
-                                    <div class="total-amount">
-                                        <strong>Total:</strong> ₱<?php echo number_format($total_amount, 2); ?>
-                                    </div>
+                            <div class="order-footer">
+                                <div class="contact-info">
+                                    <i class="fas fa-phone"></i>
+                                    <?php echo htmlspecialchars($order['phone']); ?>
+                                </div>
+                                <div class="total-amount">
+                                    <strong>Total Amount:</strong>
+                                    <span>₱<?php echo number_format($total_amount, 2); ?></span>
                                 </div>
                             </div>
                         </div>

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../CSS/ProPreOrder.css">
     <link rel="stylesheet" href="../CSS/global.css">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Smooch+Sans:wght@100..900&display=swap"
@@ -66,56 +66,58 @@
         
         <div class="cart-layout">
             <div class="products-section">
-                <table class="products-table">
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th>Name</th>
-                            <th>Size</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Include in Checkout</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (!empty($final_cart_items)): ?>
-                            <?php foreach ($final_cart_items as $item): 
-                                $item_total = $item['price'] * $item['quantity'];
-                                $total_amount += $item_total;
-                                // Remove size suffix from item name
-                                $clean_name = rtrim($item['item_name'], " SMLX234567");
-                            ?>
-                                <tr data-item-id="<?php echo $item['id']; ?>" data-item-code="<?php echo $item['item_code']; ?>">
-                                    <td>
-                                        <img src="../uploads/itemlist/<?php echo htmlspecialchars($item['image_path']); ?>" 
-                                             alt="<?php echo htmlspecialchars($clean_name); ?>" 
-                                             class="product-image">
-                                    </td>
-                                    <td><?php echo htmlspecialchars($clean_name); ?></td>
-                                    <td><?php echo htmlspecialchars($item['size'] ?? 'N/A'); ?></td>
-                                    <td>₱<?php echo number_format($item['price'], 2); ?></td>
-                                    <td>
-                                        <span class="item-quantity"><?php echo $item['quantity']; ?></span>
-                                    </td>
-                                    <td>
-                                        <div class="toggle-container">
-                                            <button class="toggle-checkout-btn check" data-item-id="<?php echo $item['id']; ?>" data-included="true">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                            <button class="toggle-checkout-btn x" data-item-id="<?php echo $item['id']; ?>" data-included="false">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
+                <div class="table-responsive">
+                    <table class="products-table">
+                        <thead>
                             <tr>
-                                <td colspan="5" class="empty-cart">Your cart is empty</td>
+                                <th>Product</th>
+                                <th>Name</th>
+                                <th>Size</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Include</th>
                             </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($final_cart_items)): ?>
+                                <?php foreach ($final_cart_items as $item): 
+                                    $item_total = $item['price'] * $item['quantity'];
+                                    $total_amount += $item_total;
+                                    // Remove size suffix from item name
+                                    $clean_name = rtrim($item['item_name'], " SMLX234567");
+                                ?>
+                                    <tr data-item-id="<?php echo $item['id']; ?>" data-item-code="<?php echo $item['item_code']; ?>">
+                                        <td>
+                                            <img src="../uploads/itemlist/<?php echo htmlspecialchars($item['image_path']); ?>" 
+                                                 alt="<?php echo htmlspecialchars($clean_name); ?>" 
+                                                 class="product-image">
+                                        </td>
+                                        <td><?php echo htmlspecialchars($clean_name); ?></td>
+                                        <td><?php echo htmlspecialchars($item['size'] ?? 'N/A'); ?></td>
+                                        <td>₱<?php echo number_format($item['price'], 2); ?></td>
+                                        <td>
+                                            <span class="item-quantity"><?php echo $item['quantity']; ?></span>
+                                        </td>
+                                        <td>
+                                            <div class="toggle-container">
+                                                <button class="toggle-checkout-btn check" data-item-id="<?php echo $item['id']; ?>" data-included="true">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="toggle-checkout-btn x" data-item-id="<?php echo $item['id']; ?>" data-included="false">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="6" class="empty-cart">Your cart is empty</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="summary-section">
