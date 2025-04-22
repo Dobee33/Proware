@@ -611,7 +611,8 @@ function closeAccessoryModal() {
 function incrementAccessoryQuantity() {
   const input = document.getElementById("accessoryQuantity");
   const max = parseInt(currentProduct.stock);
-  const currentValue = parseInt(input.value);
+  const currentValue = parseInt(input.value) || 0; // Use 0 if no value or NaN
+
   if (currentValue < max) {
     input.value = currentValue + 1;
   } else {
@@ -805,7 +806,7 @@ function incrementQuantity() {
   }
 
   const max = parseInt(selectedSize.dataset.stock);
-  const currentValue = parseInt(input.value);
+  const currentValue = parseInt(input.value) || 0; // Use 0 if no value or NaN
 
   if (currentValue < max) {
     input.value = currentValue + 1;
