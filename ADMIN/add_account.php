@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($result) {
             $_SESSION['success_message'] = "Account successfully created!";
-            $_SESSION['generated_email'] = $email;
+            $_SESSION['generated_email'] = str_replace(' ', '', $email);
             header("Location: add_account.php");
             exit();
         } else {
@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (lastName && idNumber.length >= 6) {
                 const lastSixDigits = idNumber.slice(-6);
-                emailPreview.value = `${lastName}.${lastSixDigits}@lucena.sti.edu.ph`;
+                emailPreview.value = `${lastName}.${lastSixDigits}@lucena.sti.edu.ph`.replace(/\s+/g, '');
             } else {
                 emailPreview.value = '';
             }
