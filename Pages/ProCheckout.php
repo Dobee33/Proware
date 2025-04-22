@@ -67,8 +67,6 @@ $_SESSION['checkout_total'] = $total_amount;
 </head>
 
 <body>
-    <?php include("../Includes/Header.php"); ?>
-
     <div class="preorder-container">
         <div class="process-steps">
             <div class="step completed">1. Pre Order Cart</div>

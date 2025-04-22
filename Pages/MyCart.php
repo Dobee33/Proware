@@ -537,30 +537,55 @@ $cart_total = 0;
             }
             
             .cart-table {
-                min-width: 100%;
                 width: 100%;
-                display: block;
-                overflow-x: auto;
             }
 
             .cart-items-container {
                 margin: 0 0.5rem 1rem;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+                width: 100%;
             }
 
-            .item-size, .item-quantity, .item-price {
-                white-space: nowrap;
+            .cart-table td {
+                display: table-cell;
+                vertical-align: middle;
+            }
+
+            .cart-table tr {
+                display: table-row;
+            }
+
+            .cart-table tbody {
+                display: table-row-group;
+            }
+
+            .size-col, .price-col, .quantity-col {
+                min-width: 80px;
+                text-align: center;
+            }
+
+            .item-size, .item-price, .quantity-control {
+                display: inline-block;
+                text-align: center;
             }
 
             .quantity-control {
                 min-width: 90px;
+                display: flex;
+                justify-content: center;
             }
         }
 
         @media (max-width: 480px) {
             .cart-content {
                 padding: 0.25rem;
+            }
+
+            .cart-items-container {
+                margin: 0 0.25rem 1rem;
+            }
+
+            .size-col, .price-col, .quantity-col {
+                min-width: 60px;
             }
 
             .cart-table td::before {

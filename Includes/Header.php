@@ -83,13 +83,13 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
 
             <div class="icon notification-icon">
                 <a href="#" class="fas fa-bell">
-                    <span class="notification-count">0</span>
+                    <span class="notification-count" style="display: none;">0</span>
                 </a>
                 <!-- Notification Popup -->
                 <div class="notification-popup">
                     <div class="notification-header">
                         <h3>Notifications</h3>
-                        
+                        <span class="notification-count">0</span>
                     </div>
                     <div class="notification-items">
                         <!-- Notifications will be loaded here -->
@@ -143,16 +143,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const hamburger = document.querySelector('.hamburger');
-        const navLinks = document.querySelector('.nav-links');
-
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
-    });
-
     // Function to fade out the welcome message after 5 seconds
     window.onload = function () {
         const welcomeMessage = document.getElementById('welcomeMessage');
@@ -164,7 +154,10 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         }
     };
 
+    // Header functionality
     document.addEventListener('DOMContentLoaded', function() {
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
         const cartIcon = document.querySelector('.cart-icon');
         const cartPopup = document.querySelector('.cart-popup');
         const notificationIcon = document.querySelector('.notification-icon');
@@ -210,62 +203,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
             });
         }
 
-        // Function to update cart popup content
-        async function updateCartPopup() {
-            try {
-                const response = await fetch('../Includes/cart_operations.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'action=get_cart'
-                });
-
-                const data = await response.json();
-                console.log('Cart data:', data); // Debug log
-                
-                if (data.success) {
-                    const cartItems = document.querySelector('.cart-items');
-                    const cartCountSpan = document.querySelector('.cart-header .cart-count');
-                    
-                    if (cartItems) {
-                        if (data.cart_items && data.cart_items.length > 0) {
-                            cartItems.innerHTML = data.cart_items.map(item => `
-                                <div class="cart-item">
-                                    <img src="../uploads/itemlist/${item.image_path}" alt="${item.item_name}">
-                                    <div class="cart-item-details">
-                                        <div class="cart-item-name">${item.item_name}</div>
-                                        <div class="cart-item-price">₱${item.price} × ${item.quantity}</div>
-                                    </div>
-                                </div>
-                            `).join('');
-                            
-                            // Calculate total quantity
-                            const totalQuantity = data.cart_items.reduce((sum, item) => sum + parseInt(item.quantity), 0);
-                            
-                            // Update cart count in header
-                            if (cartCountSpan) {
-                                cartCountSpan.textContent = `${totalQuantity} items`;
-                            }
-                        } else {
-                            cartItems.innerHTML = '<p class="empty-cart-message">Your cart is empty</p>';
-                            if (cartCountSpan) {
-                                cartCountSpan.textContent = '0 items';
-                            }
-                        }
-                    }
-                } else {
-                    console.error('Cart data error:', data.message); // Debug log
-                }
-            } catch (error) {
-                console.error('Cart fetch error:', error); // Debug log
-                const cartItems = document.querySelector('.cart-items');
-                if (cartItems) {
-                    cartItems.innerHTML = '<p class="empty-cart-message">Error loading cart items</p>';
-                }
-            }
-        }
-
         // Function to update notification popup content
         async function updateNotificationPopup() {
             try {
@@ -302,6 +239,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
                                 `;
                             }).join('');
                             
+                            // Update notification counts
                             if (notificationCountSpan) {
                                 notificationCountSpan.textContent = data.count;
                             }
@@ -382,6 +320,28 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
             }
         }
 
+        // Hamburger menu functionality
+        if (hamburger && navLinks) {
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+
+            // Close menu when clicking a link
+            document.querySelectorAll('.nav-links a').forEach(n => n.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            }));
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('active');
+                }
+            });
+        }
+
         // Cart icon click event
         if (cartIcon) {
             cartIcon.addEventListener('click', function(e) {
@@ -449,7 +409,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         }
 
         // Initial updates
-        if (cartIcon) updateCartPopup();
         if (notificationIcon) updateNotificationPopup();
 
         // Refresh notifications every 30 seconds
@@ -458,27 +417,6 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         // Update notification times every minute
         setInterval(updateNotificationTimes, 60000);
     });
-
-    function getNotificationIcon(type) {
-        switch (type) {
-            case 'order_approved':
-                return '<i class="fas fa-check-circle" style="color: #28a745;"></i>';
-            case 'order_rejected':
-                return '<i class="fas fa-times-circle" style="color: #dc3545;"></i>';
-            case 'order_processing':
-                return '<i class="fas fa-clock" style="color: #ffc107;"></i>';
-            case 'order_ready':
-                return '<i class="fas fa-box" style="color: #17a2b8;"></i>';
-            case 'order_completed':
-                return '<i class="fas fa-check-double" style="color: #28a745;"></i>';
-            default:
-                return '<i class="fas fa-bell" style="color: #007bff;"></i>';
-        }
-    }
-
-    function redirectToLogin(destination) {
-        window.location.href = `login.php?redirect=${encodeURIComponent(destination)}`;
-    }
 </script>
 
 <!-- Include cart functionality -->
