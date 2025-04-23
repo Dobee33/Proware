@@ -15,36 +15,28 @@ $cart_items = $cart_query->fetchAll(PDO::FETCH_ASSOC);
 
 $final_cart_items = [];
 foreach ($cart_items as $cart_item) {
-    // Debug: Log the cart item code
-    error_log("Cart Item Code: " . $cart_item['item_code']);
-    
     // Try to get inventory details for each cart item
-    $stmt = $conn->prepare("SELECT item_name, price, image_path, category FROM inventory WHERE item_code = ?");
+    $stmt = $conn->prepare("SELECT item_name, price, image_path, category, actual_quantity FROM inventory WHERE item_code = ?");
     $stmt->execute([$cart_item['item_code']]);
     $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($inventory_item) {
-        // Debug: Log successful match
-        error_log("Found matching inventory item for: " . $cart_item['item_code']);
         $final_cart_items[] = array_merge($cart_item, $inventory_item);
     } else {
-        // Debug: Log failed match
-        error_log("No matching inventory item found for: " . $cart_item['item_code']);
-        
         // Try to find the item with a LIKE query to catch potential formatting differences
-        $stmt = $conn->prepare("SELECT item_name, price, image_path, category FROM inventory WHERE item_code LIKE ?");
+        $stmt = $conn->prepare("SELECT item_name, price, image_path, category, actual_quantity FROM inventory WHERE item_code LIKE ?");
         $stmt->execute(['%' . $cart_item['item_code'] . '%']);
         $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($inventory_item) {
-            error_log("Found similar inventory item using LIKE query for: " . $cart_item['item_code']);
             $final_cart_items[] = array_merge($cart_item, $inventory_item);
         } else {
             $final_cart_items[] = array_merge($cart_item, [
                 'item_name' => 'Item no longer available',
                 'price' => 0,
                 'image_path' => 'default.jpg',
-                'category' => ''
+                'category' => '',
+                'actual_quantity' => 0
             ]);
         }
     }
@@ -59,7 +51,6 @@ $cart_total = 0;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Cart</title>
-    <link rel="stylesheet" href="../CSS/MyOrders.css">
     <link rel="stylesheet" href="../CSS/header.css">
     <link rel="stylesheet" href="../CSS/global.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -126,9 +117,11 @@ $cart_total = 0;
                                         <div class="quantity-control">
                                             <button type="button" class="qty-btn minus">-</button>
                                             <input type="number" value="<?php echo $item['quantity']; ?>" 
-                                                   min="1" class="qty-input" 
+                                                   min="1" max="<?php echo $item['actual_quantity']; ?>" 
+                                                   class="qty-input" 
                                                    data-item-id="<?php echo $item['id']; ?>"
-                                                   data-item-code="<?php echo $item['item_code']; ?>">
+                                                   data-item-code="<?php echo $item['item_code']; ?>"
+                                                   data-max-stock="<?php echo $item['actual_quantity']; ?>">
                                             <button type="button" class="qty-btn plus">+</button>
                                         </div>
                                     </td>
@@ -217,6 +210,7 @@ $cart_total = 0;
             display: flex;
             align-items: center;
             gap: 1rem;
+            color: yellow;
         }
 
         .cart-content {
@@ -692,9 +686,14 @@ $cart_total = 0;
                 btn.addEventListener("click", function () {
                     const input = this.parentElement.querySelector(".qty-input");
                     const currentValue = parseInt(input.value);
+                    const maxStock = parseInt(input.dataset.maxStock);
 
                     if (this.classList.contains("plus")) {
-                        input.value = currentValue + 1;
+                        if (currentValue < maxStock) {
+                            input.value = currentValue + 1;
+                        } else {
+                            alert(`Maximum available stock is ${maxStock}.`);
+                        }
                     } else if (this.classList.contains("minus") && currentValue > 1) {
                         input.value = currentValue - 1;
                     }
@@ -708,7 +707,15 @@ $cart_total = 0;
             // Handle direct quantity input
             document.querySelectorAll(".qty-input").forEach((input) => {
                 input.addEventListener("change", function () {
-                    if (this.value < 1) this.value = 1;
+                    const maxStock = parseInt(this.dataset.maxStock);
+                    const newValue = parseInt(this.value);
+
+                    if (newValue < 1) {
+                        this.value = 1;
+                    } else if (newValue > maxStock) {
+                        this.value = maxStock;
+                        alert(`Maximum available stock is ${maxStock}.`);
+                    }
                     
                     // Update cart in database
                     const itemId = this.dataset.itemId;
