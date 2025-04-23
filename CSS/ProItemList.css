@@ -18,6 +18,7 @@
   display: block;
   padding: 1rem;
   position: relative;
+  margin-top: 60px; /* Add space for the fixed navigation */
 }
 
 /* Header Styles */
@@ -95,20 +96,24 @@
 .sidebar {
   position: fixed;
   left: -100%;
-  top: 0;
+  top: 60px; /* Adjust this value to match your navigation height */
   width: 85%;
   max-width: 300px;
-  height: 100vh;
-  background: white;
+  height: calc(
+    100vh - 60px
+  ); /* Subtract navigation height from viewport height */
+  background: #f4ebb6;
   z-index: 1000;
-  padding: 1rem;
+  padding: 1.5rem;
   transition: left 0.3s ease;
   overflow-y: auto;
+  border-right: 2px solid var(--border-color);
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 }
 
 .sidebar.active {
   left: 0;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Modify filter toggle button */
@@ -529,11 +534,18 @@
   .sidebar {
     position: sticky;
     left: 0;
-    top: 2rem;
+    top: 80px; /* Adjust for fixed navigation */
     width: 250px;
     transform: none;
-    background: transparent;
-    box-shadow: none;
+    background: #f4ebb6;
+    height: calc(
+      100vh - 100px
+    ); /* Adjust height accounting for padding and nav */
+    border-right: 2px solid var(--border-color);
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px; /* Add some space from the top */
+    border-radius: 8px; /* Add rounded corners */
+    padding: 1.5rem;
   }
 
   .close-sidebar {
