@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit();
             }
 
-            if ($user['role_category'] === 'COLLEGE STUDENT' || $user['role_category'] === 'SHS') {
+            if ($user['role_category'] === 'COLLEGE STUDENT' || $user['role_category'] === 'SHS' || $user['role_category'] === 'EMPLOYEE' && $user['program_or_position'] === 'TEACHER') {
                 header("Location: home.php");
                 exit();
             } else if ($user['program_or_position'] === 'PAMO') {

@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Generate email
     $lastSixDigits = substr($idNumber, -6);
-    $email = strtolower($lastName . '.' . $lastSixDigits . '@lucena.sti.edu.ph');
+    $email = strtolower(str_replace(' ', '', $lastName . '.' . $lastSixDigits . '@lucena.sti.edu.ph'));
 
     // Start session before using it
     session_start();
@@ -144,7 +144,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         function closeModal() {
             document.getElementById('successModal').style.display = 'none';
             document.getElementById('modalBackdrop').style.display = 'none';
-            window.location.href = 'admin_page.php';
+            
+            // Get the selected role category
+            const roleCategory = document.getElementById('roleCategory').value;
+            
+            // Redirect based on role category
+            if (roleCategory === 'EMPLOYEE' && document.getElementById('programPosition').value === 'TEACHER') {
+                window.location.href = '../home.php';
+            } else {
+                window.location.href = 'admin_page.php';
+            }
         }
 
         // Function to generate email preview
