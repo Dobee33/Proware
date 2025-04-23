@@ -219,75 +219,78 @@ session_start();
 
     <div id="addItemModal" class="modal">
         <div class="modal-content">
-            <h2>Add New Item</h2>
-            <form id="addItemForm" onsubmit="submitNewItem(event)" enctype="multipart/form-data">
-                <div class="input-group">
-                    <label for="newItemCode">Item Code:</label>
-                    <input type="text" id="newItemCode" name="newItemCode" required>
-                </div>
+            <div class="modal-header">
+                <h2>Add New Item</h2>
+            </div>
+            <div class="modal-body">
+                <form id="addItemForm" onsubmit="submitNewItem(event)" enctype="multipart/form-data">
+                    <div class="input-group">
+                        <label for="newItemCode">Item Code:</label>
+                        <input type="text" id="newItemCode" name="newItemCode" required>
+                    </div>
 
-                <div class="input-group">
-                    <label for="newCategory">Category:</label>
-                    <select id="newCategory" name="newCategory" required>
-                        <option value="">Select Category</option>
-                        <option value="Tertiary-Uniform">Tertiary-Uniform</option>
-                        <option value="SHS-Uniform">SHS-Uniform</option>
-                        <option value="STI-Shirts">STI-Shirts</option>
-                        <option value="STI-Accessories">STI-Accessories</option>
-                        <option value="SHS-PE">SHS-PE</option>
-                        <option value="Tertiary-PE">Tertiary-PE</option>
-                    </select>
-                </div>
+                    <div class="input-group">
+                        <label for="newCategory">Category:</label>
+                        <select id="newCategory" name="newCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="Tertiary-Uniform">Tertiary-Uniform</option>
+                            <option value="SHS-Uniform">SHS-Uniform</option>
+                            <option value="STI-Shirts">STI-Shirts</option>
+                            <option value="STI-Accessories">STI-Accessories</option>
+                            <option value="SHS-PE">SHS-PE</option>
+                            <option value="Tertiary-PE">Tertiary-PE</option>
+                        </select>
+                    </div>
 
-                <div class="input-group">
-                    <label for="newItemName">Item Name:</label>
-                    <input type="text" id="newItemName" name="newItemName" required>
-                </div>
+                    <div class="input-group">
+                        <label for="newItemName">Item Name:</label>
+                        <input type="text" id="newItemName" name="newItemName" required>
+                    </div>
 
-                <div class="input-group">
-                    <label for="newSize">Size:</label>
-                    <select id="newSize" name="newSize" required>
-                        <option value="">Select Size</option>
-                        <option value="XS">XS</option>
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
-                        <option value="XXL">XXL</option>
-                        <option value="3XL">3XL</option>
-                        <option value="4XL">4XL</option>
-                        <option value="5XL">5XL</option>
-                        <option value="6XL">6XL</option>
-                        <option value="7XL">7XL</option>
-                        <option value="One Size">One Size</option>
-                    </select>
-                </div>
+                    <div class="input-group">
+                        <label for="newSize">Size:</label>
+                        <select id="newSize" name="newSize" required>
+                            <option value="">Select Size</option>
+                            <option value="XS">XS</option>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                            <option value="XXL">XXL</option>
+                            <option value="3XL">3XL</option>
+                            <option value="4XL">4XL</option>
+                            <option value="5XL">5XL</option>
+                            <option value="6XL">6XL</option>
+                            <option value="7XL">7XL</option>
+                            <option value="One Size">One Size</option>
+                        </select>
+                    </div>
 
-                <div class="input-group">
-                    <label for="newItemPrice">Price:</label>
-                    <input type="number" id="newItemPrice" name="newItemPrice" min="0" step="0.01" required>
-                </div>
+                    <div class="input-group">
+                        <label for="newItemPrice">Price:</label>
+                        <input type="number" id="newItemPrice" name="newItemPrice" min="0" step="0.01" required>
+                    </div>
 
-                <div class="input-group">
-                    <label for="newItemQuantity">Quantity:</label>
-                    <input type="number" id="newItemQuantity" name="newItemQuantity" min="0" required>
-                </div>
+                    <div class="input-group">
+                        <label for="newItemQuantity">Quantity:</label>
+                        <input type="number" id="newItemQuantity" name="newItemQuantity" min="0" required>
+                    </div>
 
-                <div class="input-group">
-                    <label for="newItemDamage">Damage:</label>
-                    <input type="number" id="newItemDamage" name="newItemDamage" min="0" value="0" required>
-                </div>
+                    <div class="input-group">
+                        <label for="newItemDamage">Damage:</label>
+                        <input type="number" id="newItemDamage" name="newItemDamage" min="0" value="0" required>
+                    </div>
 
-                <div class="input-group">
-                    <label for="newImage">Upload Image:</label>
-                    <input type="file" id="newImage" name="newImage" accept="image/*" required>
-                </div>
-
-                <div class="modal-buttons">
-                    <button type="submit" class="save-btn">Save</button>
-                    <button type="button" onclick="closeModal('addItemModal')" class="cancel-btn">Cancel</button>
-                </div>
-            </form>
+                    <div class="input-group">
+                        <label for="newImage">Upload Image:</label>
+                        <input type="file" id="newImage" name="newImage" accept="image/*" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="addItemForm" class="save-btn">Save</button>
+                <button type="button" onclick="closeModal('addItemModal')" class="cancel-btn">Cancel</button>
+            </div>
         </div>
     </div>
 
