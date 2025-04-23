@@ -181,37 +181,40 @@ session_start();
 
     <div id="editItemModal" class="modal">
         <div class="modal-content">
-            <h2>Edit Item</h2>
-            <input type="hidden" id="editItemId">
-
-            <div class="input-group">
-                <label for="editItemCode">Item Code:</label>
-                <input type="text" id="editItemCode" disabled>
+            <div class="modal-header">
+                <h2>Edit Item</h2>
+                <span class="close" onclick="closeModal('editItemModal')">&times;</span>
             </div>
-            <div class="input-group">
-                <label for="editItemName">Item Name:</label>
-                <input type="text" id="editItemName" disabled>
+            <div class="modal-body">
+                <input type="hidden" id="editItemId">
+                <div class="input-group">
+                    <label for="editItemCode">Item Code:</label>
+                    <input type="text" id="editItemCode" disabled>
+                </div>
+                <div class="input-group">
+                    <label for="editItemName">Item Name:</label>
+                    <input type="text" id="editItemName" disabled>
+                </div>
+                <div class="input-group">
+                    <label for="editCategory">Category:</label>
+                    <input type="text" id="editCategory" disabled>
+                </div>
+                <div class="input-group">
+                    <label for="editActualQuantity">Actual Quantity:</label>
+                    <input type="number" id="editActualQuantity" disabled>
+                </div>
+                <div class="input-group">
+                    <label for="editSize">Size:</label>
+                    <input type="text" id="editSize" disabled>
+                </div>
+                <div class="input-group">
+                    <label for="editPrice">Price:</label>
+                    <input type="number" id="editPrice" disabled>
+                </div>
             </div>
-            <div class="input-group">
-                <label for="editCategory">Category:</label>
-                <input type="text" id="editCategory" disabled>
-            </div>
-            <div class="input-group">
-                <label for="editActualQuantity">Actual Quantity:</label>
-                <input type="number" id="editActualQuantity" disabled>
-            </div>
-            <div class="input-group">
-                <label for="editSize">Size:</label>
-                <input type="text" id="editSize" disabled>
-            </div>
-            <div class="input-group">
-                <label for="editPrice">Price:</label>
-                <input type="number" id="editPrice" disabled>
-            </div>
-
-            <div class="modal-buttons">
-                <button onclick="showEditPriceModal()" class="action-btn">Edit Price</button>
-                <button onclick="showEditImageModal()" class="action-btn">Edit Image</button>
+            <div class="modal-footer">
+                <button onclick="showEditPriceModal()" class="save-btn">Edit Price</button>
+                <button onclick="showEditImageModal()" class="save-btn">Edit Image</button>
                 <button onclick="closeModal('editItemModal')" class="cancel-btn">Cancel</button>
             </div>
         </div>
@@ -221,6 +224,7 @@ session_start();
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Add New Item</h2>
+                <span class="close" onclick="closeModal('addItemModal')">&times;</span>
             </div>
             <div class="modal-body">
                 <form id="addItemForm" onsubmit="submitNewItem(event)" enctype="multipart/form-data">
@@ -228,7 +232,6 @@ session_start();
                         <label for="newItemCode">Item Code:</label>
                         <input type="text" id="newItemCode" name="newItemCode" required>
                     </div>
-
                     <div class="input-group">
                         <label for="newCategory">Category:</label>
                         <select id="newCategory" name="newCategory" required>
@@ -241,12 +244,10 @@ session_start();
                             <option value="Tertiary-PE">Tertiary-PE</option>
                         </select>
                     </div>
-
                     <div class="input-group">
                         <label for="newItemName">Item Name:</label>
                         <input type="text" id="newItemName" name="newItemName" required>
                     </div>
-
                     <div class="input-group">
                         <label for="newSize">Size:</label>
                         <select id="newSize" name="newSize" required>
@@ -265,22 +266,18 @@ session_start();
                             <option value="One Size">One Size</option>
                         </select>
                     </div>
-
                     <div class="input-group">
                         <label for="newItemPrice">Price:</label>
                         <input type="number" id="newItemPrice" name="newItemPrice" min="0" step="0.01" required>
                     </div>
-
                     <div class="input-group">
                         <label for="newItemQuantity">Quantity:</label>
                         <input type="number" id="newItemQuantity" name="newItemQuantity" min="0" required>
                     </div>
-
                     <div class="input-group">
                         <label for="newItemDamage">Damage:</label>
                         <input type="number" id="newItemDamage" name="newItemDamage" min="0" value="0" required>
                     </div>
-
                     <div class="input-group">
                         <label for="newImage">Upload Image:</label>
                         <input type="file" id="newImage" name="newImage" accept="image/*" required>
