@@ -21,16 +21,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $size = isset($_POST['size']) && !empty($_POST['size']) ? $_POST['size'] : null;
                 $user_id = $_SESSION['user_id'];
 
-                // Get item category from inventory
-                $stmt = $conn->prepare("SELECT category FROM inventory WHERE item_code = ? OR item_code LIKE ? LIMIT 1");
+                // Get item details from inventory including available stock
+                $stmt = $conn->prepare("SELECT category, actual_quantity FROM inventory WHERE item_code = ? OR item_code LIKE ? LIMIT 1");
                 $stmt->execute([$item_code, $item_code . '-%']);
                 $item = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                // Debug logging
-                error_log("Adding item to cart - Item Code: " . $item_code . ", Category: " . ($item ? $item['category'] : 'not found') . ", Size: " . ($size ?? 'null'));
+                if (!$item) {
+                    $response['message'] = 'Item not found in inventory';
+                    break;
+                }
+
+                // Get current quantity in cart for this item
+                $stmt = $conn->prepare("SELECT SUM(quantity) as cart_quantity FROM cart WHERE user_id = ? AND item_code = ?");
+                $stmt->execute([$user_id, $item_code]);
+                $cart_quantity = $stmt->fetch(PDO::FETCH_ASSOC)['cart_quantity'] ?? 0;
+
+                // Check if adding this quantity would exceed available stock
+                if (($cart_quantity + $quantity) > $item['actual_quantity']) {
+                    $response['message'] = 'Adding this quantity would exceed available stock. Available: ' . $item['actual_quantity'];
+                    break;
+                }
 
                 // Set size to 'One Size' for accessories if not set
-                if ($item && (stripos($item['category'], 'accessories') !== false || stripos($item['category'], 'sti-accessories') !== false)) {
+                if (stripos($item['category'], 'accessories') !== false || stripos($item['category'], 'sti-accessories') !== false) {
                     $size = 'One Size';
                 }
 
@@ -161,8 +174,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $item_id = $_POST['item_id'];
-                $quantity = $_POST['quantity'];
+                $quantity = intval($_POST['quantity']);
                 $user_id = $_SESSION['user_id'];
+
+                // Get item details from cart and inventory
+                $stmt = $conn->prepare("
+                    SELECT c.item_code, c.quantity as current_cart_quantity, i.actual_quantity 
+                    FROM cart c 
+                    JOIN inventory i ON c.item_code = i.item_code 
+                    WHERE c.id = ? AND c.user_id = ?
+                ");
+                $stmt->execute([$item_id, $user_id]);
+                $item = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if (!$item) {
+                    $response['message'] = 'Item not found in cart';
+                    break;
+                }
+
+                // Get total quantity in cart for this item (excluding current item)
+                $stmt = $conn->prepare("
+                    SELECT SUM(quantity) as other_cart_quantity 
+                    FROM cart 
+                    WHERE user_id = ? AND item_code = ? AND id != ?
+                ");
+                $stmt->execute([$user_id, $item['item_code'], $item_id]);
+                $other_cart_quantity = $stmt->fetch(PDO::FETCH_ASSOC)['other_cart_quantity'] ?? 0;
+
+                // Check if new quantity would exceed available stock
+                if (($other_cart_quantity + $quantity) > $item['actual_quantity']) {
+                    $response['message'] = 'Updating to this quantity would exceed available stock. Available: ' . $item['actual_quantity'];
+                    break;
+                }
 
                 // Update item quantity
                 $stmt = $conn->prepare("UPDATE cart SET quantity = ? WHERE id = ? AND user_id = ?");

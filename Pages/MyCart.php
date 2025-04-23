@@ -470,7 +470,7 @@ $cart_total = 0;
 
         .empty-cart i {
             font-size: 4rem;
-            color: #ccc;
+            color: var(--primary-color);
             margin-bottom: 1.5rem;
         }
 
@@ -499,7 +499,8 @@ $cart_total = 0;
         }
 
         .shop-now-btn:hover {
-            background: var(--primary-color-dark);
+            background: yellow;
+            color: black;
             transform: translateY(-2px);
         }
 
