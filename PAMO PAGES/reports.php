@@ -32,6 +32,10 @@ session_start();
                             <i class="material-icons">clear</i>
                             Clear
                         </button>
+                        <button onclick="applyFilters()" class="apply-filters-btn">
+                            <i class="material-icons">filter_list</i>
+                            Apply Filters
+                        </button>
                     </div>
                     <button onclick="generateReport()" class="generate-report-btn">
                         <i class="material-icons">assessment</i>
