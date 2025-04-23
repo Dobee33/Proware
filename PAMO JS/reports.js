@@ -87,6 +87,80 @@ function loadTableData() {
   });
 }
 
+function applyDailyFilter() {
+  const dailyButton = document.querySelector(".daily-filter-btn");
+  const monthlyButton = document.querySelector(".monthly-filter-btn");
+
+  // If daily button is already active, deselect it
+  if (dailyButton.classList.contains("active")) {
+    dailyButton.classList.remove("active");
+    clearDates();
+    return;
+  }
+
+  const today = new Date();
+  const formattedDate = today.toISOString().split("T")[0];
+
+  document.getElementById("startDate").value = formattedDate;
+  document.getElementById("endDate").value = formattedDate;
+
+  // Update active state of filter buttons
+  dailyButton.classList.add("active");
+  monthlyButton.classList.remove("active");
+
+  // Apply filters and update total
+  const reportType = document.getElementById("reportType").value;
+  if (reportType === "sales") {
+    applyFilters(true);
+  } else {
+    applyFilters();
+  }
+}
+
+function applyMonthlyFilter() {
+  const dailyButton = document.querySelector(".daily-filter-btn");
+  const monthlyButton = document.querySelector(".monthly-filter-btn");
+
+  // If monthly button is already active, deselect it
+  if (monthlyButton.classList.contains("active")) {
+    monthlyButton.classList.remove("active");
+    clearDates();
+    return;
+  }
+
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth(); // 0-11 for Jan-Dec
+
+  // Set to first day of current month
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+  // Set to last day of current month
+  const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+
+  // Format dates as YYYY-MM-DD
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  document.getElementById("startDate").value = formatDate(firstDayOfMonth);
+  document.getElementById("endDate").value = formatDate(lastDayOfMonth);
+
+  // Update active state of filter buttons
+  monthlyButton.classList.add("active");
+  dailyButton.classList.remove("active");
+
+  // Apply filters and update total
+  const reportType = document.getElementById("reportType").value;
+  if (reportType === "sales") {
+    applyFilters(true);
+  } else {
+    applyFilters();
+  }
+}
+
 function clearDates() {
   const startDate = document.getElementById("startDate");
   const endDate = document.getElementById("endDate");
@@ -94,6 +168,19 @@ function clearDates() {
   startDate.value = "";
   endDate.value = "";
   endDate.disabled = true;
+
+  // Remove active state from filter buttons
+  document.querySelector(".daily-filter-btn").classList.remove("active");
+  document.querySelector(".monthly-filter-btn").classList.remove("active");
+
+  // Hide total amount display
+  const totalDisplay = document.querySelector(".total-amount-display");
+  if (totalDisplay) {
+    totalDisplay.style.display = "none";
+  }
+
+  // Reset total amount display
+  document.getElementById("totalSalesAmount").textContent = "₱0.00";
 
   // Refresh the current report view
   const reportType = document.getElementById("reportType").value;
@@ -103,7 +190,7 @@ function clearDates() {
 
   showLoading();
 
-  fetch("includes/filter_reports.php", {
+  fetch("../PAMO PAGES/includes/filter_reports.php", {
     method: "POST",
     body: formData,
   })
@@ -117,6 +204,13 @@ function clearDates() {
       const reportDiv = document.getElementById(reportType + "Report");
       if (reportDiv) {
         reportDiv.innerHTML = data;
+        // Ensure total amount display is hidden after clearing
+        const newTotalDisplay = reportDiv.querySelector(
+          ".total-amount-display"
+        );
+        if (newTotalDisplay) {
+          newTotalDisplay.style.display = "none";
+        }
       }
       hideLoading();
     })
@@ -127,45 +221,7 @@ function clearDates() {
     });
 }
 
-function changeReportType() {
-  const reportType = document.getElementById("reportType").value;
-
-  // Hide all reports
-  document.getElementById("inventoryReport").style.display = "none";
-  document.getElementById("salesReport").style.display = "none";
-  document.getElementById("auditReport").style.display = "none";
-
-  // Show selected report
-  document.getElementById(reportType + "Report").style.display = "block";
-
-  // Clear dates and filters
-  clearDates();
-}
-
-function searchReports(query) {
-  query = query.toLowerCase();
-  const reportType = document.getElementById("reportType").value;
-  const table = document.querySelector(`#${reportType}Report table`);
-  const rows = table.getElementsByTagName("tr");
-
-  for (let i = 1; i < rows.length; i++) {
-    // Start from 1 to skip header row
-    const row = rows[i];
-    const cells = row.getElementsByTagName("td");
-    let found = false;
-
-    for (let cell of cells) {
-      if (cell.textContent.toLowerCase().includes(query)) {
-        found = true;
-        break;
-      }
-    }
-
-    row.style.display = found ? "" : "none";
-  }
-}
-
-function applyFilters() {
+function applyFilters(shouldUpdateTotal = false) {
   const startDate = document.getElementById("startDate").value;
   const endDate = document.getElementById("endDate").value;
   const reportType = document.getElementById("reportType").value;
@@ -199,6 +255,12 @@ function applyFilters() {
       const reportDiv = document.getElementById(reportType + "Report");
       if (reportDiv) {
         reportDiv.innerHTML = data;
+
+        // Update total amount for sales report
+        if (reportType === "sales" || shouldUpdateTotal) {
+          setTimeout(updateTotalSalesAmount, 100); // Add slight delay to ensure DOM is updated
+        }
+
         hideLoading();
       } else {
         console.error("Report div not found:", reportType + "Report");
@@ -212,43 +274,88 @@ function applyFilters() {
     });
 }
 
-function generateReport() {
-  const reportType = document.getElementById("reportType").value;
-  const startDate = document.getElementById("startDate").value;
-  const endDate = document.getElementById("endDate").value;
+function updateTotalSalesAmount() {
+  const salesTable = document.querySelector("#salesReport table");
+  if (!salesTable) return;
 
-  if (!startDate || !endDate) {
-    alert("Please select both start and end dates");
-    return;
+  const rows = salesTable.getElementsByTagName("tr");
+  let total = 0;
+
+  // Start from 1 to skip header row
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (row.style.display !== "none") {
+      const amountCell = row.cells[6]; // Index of Total Amount column
+      if (amountCell) {
+        // Remove ₱ symbol and commas, then parse
+        const amount = parseFloat(
+          amountCell.textContent.replace("₱", "").replace(/,/g, "")
+        );
+        if (!isNaN(amount)) {
+          total += amount;
+        }
+      }
+    }
   }
 
-  showLoading();
+  // Update the total amount display
+  const totalDisplay = document.querySelector(".total-amount-display");
+  if (totalDisplay) {
+    totalDisplay.style.display = "block"; // Show the total amount display
+    const totalAmountSpan = document.getElementById("totalSalesAmount");
+    if (totalAmountSpan) {
+      totalAmountSpan.textContent =
+        "₱" +
+        total.toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+    }
+  }
+}
 
-  // Create form data
-  const formData = new FormData();
-  formData.append("reportType", reportType);
-  formData.append("startDate", startDate);
-  formData.append("endDate", endDate);
-  formData.append("generateReport", "true"); // Flag to indicate this is for report generation
+function searchReports(query) {
+  query = query.toLowerCase();
+  const reportType = document.getElementById("reportType").value;
+  const table = document.querySelector(`#${reportType}Report table`);
+  const rows = table.getElementsByTagName("tr");
 
-  // Send AJAX request to fetch filtered data
-  fetch("includes/filter_reports.php", {
-    method: "POST",
-    body: formData,
-  })
-    .then((response) => response.text())
-    .then((data) => {
-      // Update the table content with the filtered data
-      const reportDiv = document.getElementById(reportType + "Report");
-      const tableContainer = reportDiv.querySelector("table").parentNode;
-      tableContainer.innerHTML = data;
-      hideLoading();
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      hideLoading();
-      showNotification("Error generating report");
-    });
+  for (let i = 1; i < rows.length; i++) {
+    // Start from 1 to skip header row
+    const row = rows[i];
+    const cells = row.getElementsByTagName("td");
+    let found = false;
+
+    for (let cell of cells) {
+      if (cell.textContent.toLowerCase().includes(query)) {
+        found = true;
+        break;
+      }
+    }
+
+    row.style.display = found ? "" : "none";
+  }
+}
+
+function changeReportType() {
+  const reportType = document.getElementById("reportType").value;
+
+  // Hide all reports
+  document.getElementById("inventoryReport").style.display = "none";
+  document.getElementById("salesReport").style.display = "none";
+  document.getElementById("auditReport").style.display = "none";
+
+  // Show selected report
+  document.getElementById(reportType + "Report").style.display = "block";
+
+  // Hide total amount display when changing report type
+  const totalDisplay = document.querySelector(".total-amount-display");
+  if (totalDisplay) {
+    totalDisplay.style.display = "none";
+  }
+
+  // Clear dates and filters
+  clearDates();
 }
 
 function exportToExcel() {

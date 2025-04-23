@@ -423,3 +423,52 @@ tr:hover {
 .apply-filters-btn i {
   font-size: 18px;
 }
+
+.quick-filters {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.daily-filter-btn,
+.monthly-filter-btn {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s;
+}
+
+.daily-filter-btn:hover,
+.monthly-filter-btn:hover {
+  background-color: #5a6268;
+}
+
+.daily-filter-btn.active,
+.monthly-filter-btn.active {
+  background-color: #28a745;
+}
+
+.total-amount-display {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.total-amount-display h4 {
+  margin: 0;
+  color: #495057;
+  font-size: 1.1em;
+}
+
+#totalSalesAmount {
+  color: #28a745;
+  font-weight: bold;
+  font-size: 1.2em;
+}

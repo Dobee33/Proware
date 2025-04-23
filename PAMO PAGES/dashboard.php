@@ -29,7 +29,6 @@ $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PAMO - Dashboard</title>
     <link rel="stylesheet" href="../PAMO CSS/styles.css">
-    <script src="../PAMO JS/script.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Anton+SC&family=Smooch+Sans:wght@100..900&display=swap"
         rel="stylesheet">

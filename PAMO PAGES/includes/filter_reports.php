@@ -85,6 +85,9 @@ function displayReport($reportType, $startDate, $endDate, $conn) {
                 
                 echo '<div class="report-table">';
                 echo '<h3>Sales Report</h3>';
+                echo '<div class="total-amount-display">';
+                echo '<h4>Total Sales Amount: <span id="totalSalesAmount">₱0.00</span></h4>';
+                echo '</div>';
                 echo '<table>';
                 echo '<thead><tr>
                         <th>Order Number</th>

@@ -36,11 +36,17 @@ session_start();
                             <i class="material-icons">filter_list</i>
                             Apply Filters
                         </button>
+                        <div class="quick-filters">
+                            <button onclick="applyDailyFilter()" class="daily-filter-btn">
+                                <i class="material-icons">today</i>
+                                Daily
+                            </button>
+                            <button onclick="applyMonthlyFilter()" class="monthly-filter-btn">
+                                <i class="material-icons">date_range</i>
+                                Monthly
+                            </button>
+                        </div>
                     </div>
-                    <button onclick="generateReport()" class="generate-report-btn">
-                        <i class="material-icons">assessment</i>
-                        Generate Report
-                    </button>
                     <button onclick="exportToExcel()" class="export-btn">
                         <i class="material-icons">table_view</i>
                         Export to Excel
@@ -104,6 +110,9 @@ session_start();
                 <!-- Sales Report Table -->
                 <div id="salesReport" class="report-table" style="display: none;">
                     <h3>Sales Report</h3>
+                    <div class="total-amount-display" style="display: none;">
+                        <h4>Total Sales Amount: <span id="totalSalesAmount">₱0.00</span></h4>
+                    </div>
                     <table>
                         <thead>
                             <tr>
