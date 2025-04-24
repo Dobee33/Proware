@@ -341,10 +341,26 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  // Add these helper functions before applyAllFilters
+  function normalizeText(text) {
+    return text.toLowerCase().trim();
+  }
+
+  function containsPartialMatch(source, searchTerm) {
+    const words = searchTerm.split(/\s+/);
+    return words.every((word) => {
+      const normalizedWord = normalizeText(word);
+      return normalizeText(source).includes(normalizedWord);
+    });
+  }
+
   // Add this new function to combine all filters
   function applyAllFilters() {
     const productContainers = document.querySelectorAll(".product-container");
     let visibleCount = 0;
+
+    // Normalize search term once
+    const normalizedSearchTerm = normalizeText(currentSearchTerm);
 
     productContainers.forEach((container) => {
       const productCategory = container.dataset.category.toLowerCase();
@@ -377,11 +393,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
 
-      // Check if product matches search term
+      // Enhanced search matching using partial matches
       const matchesSearch =
-        currentSearchTerm === "" ||
-        itemName.includes(currentSearchTerm) ||
-        itemCode.includes(currentSearchTerm);
+        normalizedSearchTerm === "" ||
+        containsPartialMatch(itemName, normalizedSearchTerm) ||
+        containsPartialMatch(itemCode, normalizedSearchTerm) ||
+        containsPartialMatch(productCategory, normalizedSearchTerm);
 
       // Show product only if it matches both category and search filters
       const shouldShow = matchesCategory && matchesSearch;
