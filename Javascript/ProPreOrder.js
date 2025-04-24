@@ -1,133 +1,80 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Function to update total amount
+  // Function to update total amount and cart items
   function updateTotalAmount() {
+    const rows = document.querySelectorAll(".products-table tbody tr");
     let total = 0;
-    document.querySelectorAll(".products-table tbody tr").forEach((row) => {
-      const price = parseFloat(
-        row
-          .querySelector("td:nth-child(4)")
-          .textContent.replace("₱", "")
-          .replace(/,/g, "")
-      );
-      const quantity = parseInt(
-        row.querySelector(".item-quantity").textContent
-      );
-      const isIncluded = row
-        .querySelector(".toggle-checkout-btn.check")
-        .classList.contains("active");
+    const selectedCartItems = [];
 
-      if (isIncluded) {
+    rows.forEach((row) => {
+      const checkbox = row.querySelector(".include-checkbox");
+      if (checkbox && checkbox.checked) {
+        const price = parseFloat(
+          row
+            .querySelector("td:nth-child(4)")
+            .textContent.replace("₱", "")
+            .replace(/,/g, "")
+            .trim()
+        );
+        const quantity = parseInt(
+          row.querySelector(".item-quantity").textContent
+        );
+
+        // Get item details for the cart
+        const itemName = row.querySelector("td:nth-child(2)").textContent;
+        const size = row.querySelector("td:nth-child(3)").textContent;
+        const imagePath = row
+          .querySelector("td:nth-child(1) img")
+          .getAttribute("src");
+        const itemId = row.dataset.itemId;
+        const itemCode = row.dataset.itemCode;
+
+        // Add to selected items array
+        selectedCartItems.push({
+          id: itemId,
+          item_code: itemCode,
+          item_name: itemName,
+          size: size,
+          price: price,
+          quantity: quantity,
+          image_path: imagePath,
+        });
+
         total += price * quantity;
       }
     });
 
-    // Format number with commas for display
-    const formattedTotal = total
-      .toFixed(2)
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-    // Update total amount display
-    document.querySelector(".total-table td").textContent =
-      "₱" + formattedTotal;
-
-    // Update hidden input with raw number
-    if (document.querySelector('input[name="total_amount"]')) {
-      document.querySelector('input[name="total_amount"]').value = total;
+    // Update the total amount display with proper formatting
+    const totalAmountCell = document.querySelector(".total-table td");
+    if (totalAmountCell) {
+      totalAmountCell.textContent =
+        "₱" + total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
-    return total;
+    // Update hidden inputs for form submission
+    const totalAmountInput = document.getElementById("totalAmountInput");
+    if (totalAmountInput) {
+      totalAmountInput.value = total;
+    }
+
+    // Update included items and cart items for form submission
+    const includedItems = selectedCartItems.map((item) => item.id);
+
+    const includedItemsInput = document.getElementById("includedItems");
+    if (includedItemsInput) {
+      includedItemsInput.value = JSON.stringify(includedItems);
+    }
+
+    const cartItemsInput = document.getElementById("cartItemsInput");
+    if (cartItemsInput) {
+      cartItemsInput.value = JSON.stringify(selectedCartItems);
+    }
   }
 
-  // Initialize active states
-  document.querySelectorAll(".toggle-container").forEach((container) => {
-    const checkBtn = container.querySelector(".check");
-    const xBtn = container.querySelector(".x");
-
-    checkBtn.classList.add("active");
-    xBtn.classList.remove("active");
-
-    // Add click handlers
-    checkBtn.addEventListener("click", function () {
-      checkBtn.classList.add("active");
-      xBtn.classList.remove("active");
-      updateTotalAmount();
-    });
-
-    xBtn.addEventListener("click", function () {
-      xBtn.classList.add("active");
-      checkBtn.classList.remove("active");
-      updateTotalAmount();
-    });
+  // Add event listeners to checkboxes
+  document.querySelectorAll(".include-checkbox").forEach((checkbox) => {
+    checkbox.addEventListener("change", updateTotalAmount);
   });
 
-  // Update included items before form submission
-  document
-    .getElementById("checkoutForm")
-    .addEventListener("submit", function (e) {
-      e.preventDefault(); // Prevent default form submission
-
-      const includedItems = [];
-      const cartItems = [];
-      let totalAmount = 0;
-
-      document.querySelectorAll(".products-table tbody tr").forEach((row) => {
-        const itemId = row.dataset.itemId;
-        const isIncluded = row
-          .querySelector(".toggle-checkout-btn.check")
-          .classList.contains("active");
-
-        if (isIncluded) {
-          includedItems.push(itemId);
-
-          // Get current item data
-          const price = parseFloat(
-            row
-              .querySelector("td:nth-child(4)")
-              .textContent.replace("₱", "")
-              .replace(/,/g, "")
-          );
-          const quantity = parseInt(
-            row.querySelector(".item-quantity").textContent
-          );
-          const name = row.querySelector("td:nth-child(2)").textContent;
-          const size = row.querySelector("td:nth-child(3)").textContent;
-          const imagePath = row
-            .querySelector("td:nth-child(1) img")
-            .getAttribute("src")
-            .split("/")
-            .pop();
-          const itemCode = row.dataset.itemCode || "";
-
-          // Add to cart items
-          cartItems.push({
-            id: itemId,
-            item_code: itemCode,
-            item_name: name,
-            size: size,
-            price: price,
-            quantity: quantity,
-            image_path: imagePath,
-          });
-
-          totalAmount += price * quantity;
-        }
-      });
-
-      if (includedItems.length === 0) {
-        alert("Please include at least one item for checkout");
-        return;
-      }
-
-      // Update hidden inputs with current values
-      document.getElementById("includedItems").value =
-        JSON.stringify(includedItems);
-      document.getElementById("cartItemsInput").value =
-        JSON.stringify(cartItems);
-      document.getElementById("totalAmountInput").value = totalAmount;
-
-      this.submit(); // Submit the form if we have included items
-    });
-
-  // Initial total calculation
+  // Initial calculation
   updateTotalAmount();
 });

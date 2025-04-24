@@ -100,12 +100,10 @@
                                         </td>
                                         <td>
                                             <div class="toggle-container">
-                                                <button class="toggle-checkout-btn check" data-item-id="<?php echo $item['id']; ?>" data-included="true">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                                <button class="toggle-checkout-btn x" data-item-id="<?php echo $item['id']; ?>" data-included="false">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
+                                                <input type="checkbox" 
+                                                       class="include-checkbox" 
+                                                       data-item-id="<?php echo $item['id']; ?>" 
+                                                       checked>
                                             </div>
                                         </td>
                                     </tr>
@@ -137,17 +135,45 @@
 
                 <?php if (!empty($final_cart_items)): ?>
                 <form action="ProCheckout.php" method="POST" id="checkoutForm">
-                    <input type="hidden" name="cart_items" id="cartItemsInput" value=''>
+                    <input type="hidden" name="cart_items" id="cartItemsInput" value="">
                     <input type="hidden" name="total_amount" id="totalAmountInput" value="<?php echo $included_total; ?>">
                     <input type="hidden" name="included_items" id="includedItems" value="">
-                    <button type="submit" class="proceed-btn">Proceed to Checkout</button>
+                    <button type="submit" class="proceed-btn" onclick="return validateCheckout()">Proceed to Checkout</button>
                 </form>
                 <?php endif; ?>
             </div>
         </div>
     </div>
 
+    <?php
+    // Store selected items in session when form is submitted
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['included_items'])) {
+        $_SESSION['selected_items'] = json_decode($_POST['included_items'], true);
+    }
+    ?>
+
     <script src="../Javascript/ProPreOrder.js"></script>
+    <script>
+    function validateCheckout() {
+        const includedItems = document.getElementById('includedItems').value;
+        const items = JSON.parse(includedItems || '[]');
+        
+        if (items.length === 0) {
+            alert('Please include at least one item for checkout');
+            return false;
+        }
+
+        // Store selected items in session before submitting
+        const cartItems = document.getElementById('cartItemsInput').value;
+        const totalAmount = document.getElementById('totalAmountInput').value;
+        
+        // Create a form to submit the data
+        const form = document.getElementById('checkoutForm');
+        form.submit();
+        
+        return true;
+    }
+    </script>
 </body>
 
 </html>

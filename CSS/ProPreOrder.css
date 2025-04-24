@@ -200,45 +200,24 @@ h1 {
 
 .toggle-container {
   display: flex;
-  gap: 5px;
   justify-content: center;
+  align-items: center;
 }
 
-.toggle-checkout-btn {
-  background: none;
-  border: none;
+.include-checkbox {
+  width: 20px;
+  height: 20px;
   cursor: pointer;
-  padding: 5px;
-  font-size: 1.1em;
-  transition: all 0.3s ease;
-  border-radius: 4px;
+  accent-color: var(--primary-color);
 }
 
-.toggle-checkout-btn.check {
-  color: #4caf50;
-  background-color: rgba(76, 175, 80, 0.1);
+.include-checkbox:checked {
+  background-color: var(--primary-color);
 }
 
-.toggle-checkout-btn.x {
-  color: #f44336;
-  background-color: rgba(244, 67, 54, 0.1);
-}
-
-.toggle-checkout-btn.active {
-  transform: scale(1.1);
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-}
-
-.toggle-checkout-btn:not(.active) {
-  opacity: 0.5;
-}
-
-.toggle-checkout-btn:hover {
-  transform: scale(1.1);
-}
-
-.toggle-checkout-btn i {
-  pointer-events: none;
+/* Remove old toggle button styles */
+.toggle-checkout-btn {
+  display: none;
 }
 
 /* Small - ≥576px */

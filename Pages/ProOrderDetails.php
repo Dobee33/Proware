@@ -54,6 +54,15 @@ try {
     // Begin transaction
     $conn->beginTransaction();
 
+    // Process selected items to store only the filename for image paths
+    foreach ($selected_items as &$item) {
+        if (isset($item['image_path'])) {
+            // Extract only the filename from the path
+            $item['image_path'] = basename($item['image_path']);
+        }
+    }
+    unset($item); // Break the reference
+
     // Insert into pre_orders table
     $stmt = $conn->prepare("
         INSERT INTO pre_orders (order_number, user_id, items, phone, total_amount, status, payment_date) 
@@ -165,7 +174,7 @@ try {
                 </div>
 
                 <button class="back-home-btn" onclick="window.location.href='MyOrders.php'">
-                    Back to My Orders
+                    View Orders
                 </button>
             </div>
         </div>

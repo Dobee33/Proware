@@ -94,7 +94,12 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 ?>
                                     <div class="order-item">
                                         <div class="item-image">
-                                            <img src="../uploads/itemlist/<?php echo htmlspecialchars($item['image_path'] ?? 'default.jpg'); ?>" 
+                                            <?php
+                                            $image_path = $item['image_path'] ?? 'default.jpg';
+                                            // Ensure we're using just the filename
+                                            $image_filename = basename($image_path);
+                                            ?>
+                                            <img src="../uploads/itemlist/<?php echo htmlspecialchars($image_filename); ?>" 
                                                  alt="<?php echo htmlspecialchars($clean_name); ?>">
                                         </div>
                                         <div class="item-details">

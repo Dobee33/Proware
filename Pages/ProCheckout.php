@@ -13,36 +13,32 @@ $cart_items = json_decode($_POST['cart_items'], true);
 $included_items = json_decode($_POST['included_items'], true);
 $total_amount = $_POST['total_amount'];
 
-// If cart_items is empty, fetch them from the database
-if (empty($cart_items)) {
-    // Fetch cart items
+// Store the selected items in session
+$_SESSION['selected_items'] = $included_items;
+
+// If cart_items is empty, fetch only the selected items from the database
+if (empty($cart_items) && !empty($included_items)) {
+    $placeholders = str_repeat('?,', count($included_items) - 1) . '?';
     $stmt = $conn->prepare("
         SELECT c.*, i.item_name, i.price, i.image_path 
         FROM cart c 
         JOIN inventory i ON c.item_code = i.item_code 
-        WHERE c.user_id = ?
+        WHERE c.user_id = ? AND c.id IN ($placeholders)
     ");
-    $stmt->execute([$_SESSION['user_id']]);
+    
+    $params = array_merge([$_SESSION['user_id']], $included_items);
+    $stmt->execute($params);
     $cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Calculate total
+    // Calculate total for selected items only
     $total_amount = 0;
     foreach ($cart_items as $item) {
         $total_amount += $item['price'] * $item['quantity'];
     }
 }
 
-// Filter cart items to only include selected items if included_items is provided
-if (!empty($included_items)) {
-    $selected_items = array_filter($cart_items, function($item) use ($included_items) {
-        return in_array($item['id'], $included_items);
-    });
-    
-    // Reindex the array
-    $selected_items = array_values($selected_items);
-} else {
-    $selected_items = $cart_items;
-}
+// Use the cart items as is since they're already filtered
+$selected_items = $cart_items;
 
 // Store the selected items in session for later use
 $_SESSION['checkout_items'] = $selected_items;
