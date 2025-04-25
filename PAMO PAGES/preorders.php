@@ -7,7 +7,7 @@ $status = isset($_GET['status']) ? $_GET['status'] : '';
 
 // Build the query based on status
 $query = "
-    SELECT po.*, a.first_name, a.last_name, a.email, a.program_or_position
+    SELECT po.*, a.first_name, a.last_name, a.email, a.program_or_position, a.id_number
     FROM pre_orders po
     JOIN account a ON po.user_id = a.id
 ";
@@ -89,6 +89,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="order-details">
                                     <div class="customer-info">
                                         <p><strong>Customer:</strong> <?php echo htmlspecialchars($order['first_name'] . ' ' . $order['last_name']); ?></p>
+                                        <p><strong>Student Number:</strong> <?php echo htmlspecialchars($order['id_number']); ?></p>
                                         <p><strong>Course/Strand:</strong> <?php echo htmlspecialchars($order['program_or_position']); ?></p>
                                         <p><strong>Email:</strong> <?php echo htmlspecialchars($order['email']); ?></p>
                                     </div>
