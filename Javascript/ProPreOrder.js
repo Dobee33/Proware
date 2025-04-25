@@ -68,11 +68,50 @@ document.addEventListener("DOMContentLoaded", function () {
     if (cartItemsInput) {
       cartItemsInput.value = JSON.stringify(selectedCartItems);
     }
+
+    // Update "All" checkbox state
+    updateSelectAllCheckbox();
+  }
+
+  // Function to update "All" checkbox state
+  function updateSelectAllCheckbox() {
+    const selectAllCheckbox = document.getElementById("selectAllCheckbox");
+    const individualCheckboxes = document.querySelectorAll(
+      ".products-table tbody .include-checkbox"
+    );
+    const allChecked = Array.from(individualCheckboxes).every(
+      (checkbox) => checkbox.checked
+    );
+
+    if (selectAllCheckbox) {
+      selectAllCheckbox.checked = allChecked;
+    }
   }
 
   // Add event listeners to checkboxes
+  document
+    .querySelectorAll(".products-table tbody .include-checkbox")
+    .forEach((checkbox) => {
+      checkbox.addEventListener("change", updateTotalAmount);
+    });
+
+  // Handle select all checkbox
+  const selectAllCheckbox = document.getElementById("selectAllCheckbox");
+  if (selectAllCheckbox) {
+    selectAllCheckbox.addEventListener("change", function () {
+      const isChecked = this.checked;
+      document
+        .querySelectorAll(".products-table tbody .include-checkbox")
+        .forEach((checkbox) => {
+          checkbox.checked = isChecked;
+        });
+      updateTotalAmount();
+    });
+  }
+
+  // Ensure all checkboxes are checked by default
   document.querySelectorAll(".include-checkbox").forEach((checkbox) => {
-    checkbox.addEventListener("change", updateTotalAmount);
+    checkbox.checked = true;
   });
 
   // Initial calculation

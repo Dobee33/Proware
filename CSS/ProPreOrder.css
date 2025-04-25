@@ -208,11 +208,56 @@ h1 {
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: var(--primary-color);
+  accent-color: #ffd700; /* Golden yellow color */
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: white;
+  border: 2px solid #0077be;
+  border-radius: 3px;
+  position: relative;
+  margin: 0;
 }
 
 .include-checkbox:checked {
-  background-color: var(--primary-color);
+  background-color: #ffd700;
+  border-color: #ffd700;
+}
+
+.include-checkbox:checked::after {
+  content: "✓";
+  position: absolute;
+  color: #0077be; /* Primary blue color for the checkmark */
+  font-size: 14px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+}
+
+.include-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.all-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.all-label label {
+  color: white;
+  cursor: pointer;
+}
+
+.all-label .include-checkbox {
+  margin: 0;
 }
 
 /* Remove old toggle button styles */

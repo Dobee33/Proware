@@ -70,12 +70,20 @@
                     <table class="products-table">
                         <thead>
                             <tr>
-                                <th>Product</th>
-                                <th>Name</th>
-                                <th>Size</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                                <th>Include</th>
+                                <th style="text-align: center;">Product</th>
+                                <th style="text-align: left;">Name</th>
+                                <th style="text-align: center;">Size</th>
+                                <th style="text-align: center;">Price</th>
+                                <th style="text-align: center;">Quantity</th>
+                                <th style="text-align: center;">
+                                    <div class="include-header">
+                                        <span>Include</span>
+                                        <span class="all-label">
+                                            <input type="checkbox" id="selectAllCheckbox" class="include-checkbox" checked>
+                                            <label for="selectAllCheckbox">All</label>
+                                        </span>
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
