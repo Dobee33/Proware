@@ -639,8 +639,9 @@ function incrementAccessoryQuantity() {
 
 function decrementAccessoryQuantity() {
   const input = document.getElementById("accessoryQuantity");
-  if (parseInt(input.value) > 1) {
-    input.value = parseInt(input.value) - 1;
+  const currentValue = parseInt(input.value) || 0;
+  if (currentValue > 0) {
+    input.value = currentValue - 1;
   }
 }
 
@@ -709,31 +710,51 @@ function showSizeModal(element) {
     "modalProductStock"
   ).textContent = `Total Stock: ${currentProduct.stock}`;
 
-  // Generate size options
+  // Generate size options - display all sizes XS to 7XL
   const sizeOptionsContainer = document.querySelector(".size-options");
   sizeOptionsContainer.innerHTML = "";
 
-  currentProduct.sizes.forEach((size, index) => {
+  const allSizes = [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL",
+    "3XL",
+    "4XL",
+    "5XL",
+    "6XL",
+    "7XL",
+  ];
+
+  allSizes.forEach((size) => {
     const sizeBtn = document.createElement("div");
     sizeBtn.className = "size-option";
     sizeBtn.textContent = size;
 
-    // Add stock and individual item code as data attributes
-    const stock = currentProduct.stocks[index] || 0;
-    const itemCode = currentProduct.itemCodes[index] || currentProduct.itemCode;
+    const idx = currentProduct.sizes.findIndex(
+      (s) => s.toUpperCase() === size.toUpperCase()
+    );
+    const stock = idx >= 0 ? parseInt(currentProduct.stocks[idx]) || 0 : 0;
+    const itemCode =
+      idx >= 0 && currentProduct.itemCodes[idx]
+        ? currentProduct.itemCodes[idx]
+        : currentProduct.itemCode;
+    const price =
+      idx >= 0 && currentProduct.prices[idx] ? currentProduct.prices[idx] : "";
 
     sizeBtn.dataset.stock = stock;
     sizeBtn.dataset.itemCode = itemCode;
-    sizeBtn.dataset.price = currentProduct.prices[index];
+    sizeBtn.dataset.price = price;
 
-    // Add available class if stock > 0
-    if (parseInt(stock) > 0) {
+    if (stock > 0) {
       sizeBtn.classList.add("available");
+      sizeBtn.onclick = () => selectSize(sizeBtn);
     } else {
       sizeBtn.classList.add("unavailable");
     }
 
-    sizeBtn.onclick = () => selectSize(sizeBtn);
     sizeOptionsContainer.appendChild(sizeBtn);
   });
 
@@ -780,6 +801,27 @@ function validateQuantityInput(input, enforceMax = false) {
 }
 
 function selectSize(element) {
+  // If the clicked element is already selected, deselect it
+  if (element.classList.contains("selected")) {
+    element.classList.remove("selected");
+    // Reset stock and price display
+    document.getElementById(
+      "modalProductStock"
+    ).textContent = `Total Stock: ${currentProduct.stock}`;
+    document.getElementById(
+      "modalProductPrice"
+    ).textContent = `Price Range: ₱${Math.min(
+      ...currentProduct.prices.map(Number)
+    ).toFixed(2)} - ₱${Math.max(...currentProduct.prices.map(Number)).toFixed(
+      2
+    )}`;
+    // Reset quantity input
+    const quantityInput = document.getElementById("quantity");
+    quantityInput.value = "";
+    quantityInput.placeholder = "0";
+    return;
+  }
+
   // Only allow selection if size is available
   if (element.classList.contains("unavailable")) {
     return;
@@ -834,8 +876,9 @@ function incrementQuantity() {
 
 function decrementQuantity() {
   const input = document.getElementById("quantity");
-  if (parseInt(input.value) > 1) {
-    input.value = parseInt(input.value) - 1;
+  const currentValue = parseInt(input.value) || 0;
+  if (currentValue > 0) {
+    input.value = currentValue - 1;
   }
 }
 
