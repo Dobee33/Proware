@@ -58,13 +58,13 @@ session_start();
                         <i class="material-icons">edit</i> Edit
                     </button>
                     
-                    <a href="add_quantity_page.php" class="action-btn">
+                    <button onclick="showAddQuantityModal()" class="action-btn">
                         <i class="material-icons">add_shopping_cart</i> Add Quantity
-                    </a>
+                    </button>
                     
-                    <a href="deduct_quantity_page.php" class="action-btn">
+                    <button onclick="showDeductQuantityModal()" class="action-btn">
                         <i class="material-icons">remove_shopping_cart</i> Sales Entry
-                    </a>
+                    </button>
                 </div>
 
                 <div class="filters">
@@ -320,6 +320,235 @@ session_start();
             </div>
         </div>
     </div>
+
+    <div id="addQuantityModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Quantity</h2>
+                <span class="close" onclick="closeModal('addQuantityModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addQuantityForm" onsubmit="submitAddQuantity(event)">
+                    <div class="input-group">
+                        <label for="orderNumber">Order Number:</label>
+                        <input type="text" id="orderNumber" name="orderNumber" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="itemId">Item:</label>
+                        <select id="itemId" name="itemId" required>
+                            <option value="">Select Item</option>
+                            <?php
+                            $conn = mysqli_connect("localhost", "root", "", "proware");
+                            if (!$conn) {
+                                die("Connection failed: " . mysqli_connect_error());
+                            }
+
+                            $sql = "SELECT item_code, item_name, category FROM inventory ORDER BY item_name";
+                            $result = mysqli_query($conn, $sql);
+
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo "<option value='" . $row['item_code'] . "'>" . $row['item_name'] . " (" . $row['item_code'] . ") - " . $row['category'] . "</option>";
+                            }
+                            mysqli_close($conn);
+                            ?>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="quantityToAdd">Number of Items to Add:</label>
+                        <input type="number" id="quantityToAdd" name="quantityToAdd" min="1" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="addQuantityForm" class="save-btn">Save</button>
+                <button onclick="closeModal('addQuantityModal')" class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deductQuantityModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Sales Entry</h2>
+                <span class="close" onclick="closeModal('deductQuantityModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="deductQuantityForm" onsubmit="submitDeductQuantity(event)">
+                    <div class="input-group">
+                        <label for="transactionNumber">Transaction Number:</label>
+                        <input type="text" id="transactionNumber" name="transactionNumber" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="deductItemId">Item:</label>
+                        <select id="deductItemId" name="deductItemId" required onchange="updateItemDetails()">
+                            <option value="">Select Item</option>
+                            <?php
+                            $conn = mysqli_connect("localhost", "root", "", "proware");
+                            if (!$conn) {
+                                die("Connection failed: " . mysqli_connect_error());
+                            }
+
+                            $sql = "SELECT item_code, item_name, category, price FROM inventory ORDER BY item_name";
+                            $result = mysqli_query($conn, $sql);
+
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo "<option value='" . $row['item_code'] . "' data-price='" . $row['price'] . "'>" . $row['item_name'] . " (" . $row['item_code'] . ") - " . $row['category'] . "</option>";
+                            }
+                            mysqli_close($conn);
+                            ?>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="size">Size:</label>
+                        <select id="size" name="size" required>
+                            <option value="">Select Size</option>
+                            <option value="XS">XS</option>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                            <option value="XXL">XXL</option>
+                            <option value="3XL">3XL</option>
+                            <option value="4XL">4XL</option>
+                            <option value="5XL">5XL</option>
+                            <option value="6XL">6XL</option>
+                            <option value="7XL">7XL</option>
+                            <option value="One Size">One Size</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="quantityToDeduct">Quantity Sold:</label>
+                        <input type="number" id="quantityToDeduct" name="quantityToDeduct" min="1" required onchange="calculateTotal()">
+                    </div>
+                    <div class="input-group">
+                        <label for="pricePerItem">Price per Item:</label>
+                        <input type="number" id="pricePerItem" name="pricePerItem" step="0.01" min="0" required onchange="calculateTotal()">
+                    </div>
+                    <div class="input-group">
+                        <label for="totalAmount">Total Amount:</label>
+                        <input type="number" id="totalAmount" name="totalAmount" step="0.01" min="0" readonly>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="deductQuantityForm" class="save-btn">Save</button>
+                <button onclick="closeModal('deductQuantityModal')" class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showAddQuantityModal() {
+            document.getElementById('addQuantityModal').style.display = 'block';
+        }
+
+        function showDeductQuantityModal() {
+            document.getElementById('deductQuantityModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function submitAddQuantity(event) {
+            event.preventDefault();
+            
+            const orderNumber = document.getElementById('orderNumber').value;
+            const itemId = document.getElementById('itemId').value;
+            const quantityToAdd = document.getElementById('quantityToAdd').value;
+            
+            if (!orderNumber || !itemId || !quantityToAdd) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('orderNumber', orderNumber);
+            formData.append('itemId', itemId);
+            formData.append('quantityToAdd', quantityToAdd);
+            
+            fetch('../PAMO Inventory backend/process_add_quantity.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Quantity added successfully!');
+                    closeModal('addQuantityModal');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while processing your request');
+            });
+        }
+
+        function updateItemDetails() {
+            const itemSelect = document.getElementById('deductItemId');
+            const selectedOption = itemSelect.options[itemSelect.selectedIndex];
+            const price = selectedOption.getAttribute('data-price');
+            
+            if (price) {
+                document.getElementById('pricePerItem').value = price;
+                calculateTotal();
+            }
+        }
+
+        function calculateTotal() {
+            const quantity = parseFloat(document.getElementById('quantityToDeduct').value) || 0;
+            const price = parseFloat(document.getElementById('pricePerItem').value) || 0;
+            const total = quantity * price;
+            
+            document.getElementById('totalAmount').value = total.toFixed(2);
+        }
+
+        function submitDeductQuantity(event) {
+            event.preventDefault();
+            
+            const transactionNumber = document.getElementById('transactionNumber').value;
+            const itemId = document.getElementById('deductItemId').value;
+            const size = document.getElementById('size').value;
+            const quantityToDeduct = document.getElementById('quantityToDeduct').value;
+            const pricePerItem = document.getElementById('pricePerItem').value;
+            const totalAmount = document.getElementById('totalAmount').value;
+            
+            if (!transactionNumber || !itemId || !size || !quantityToDeduct || !pricePerItem) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('transactionNumber', transactionNumber);
+            formData.append('itemId', itemId);
+            formData.append('size', size);
+            formData.append('quantityToDeduct', quantityToDeduct);
+            formData.append('pricePerItem', pricePerItem);
+            formData.append('totalAmount', totalAmount);
+            
+            fetch('../PAMO Inventory backend/process_deduct_quantity.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Sale recorded successfully!');
+                    closeModal('deductQuantityModal');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while processing your request');
+            });
+        }
+    </script>
 
     <style>
 
