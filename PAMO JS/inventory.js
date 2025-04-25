@@ -159,12 +159,6 @@ function submitNewItem(event) {
   const form = document.getElementById("addItemForm");
   const formData = new FormData(form);
 
-  for (const pair of formData.entries()) {
-    console.log(pair[0] + ": " + pair[1]);
-  }
-
-  console.log("Sending data:", formData.get("newItemCode"));
-
   if (
     !formData.get("newItemCode") ||
     !formData.get("newCategory") ||
@@ -183,21 +177,18 @@ function submitNewItem(event) {
 
   xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
-      console.log("Raw server response:", xhr.responseText);
-
       if (xhr.status === 200) {
         try {
           const data = JSON.parse(xhr.responseText);
           if (data.success) {
-            alert("Item added successfully!");
+            alert("New product added successfully!");
             location.reload();
           } else {
             throw new Error(data.message || "Unknown error");
           }
         } catch (e) {
           console.error("Parse error:", e);
-          console.error("Response text:", xhr.responseText);
-          alert("Server response was not valid JSON: " + xhr.responseText);
+          alert("Error adding product: " + xhr.responseText);
         }
       } else {
         alert("Error: " + xhr.statusText);
@@ -206,8 +197,6 @@ function submitNewItem(event) {
   };
 
   xhr.send(formData);
-
-  document.getElementById("addItemForm").reset();
 }
 
 document.getElementById("newCategory").addEventListener("change", function () {
@@ -474,10 +463,138 @@ function editImage() {
 }
 
 function showAddQuantityModal() {
-  document.getElementById("addItemId").value =
-    document.getElementById("editItemId").value; // Set the item ID
-  document.getElementById("addQuantityModal").style.display = "block"; // Show the modal
+  document.getElementById("addQuantityModal").style.display = "block";
+  document.getElementById("addQuantityForm").reset();
 }
+
+function submitAddQuantity(event) {
+  event.preventDefault();
+
+  const orderNumber = document.getElementById("orderNumber").value;
+  const deliveryItems = document.querySelectorAll(".delivery-item");
+
+  if (!orderNumber || deliveryItems.length === 0) {
+    alert("Please fill in all required fields");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("orderNumber", orderNumber);
+
+  // Arrays to store multiple items
+  const itemIds = [];
+  const quantities = [];
+
+  // Validate and collect all items data
+  let hasErrors = false;
+  deliveryItems.forEach((item, index) => {
+    const itemSelect = item.querySelector('select[name="itemId[]"]');
+    const quantityInput = item.querySelector('input[name="quantityToAdd[]"]');
+
+    if (
+      !itemSelect ||
+      !quantityInput ||
+      !itemSelect.value ||
+      !quantityInput.value
+    ) {
+      alert(`Please fill in all fields for item ${index + 1}`);
+      hasErrors = true;
+      return;
+    }
+
+    if (parseInt(quantityInput.value) <= 0) {
+      alert(`Quantity must be greater than 0 for item ${index + 1}`);
+      hasErrors = true;
+      return;
+    }
+
+    itemIds.push(itemSelect.value);
+    quantities.push(quantityInput.value);
+  });
+
+  if (hasErrors) {
+    return;
+  }
+
+  // Append arrays to FormData
+  itemIds.forEach((id, index) => {
+    formData.append("itemId[]", id);
+    formData.append("quantityToAdd[]", quantities[index]);
+  });
+
+  // Debug: Log the data being sent
+  console.log("Form Data Contents:");
+  for (let pair of formData.entries()) {
+    console.log(pair[0] + ": " + pair[1]);
+  }
+
+  fetch("../PAMO Inventory backend/process_add_quantity.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.text()) // First get the raw response
+    .then((text) => {
+      console.log("Raw server response:", text); // Log the raw response
+      return JSON.parse(text); // Then parse it as JSON
+    })
+    .then((data) => {
+      if (data.success) {
+        alert("Delivery recorded successfully!");
+        closeModal("addQuantityModal");
+        location.reload();
+      } else {
+        alert("Error: " + data.message);
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      alert(
+        "An error occurred while processing your request. Check console for details."
+      );
+    });
+}
+
+function addDeliveryItem() {
+  const deliveryItems = document.getElementById("deliveryItems");
+  const newItem = deliveryItems.querySelector(".delivery-item").cloneNode(true);
+
+  // Reset the values in the cloned item
+  const select = newItem.querySelector('select[name="itemId[]"]');
+  const input = newItem.querySelector('input[name="quantityToAdd[]"]');
+  if (select) select.value = "";
+  if (input) input.value = "";
+
+  // Show close button for the new item
+  const closeBtn = newItem.querySelector(".item-close");
+  if (closeBtn) {
+    closeBtn.style.display = "block";
+    closeBtn.onclick = function () {
+      removeDeliveryItem(this);
+    };
+  }
+
+  deliveryItems.appendChild(newItem);
+}
+
+function removeDeliveryItem(closeButton) {
+  const deliveryItems = document.getElementById("deliveryItems");
+  const items = deliveryItems.querySelectorAll(".delivery-item");
+
+  if (items.length > 1) {
+    const deliveryItem = closeButton.closest(".delivery-item");
+    deliveryItem.remove();
+  }
+}
+
+// Add click handlers to existing close buttons
+document.addEventListener("DOMContentLoaded", function () {
+  const closeButtons = document.querySelectorAll(".item-close");
+  closeButtons.forEach((btn) => {
+    btn.onclick = function () {
+      removeDeliveryItem(this);
+    };
+  });
+});
 
 function showDeductQuantityModal() {
   document.getElementById("deductItemId").value =
@@ -497,33 +614,6 @@ function showEditImageModal() {
   document.getElementById("imageItemId").value =
     document.getElementById("editItemId").value; // Set the item ID
   document.getElementById("editImageModal").style.display = "block"; // Show the modal
-}
-
-function submitAddQuantity() {
-  const itemId = document.getElementById("addItemId").value;
-  const quantityToAdd = document.getElementById("quantityToAdd").value;
-
-  fetch("../PAMO Inventory backend/add_quantity.php", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ itemId, quantityToAdd }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        // Update the UI
-        updateInventoryDisplay(itemId, quantityToAdd, "add");
-        showMessage(`Added ${quantityToAdd} to item ${itemId}.`);
-        closeModal("addQuantityModal");
-        // Clear input field
-        document.getElementById("quantityToAdd").value = "";
-      } else {
-        alert("Error adding quantity");
-      }
-    })
-    .catch((error) => console.error("Error:", error));
 }
 
 function submitDeductQuantity() {

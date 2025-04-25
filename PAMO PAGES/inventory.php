@@ -51,7 +51,7 @@ session_start();
             <div class="inventory-content">
                 <div class="action-buttons-container">
                     <button onclick="showAddItemModal()" class="action-btn">
-                        <i class="material-icons">add_circle</i> Add New Item
+                        <i class="material-icons">add_circle</i> New Product
                     </button>
                     
                     <button onclick="handleEdit()" class="action-btn" id="editBtn" disabled>
@@ -59,7 +59,7 @@ session_start();
                     </button>
                     
                     <button onclick="showAddQuantityModal()" class="action-btn">
-                        <i class="material-icons">add_shopping_cart</i> Add Quantity
+                        <i class="material-icons">local_shipping</i> New Delivery
                     </button>
                     
                     <button onclick="showDeductQuantityModal()" class="action-btn">
@@ -223,7 +223,7 @@ session_start();
     <div id="addItemModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Add New Item</h2>
+                <h2>Add New Product</h2>
                 <span class="close" onclick="closeModal('addItemModal')">&times;</span>
             </div>
             <div class="modal-body">
@@ -245,7 +245,7 @@ session_start();
                         </select>
                     </div>
                     <div class="input-group">
-                        <label for="newItemName">Item Name:</label>
+                        <label for="newItemName">Product Name:</label>
                         <input type="text" id="newItemName" name="newItemName" required>
                     </div>
                     <div class="input-group">
@@ -271,21 +271,21 @@ session_start();
                         <input type="number" id="newItemPrice" name="newItemPrice" min="0" step="0.01" required>
                     </div>
                     <div class="input-group">
-                        <label for="newItemQuantity">Quantity:</label>
+                        <label for="newItemQuantity">Initial Stock:</label>
                         <input type="number" id="newItemQuantity" name="newItemQuantity" min="0" required>
                     </div>
                     <div class="input-group">
-                        <label for="newItemDamage">Damage:</label>
+                        <label for="newItemDamage">Damaged Items:</label>
                         <input type="number" id="newItemDamage" name="newItemDamage" min="0" value="0" required>
                     </div>
                     <div class="input-group">
-                        <label for="newImage">Upload Image:</label>
+                        <label for="newImage">Product Image:</label>
                         <input type="file" id="newImage" name="newImage" accept="image/*" required>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" form="addItemForm" class="save-btn">Save</button>
+                <button type="submit" form="addItemForm" class="save-btn">Add Product</button>
                 <button type="button" onclick="closeModal('addItemModal')" class="cancel-btn">Cancel</button>
             </div>
         </div>
@@ -324,43 +324,57 @@ session_start();
     <div id="addQuantityModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Add Quantity</h2>
+                <h2>New Delivery</h2>
                 <span class="close" onclick="closeModal('addQuantityModal')">&times;</span>
             </div>
             <div class="modal-body">
                 <form id="addQuantityForm" onsubmit="submitAddQuantity(event)">
-                    <div class="input-group">
-                        <label for="orderNumber">Order Number:</label>
-                        <input type="text" id="orderNumber" name="orderNumber" required>
+                    <div class="order-section">
+                        <div class="input-group">
+                            <label for="orderNumber">Delivery Order #:</label>
+                            <input type="text" id="orderNumber" name="orderNumber" required>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label for="itemId">Item:</label>
-                        <select id="itemId" name="itemId" required>
-                            <option value="">Select Item</option>
-                            <?php
-                            $conn = mysqli_connect("localhost", "root", "", "proware");
-                            if (!$conn) {
-                                die("Connection failed: " . mysqli_connect_error());
-                            }
+                    
+                    <div id="deliveryItems">
+                        <div class="delivery-item">
+                            <div class="item-close">&times;</div>
+                            <div class="item-content">
+                                <div class="input-group">
+                                    <label for="itemId">Product:</label>
+                                    <select name="itemId[]" required>
+                                        <option value="">Select Product</option>
+                                        <?php
+                                        $conn = mysqli_connect("localhost", "root", "", "proware");
+                                        if (!$conn) {
+                                            die("Connection failed: " . mysqli_connect_error());
+                                        }
 
-                            $sql = "SELECT item_code, item_name, category FROM inventory ORDER BY item_name";
-                            $result = mysqli_query($conn, $sql);
+                                        $sql = "SELECT item_code, item_name, category FROM inventory ORDER BY item_name";
+                                        $result = mysqli_query($conn, $sql);
 
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                echo "<option value='" . $row['item_code'] . "'>" . $row['item_name'] . " (" . $row['item_code'] . ") - " . $row['category'] . "</option>";
-                            }
-                            mysqli_close($conn);
-                            ?>
-                        </select>
+                                        while ($row = mysqli_fetch_assoc($result)) {
+                                            echo "<option value='" . $row['item_code'] . "'>" . $row['item_name'] . " (" . $row['item_code'] . ") - " . $row['category'] . "</option>";
+                                        }
+                                        mysqli_close($conn);
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label for="quantityToAdd">Delivery Quantity:</label>
+                                    <input type="number" name="quantityToAdd[]" min="1" required>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label for="quantityToAdd">Number of Items to Add:</label>
-                        <input type="number" id="quantityToAdd" name="quantityToAdd" min="1" required>
-                    </div>
+                    
+                    <button type="button" class="add-item-btn" onclick="addDeliveryItem()">
+                        <i class="material-icons">add_circle</i> Add Another Item
+                    </button>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" form="addQuantityForm" class="save-btn">Save</button>
+                <button type="submit" form="addQuantityForm" class="save-btn">Record Delivery</button>
                 <button onclick="closeModal('addQuantityModal')" class="cancel-btn">Cancel</button>
             </div>
         </div>
@@ -454,18 +468,20 @@ session_start();
             event.preventDefault();
             
             const orderNumber = document.getElementById('orderNumber').value;
-            const itemId = document.getElementById('itemId').value;
-            const quantityToAdd = document.getElementById('quantityToAdd').value;
+            const itemIds = document.querySelectorAll('[name="itemId[]"]');
+            const quantities = document.querySelectorAll('[name="quantityToAdd[]"]');
             
-            if (!orderNumber || !itemId || !quantityToAdd) {
+            if (!orderNumber || itemIds.length === 0 || quantities.length === 0) {
                 alert('Please fill in all required fields');
                 return;
             }
             
             const formData = new FormData();
             formData.append('orderNumber', orderNumber);
-            formData.append('itemId', itemId);
-            formData.append('quantityToAdd', quantityToAdd);
+            for (let i = 0; i < itemIds.length; i++) {
+                formData.append('itemId', itemIds[i].value);
+                formData.append('quantityToAdd', quantities[i].value);
+            }
             
             fetch('../PAMO Inventory backend/process_add_quantity.php', {
                 method: 'POST',
@@ -551,7 +567,120 @@ session_start();
     </script>
 
     <style>
+    .order-section {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #eee;
+    }
 
+    .delivery-item {
+        position: relative;
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 15px;
+    }
+
+    .item-close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 20px;
+        cursor: pointer;
+        color: #dc3545;
+        font-weight: bold;
+        display: none;
+    }
+
+    .delivery-item:not(:first-child) .item-close {
+        display: block;
+    }
+
+    .item-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .input-group {
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .input-group input,
+    .input-group select {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        height: 38px;
+        font-size: 14px;
+    }
+
+    .input-group select {
+        background-color: white;
+        cursor: pointer;
+    }
+
+    .add-item-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin: 15px 0;
+    }
+
+    .add-item-btn:hover {
+        background: #218838;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #ddd;
+        padding-top: 15px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .save-btn, .cancel-btn {
+        padding: 8px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        border: none;
+    }
+
+    .save-btn {
+        background: #007bff;
+        color: white;
+    }
+
+    .cancel-btn {
+        background: #dc3545;
+        color: white;
+    }
+
+    .save-btn:hover {
+        background: #0056b3;
+    }
+
+    .cancel-btn:hover {
+        background: #c82333;
+    }
     </style>
 </body>
 
