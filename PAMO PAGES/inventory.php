@@ -16,6 +16,7 @@ session_start();
     <script src="../PAMO JS/backend/editItem.js"></script>
     <script src="../PAMO JS/backend/addQuantity.js"></script>
     <script src="../PAMO JS/backend/deductQuantity.js"></script>
+    <script src="../PAMO JS/backend/addItemSize.js"></script>
     <script>
         // Check for low stock filter on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -54,24 +55,20 @@ session_start();
 
             <div class="inventory-content">
                 <div class="action-buttons-container">
-                    <button onclick="showAddItemModal()" class="action-btn">
-                        <i class="material-icons">add_circle</i> New Product
-                    </button>
-                    
                     <button onclick="handleEdit()" class="action-btn" id="editBtn" disabled>
                         <i class="material-icons">edit</i> Edit
                     </button>
-                    
+                    <button onclick="showAddItemModal()" class="action-btn">
+                        <i class="material-icons">add_circle</i> New Product
+                    </button>
+                    <button onclick="showAddItemSizeModal()" class="action-btn">
+                        <i class="material-icons">add_box</i> Add Item Size
+                    </button>
                     <button onclick="showAddQuantityModal()" class="action-btn">
                         <i class="material-icons">local_shipping</i> New Delivery
                     </button>
-                    
                     <button onclick="showDeductQuantityModal()" class="action-btn">
                         <i class="material-icons">remove_shopping_cart</i> Sales Entry
-                    </button>
-                    
-                    <button onclick="showAddItemSizeModal()" class="action-btn">
-                        <i class="material-icons">add_box</i> Add Item Size
                     </button>
                 </div>
 
@@ -497,7 +494,6 @@ session_start();
                     <div class="input-group">
                         <label for="newItemCode">Item Code:</label>
                         <input type="text" id="newItemCode" name="newItemCode" required>
-                        <small>Enter the unique suffix after the dash (e.g., if prefix is "TM-001", enter "002" for "TM-001-002")</small>
                     </div>
                     <div class="input-group">
                         <label for="newSize">Size:</label>
@@ -648,10 +644,6 @@ session_start();
             });
         }
 
-        function showAddItemSizeModal() {
-            document.getElementById('addItemSizeModal').style.display = 'block';
-        }
-
         function updateItemCodePrefix() {
             const select = document.getElementById('existingItem');
             const selectedOption = select.options[select.selectedIndex];
@@ -661,50 +653,6 @@ session_start();
             if (!itemCodeField.value || !itemCodeField.value.startsWith(prefix + '-')) {
                 itemCodeField.value = prefix + '-';
             }
-        }
-
-        function submitNewItemSize(event) {
-            event.preventDefault();
-
-            const size = document.getElementById('newSize').value;
-            let itemCode = document.getElementById('newItemCode').value;
-            itemCode = itemCode.trim();
-            console.log('Item code value:', JSON.stringify(itemCode));
-
-            if (!size) {
-                alert('Please select a size.');
-                return;
-            }
-            if (!itemCode || itemCode.endsWith('-')) {
-                alert('Please enter a complete item code (with unique suffix).');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('existingItem', document.getElementById('existingItem').value);
-            formData.append('newItemCode', itemCode);
-            formData.append('newSize', size);
-            formData.append('newQuantity', document.getElementById('newQuantity').value);
-            formData.append('newDamage', document.getElementById('newDamage').value);
-            
-            fetch('../PAMO Inventory backend/process_add_item_size.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('New size added successfully!');
-                    closeModal('addItemSizeModal');
-                    location.reload();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while processing your request');
-            });
         }
     </script>
 

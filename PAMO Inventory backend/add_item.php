@@ -49,6 +49,18 @@ try {
         throw new Exception('Error uploading image');
     }
 
+    // Check if item_code already exists
+    $check_sql = "SELECT COUNT(*) FROM inventory WHERE item_code = ?";
+    $check_stmt = mysqli_prepare($conn, $check_sql);
+    mysqli_stmt_bind_param($check_stmt, "s", $item_code);
+    mysqli_stmt_execute($check_stmt);
+    mysqli_stmt_bind_result($check_stmt, $item_code_count);
+    mysqli_stmt_fetch($check_stmt);
+    mysqli_stmt_close($check_stmt);
+    if ($item_code_count > 0) {
+        throw new Exception('Item code already exists. Please enter a unique item code.');
+    }
+
     $sql = "INSERT INTO inventory (
         item_code, category, item_name, sizes, price, 
         actual_quantity, new_delivery, beginning_quantity, 
