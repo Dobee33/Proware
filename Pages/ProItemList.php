@@ -228,19 +228,22 @@
                 while ($row = mysqli_fetch_assoc($result)) {
                     $itemCode = $row['item_code'];
                     $itemName = $row['item_name'];
-                    // Handle both full paths and filenames
                     $imagePath = $row['image_path'];
-                    if (strpos($imagePath, 'uploads/') === false) {
-                        // If it's just a filename, construct the full path
-                        $itemImage = '../uploads/itemlist/' . $imagePath;
-                    } else {
-                        // If it's already a full path, just add the parent directory reference
-                        $itemImage = '../' . $imagePath;
-                    }
                     $itemPrice = $row['price'];
                     $itemCategory = $row['category'];
                     $sizes = array_map(function($s) { return trim($s); }, explode(',', $row['sizes']));
                     $baseItemCode = strtok($itemCode, '-');
+
+                    // Handle both full paths and filenames
+                    if (!empty($imagePath)) {
+                        if (strpos($imagePath, 'uploads/') === false) {
+                            $itemImage = '../uploads/itemlist/' . $imagePath;
+                        } else {
+                            $itemImage = '../' . $imagePath;
+                        }
+                    } else {
+                        $itemImage = '';
+                    }
 
                     if (!isset($products[$baseItemCode])) {
                         $products[$baseItemCode] = [
@@ -255,7 +258,8 @@
                                     'item_code' => $itemCode,
                                     'size' => isset($sizes[0]) ? $sizes[0] : '',
                                     'price' => $itemPrice,
-                                    'stock' => $row['actual_quantity']
+                                    'stock' => $row['actual_quantity'],
+                                    'image' => $itemImage
                                 ]
                             ]
                         ];
@@ -263,11 +267,17 @@
                         $products[$baseItemCode]['sizes'] = array_unique(array_merge($products[$baseItemCode]['sizes'], $sizes));
                         $products[$baseItemCode]['prices'][] = $itemPrice;
                         $products[$baseItemCode]['stock'] += $row['actual_quantity'];
+                        // Fallback: use the first variant's image if this one is missing
+                        $variantImage = $itemImage;
+                        if (empty($variantImage)) {
+                            $variantImage = $products[$baseItemCode]['image'];
+                        }
                         $products[$baseItemCode]['variants'][] = [
                             'item_code' => $itemCode,
                             'size' => isset($sizes[0]) ? $sizes[0] : '',
                             'price' => $itemPrice,
-                            'stock' => $row['actual_quantity']
+                            'stock' => $row['actual_quantity'],
+                            'image' => $variantImage
                         ];
                     }
                 }
@@ -297,7 +307,20 @@
                         data-stock="<?php echo $product['stock']; ?>"
                         data-item-code="<?php echo htmlspecialchars($baseItemCode); ?>"
                         data-item-name="<?php echo htmlspecialchars($product['name']); ?>">
-                        <img src="<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>">
+                        <?php
+// Find the first non-empty image among variants
+$productImage = '';
+foreach ($product['variants'] as $variant) {
+    if (!empty($variant['image'])) {
+        $productImage = $variant['image'];
+        break;
+    }
+}
+if (empty($productImage)) {
+    $productImage = '../uploads/itemlist/default.png'; // or your default image path
+}
+?>
+<img src="<?php echo $productImage; ?>" alt="<?php echo $product['name']; ?>">
                         <div class="product-overlay">
                             <div class="items"></div>
                             <div class="items head">

@@ -34,6 +34,21 @@
         $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($inventory_item) {
+            // Fallback logic for image
+            $image_path = $inventory_item['image_path'];
+            if (empty($image_path) || !file_exists(__DIR__ . '/../uploads/itemlist/' . basename($image_path))) {
+                $prefix = explode('-', $cart_item['item_code'])[0];
+                $stmt2 = $conn->prepare("SELECT image_path FROM inventory WHERE item_code LIKE ? AND image_path IS NOT NULL AND image_path != '' LIMIT 1");
+                $likePrefix = $prefix . '-%';
+                $stmt2->execute([$likePrefix]);
+                $row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+                if ($row2 && !empty($row2['image_path']) && file_exists(__DIR__ . '/../uploads/itemlist/' . basename($row2['image_path']))) {
+                    $image_path = $row2['image_path'];
+                } else {
+                    $image_path = 'uploads/itemlist/default.jpg';
+                }
+            }
+            $inventory_item['image_path'] = $image_path;
             $final_cart_items[] = array_merge($cart_item, $inventory_item);
         } else {
             // Try to find the item with a LIKE query to catch potential formatting differences
@@ -42,12 +57,27 @@
             $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($inventory_item) {
+                // Fallback logic for image
+                $image_path = $inventory_item['image_path'];
+                if (empty($image_path) || !file_exists(__DIR__ . '/../uploads/itemlist/' . basename($image_path))) {
+                    $prefix = explode('-', $cart_item['item_code'])[0];
+                    $stmt2 = $conn->prepare("SELECT image_path FROM inventory WHERE item_code LIKE ? AND image_path IS NOT NULL AND image_path != '' LIMIT 1");
+                    $likePrefix = $prefix . '-%';
+                    $stmt2->execute([$likePrefix]);
+                    $row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+                    if ($row2 && !empty($row2['image_path']) && file_exists(__DIR__ . '/../uploads/itemlist/' . basename($row2['image_path']))) {
+                        $image_path = $row2['image_path'];
+                    } else {
+                        $image_path = 'uploads/itemlist/default.jpg';
+                    }
+                }
+                $inventory_item['image_path'] = $image_path;
                 $final_cart_items[] = array_merge($cart_item, $inventory_item);
             } else {
                 $final_cart_items[] = array_merge($cart_item, [
                     'item_name' => 'Item no longer available',
                     'price' => 0,
-                    'image_path' => 'default.jpg'
+                    'image_path' => 'uploads/itemlist/default.jpg'
                 ]);
             }
         }

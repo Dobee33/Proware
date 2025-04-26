@@ -69,6 +69,10 @@ session_start();
                     <button onclick="showDeductQuantityModal()" class="action-btn">
                         <i class="material-icons">remove_shopping_cart</i> Sales Entry
                     </button>
+                    
+                    <button onclick="showAddItemSizeModal()" class="action-btn">
+                        <i class="material-icons">add_box</i> Add Item Size
+                    </button>
                 </div>
 
                 <div class="filters">
@@ -233,8 +237,8 @@ session_start();
             <div class="modal-body">
                 <form id="addItemForm" onsubmit="submitNewItem(event)" enctype="multipart/form-data">
                     <div class="input-group">
-                        <label for="newItemCode">Item Code:</label>
-                        <input type="text" id="newItemCode" name="newItemCode" required>
+                        <label for="newProductItemCode">Item Code:</label>
+                        <input type="text" id="newProductItemCode" name="newItemCode" required>
                     </div>
                     <div class="input-group">
                         <label for="newCategory">Category:</label>
@@ -254,7 +258,7 @@ session_start();
                     </div>
                     <div class="input-group">
                         <label for="newSize">Size:</label>
-                        <select id="newSize" name="newSize" required>
+                        <select id="newProductSize" name="newSize" required>
                             <option value="">Select Size</option>
                             <option value="XS">XS</option>
                             <option value="S">S</option>
@@ -455,6 +459,81 @@ session_start();
         </div>
     </div>
 
+    <div id="addItemSizeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Item Size</h2>
+                <span class="close" onclick="closeModal('addItemSizeModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addItemSizeForm" onsubmit="submitNewItemSize(event)">
+                    <div class="input-group">
+                        <label for="existingItem">Select Item:</label>
+                        <select id="existingItem" name="existingItem" required onchange="updateItemCodePrefix()">
+                            <option value="">Select Item</option>
+                            <?php
+                            $conn = mysqli_connect("localhost", "root", "", "proware");
+                            if (!$conn) {
+                                die("Connection failed: " . mysqli_connect_error());
+                            }
+
+                            // Get unique items based on their prefix (before the dash)
+                            $sql = "SELECT DISTINCT 
+                                    SUBSTRING_INDEX(item_code, '-', 1) as prefix,
+                                    item_name,
+                                    category
+                                    FROM inventory 
+                                    ORDER BY item_name";
+                            $result = mysqli_query($conn, $sql);
+
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo "<option value='" . $row['prefix'] . "' data-name='" . $row['item_name'] . "' data-category='" . $row['category'] . "'>" . 
+                                     $row['item_name'] . " (" . $row['prefix'] . ")</option>";
+                            }
+                            mysqli_close($conn);
+                            ?>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="newItemCode">Item Code:</label>
+                        <input type="text" id="newItemCode" name="newItemCode" required>
+                        <small>Enter the unique suffix after the dash (e.g., if prefix is "TM-001", enter "002" for "TM-001-002")</small>
+                    </div>
+                    <div class="input-group">
+                        <label for="newSize">Size:</label>
+                        <select id="newSize" name="newSize" required>
+                            <option value="">Select Size</option>
+                            <option value="XS">XS</option>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                            <option value="XXL">XXL</option>
+                            <option value="3XL">3XL</option>
+                            <option value="4XL">4XL</option>
+                            <option value="5XL">5XL</option>
+                            <option value="6XL">6XL</option>
+                            <option value="7XL">7XL</option>
+                            <option value="One Size">One Size</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="newQuantity">Initial Stock:</label>
+                        <input type="number" id="newQuantity" name="newQuantity" min="0" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="newDamage">Damaged Items:</label>
+                        <input type="number" id="newDamage" name="newDamage" min="0" value="0">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="addItemSizeForm" class="save-btn">Add Size</button>
+                <button onclick="closeModal('addItemSizeModal')" class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         function showAddQuantityModal() {
             document.getElementById('addQuantityModal').style.display = 'block';
@@ -558,6 +637,65 @@ session_start();
                 if (data.success) {
                     alert('Sale recorded successfully!');
                     closeModal('deductQuantityModal');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while processing your request');
+            });
+        }
+
+        function showAddItemSizeModal() {
+            document.getElementById('addItemSizeModal').style.display = 'block';
+        }
+
+        function updateItemCodePrefix() {
+            const select = document.getElementById('existingItem');
+            const selectedOption = select.options[select.selectedIndex];
+            const prefix = selectedOption.value;
+            const itemCodeField = document.getElementById('newItemCode');
+            // Only set the prefix if the field is empty or if the prefix changed
+            if (!itemCodeField.value || !itemCodeField.value.startsWith(prefix + '-')) {
+                itemCodeField.value = prefix + '-';
+            }
+        }
+
+        function submitNewItemSize(event) {
+            event.preventDefault();
+
+            const size = document.getElementById('newSize').value;
+            let itemCode = document.getElementById('newItemCode').value;
+            itemCode = itemCode.trim();
+            console.log('Item code value:', JSON.stringify(itemCode));
+
+            if (!size) {
+                alert('Please select a size.');
+                return;
+            }
+            if (!itemCode || itemCode.endsWith('-')) {
+                alert('Please enter a complete item code (with unique suffix).');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('existingItem', document.getElementById('existingItem').value);
+            formData.append('newItemCode', itemCode);
+            formData.append('newSize', size);
+            formData.append('newQuantity', document.getElementById('newQuantity').value);
+            formData.append('newDamage', document.getElementById('newDamage').value);
+            
+            fetch('../PAMO Inventory backend/process_add_item_size.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('New size added successfully!');
+                    closeModal('addItemSizeModal');
                     location.reload();
                 } else {
                     alert('Error: ' + data.message);

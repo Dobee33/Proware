@@ -20,6 +20,21 @@ foreach ($cart_items as $cart_item) {
     $stmt->execute([$cart_item['item_code']]);
     $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
     
+    // Fallback logic for image
+    if ($inventory_item && (empty($inventory_item['image_path']) || !file_exists('../' . $inventory_item['image_path']))) {
+        // Get prefix before dash
+        $prefix = explode('-', $cart_item['item_code'])[0];
+        $stmt2 = $conn->prepare("SELECT image_path FROM inventory WHERE item_code LIKE ? AND image_path IS NOT NULL AND image_path != '' LIMIT 1");
+        $likePrefix = $prefix . '-%';
+        $stmt2->execute([$likePrefix]);
+        $row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+        if ($row2 && !empty($row2['image_path'])) {
+            $inventory_item['image_path'] = $row2['image_path'];
+        } else {
+            $inventory_item['image_path'] = 'uploads/itemlist/default.png'; // fallback default
+        }
+    }
+    
     if ($inventory_item) {
         $final_cart_items[] = array_merge($cart_item, $inventory_item);
     } else {
@@ -28,13 +43,27 @@ foreach ($cart_items as $cart_item) {
         $stmt->execute(['%' . $cart_item['item_code'] . '%']);
         $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
         
+        // Fallback logic for image
+        if ($inventory_item && (empty($inventory_item['image_path']) || !file_exists('../' . $inventory_item['image_path']))) {
+            $prefix = explode('-', $cart_item['item_code'])[0];
+            $stmt2 = $conn->prepare("SELECT image_path FROM inventory WHERE item_code LIKE ? AND image_path IS NOT NULL AND image_path != '' LIMIT 1");
+            $likePrefix = $prefix . '-%';
+            $stmt2->execute([$likePrefix]);
+            $row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+            if ($row2 && !empty($row2['image_path'])) {
+                $inventory_item['image_path'] = $row2['image_path'];
+            } else {
+                $inventory_item['image_path'] = 'uploads/itemlist/default.png';
+            }
+        }
+        
         if ($inventory_item) {
             $final_cart_items[] = array_merge($cart_item, $inventory_item);
         } else {
             $final_cart_items[] = array_merge($cart_item, [
                 'item_name' => 'Item no longer available',
                 'price' => 0,
-                'image_path' => 'default.jpg',
+                'image_path' => 'uploads/itemlist/default.png',
                 'category' => '',
                 'actual_quantity' => 0
             ]);
@@ -98,8 +127,9 @@ $cart_total = 0;
                                         <div class="item-image">
                                             <img src="../<?php echo htmlspecialchars($item['image_path']); ?>"
                                                 alt="<?php echo htmlspecialchars($item['item_name']); ?>">
+                                                
                                         </div>
-                                    </td>
+                                    </td>s
                                     <td class="item-col" data-label="Item Name">
                                         <div class="item-name"><?php echo htmlspecialchars($item['item_name']); ?></div>
                                     </td>

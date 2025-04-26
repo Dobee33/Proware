@@ -108,11 +108,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($item['item_name']) {
                         // Fix image path
                         if ($item['image_path']) {
-                            // Remove any existing path prefix
                             $image_name = basename($item['image_path']);
                             $item['image_path'] = '../uploads/itemlist/' . $image_name;
+                            // Fallback: check if file exists, else fallback to prefix or default
+                            if (!file_exists(__DIR__ . '/../uploads/itemlist/' . $image_name)) {
+                                $prefix = explode('-', $item['item_code'])[0];
+                                $stmt2 = $conn->prepare("SELECT image_path FROM inventory WHERE item_code LIKE ? AND image_path IS NOT NULL AND image_path != '' LIMIT 1");
+                                $likePrefix = $prefix . '-%';
+                                $stmt2->execute([$likePrefix]);
+                                $row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+                                if ($row2 && !empty($row2['image_path'])) {
+                                    $item['image_path'] = '../uploads/itemlist/' . basename($row2['image_path']);
+                                } else {
+                                    $item['image_path'] = '../uploads/itemlist/default.jpg';
+                                }
+                            }
                         } else {
-                            $item['image_path'] = '../uploads/itemlist/default.jpg';
+                            // Fallback: use prefix or default
+                            $prefix = explode('-', $item['item_code'])[0];
+                            $stmt2 = $conn->prepare("SELECT image_path FROM inventory WHERE item_code LIKE ? AND image_path IS NOT NULL AND image_path != '' LIMIT 1");
+                            $likePrefix = $prefix . '-%';
+                            $stmt2->execute([$likePrefix]);
+                            $row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+                            if ($row2 && !empty($row2['image_path'])) {
+                                $item['image_path'] = '../uploads/itemlist/' . basename($row2['image_path']);
+                            } else {
+                                $item['image_path'] = '../uploads/itemlist/default.jpg';
+                            }
                         }
                         // Remove any size suffix from item name (e.g., "Item Name S" -> "Item Name")
                         $item['item_name'] = rtrim($item['item_name'], " SMLX234567");

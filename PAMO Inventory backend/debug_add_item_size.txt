@@ -1,0 +1,8 @@
+Array
+(
+    [existingItem] => UTMBM001
+    [newItemCode] => UTMBM001-001
+    [newSize] => XS
+    [newQuantity] => 5
+    [newDamage] => 0
+)
