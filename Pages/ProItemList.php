@@ -41,8 +41,9 @@
             <span class="close-sidebar" id="closeSidebar">&times;</span>
             <div class="filter-header">
                 <span class="filter-label">FILTER</span>
-                <span class="category-title">Product categories</span>
             </div>
+
+            <button class="clear-filters" id="clearFiltersBtn" type="button">Clear Filters</button>
 
             <div class="category-list">
                 <!-- Tertiary Uniform -->
@@ -59,10 +60,10 @@
                                 <i class="fas fa-chevron-down"></i>
                             </div>
                             <div class="course-items hidden">
-                                <label><input type="checkbox" value="bscm-blazer"> Blazer</label>
-                                <label><input type="checkbox" value="bscm-long-sleeve"> Long Sleeve Uniform</label>
-                                <label><input type="checkbox" value="bscm-pants"> Pants</label>
-                                <label><input type="checkbox" value="bscm-skirt"> Skirt</label>
+                                <label><input type="checkbox" value="female-blazer">Female Blazer</label>
+                                <label><input type="checkbox" value="long-sleeve-uniform"> Long Sleeve Uniform</label>
+                                <label><input type="checkbox" value="pants"> Pants</label>
+                                <label><input type="checkbox" value="skirt"> Skirt</label>
                             </div>
                         </div>
 
@@ -73,14 +74,15 @@
                                 <i class="fas fa-chevron-down"></i>
                             </div>
                             <div class="course-items hidden">
-                                <label><input type="checkbox" value="bstm-baret"> Baret</label>
-                                <label><input type="checkbox" value="bstm-white-blouse"> White Blouse</label>
-                                <label><input type="checkbox" value="bstm-yellow-scarf"> Yellow Scarf</label>
-                                <label><input type="checkbox" value="bstm-tourism-blazer"> Tourism Blazer</label>
-                                <label><input type="checkbox" value="bstm-gray-skirt"> Gray Skirt</label>
-                                <label><input type="checkbox" value="bstm-white-polo"> White Polo</label>
-                                <label><input type="checkbox" value="bstm-yellow-necktie"> Yellow Necktie</label>
-                                <label><input type="checkbox" value="bstm-gray-pants"> Gray Pants</label>
+                                <label><input type="checkbox" value="TM-SKIRT"> TM Skirt</label>
+                                <label><input type="checkbox" value="TM-CLOTH-PANTS">TM Cloth Pants</label>
+                                <label><input type="checkbox" value="TM-BLAZER-FEMALE">TM Blazer Female</label>
+                                <label><input type="checkbox" value="TM-BLAZER-MALE">TM Blazer Male</label>
+                                <label><input type="checkbox" value="TM-FEMALE-BLOUSE"> TM Female Blouse</label>
+                                <label><input type="checkbox" value="TM-MALE-POLO">TM Male Polo</label>
+                                <label><input type="checkbox" value="TM-BERET">TM Beret</label>
+                                <label><input type="checkbox" value="TM-NECKTIE">TM NECKTIE </label>
+                                <label><input type="checkbox" value="TM-SCARF">TM SCARF</label>
                             </div>
                         </div>
 
@@ -91,10 +93,10 @@
                                 <i class="fas fa-chevron-down"></i>
                             </div>
                             <div class="course-items hidden">
-                                <label><input type="checkbox" value="bsit-pants"> Pants</label>
-                                <label><input type="checkbox" value="bsit-skirt"> Skirt</label>
-                                <label><input type="checkbox" value="bsit-gray-polo"> Gray polo with 3/4 Sleeve</label>
-                                <label><input type="checkbox" value="bsit-gray-blouse"> Gray blouse 3/4 sleeve</label>
+                                <label><input type="checkbox" value="Pants"> Pants</label>
+                                <label><input type="checkbox" value="Skirt"> Skirt</label>
+                                <label><input type="checkbox" value="IT 3/4 Polo"> IT 3/4 Polo </label>
+                                <label><input type="checkbox" value="IT 3/4 Blouse"> IT 3/4 Blouse</label>
                             </div>
                         </div>
 
@@ -206,7 +208,7 @@
             </div>
         </aside>
         <button class="filter-toggle" id="filterToggle">
-        <i class="fas fa-filter"></i>
+        <i class="fas fa-filter"></i>   
         <span>Filter</span>
     </button>
 
@@ -237,7 +239,7 @@
                     }
                     $itemPrice = $row['price'];
                     $itemCategory = $row['category'];
-                    $sizes = explode(',', $row['sizes']);
+                    $sizes = array_map(function($s) { return trim($s); }, explode(',', $row['sizes']));
                     $baseItemCode = strtok($itemCode, '-');
 
                     if (!isset($products[$baseItemCode])) {

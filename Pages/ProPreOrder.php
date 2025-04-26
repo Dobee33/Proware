@@ -96,7 +96,7 @@
                                 ?>
                                     <tr data-item-id="<?php echo $item['id']; ?>" data-item-code="<?php echo $item['item_code']; ?>">
                                         <td>
-                                            <img src="../uploads/itemlist/<?php echo htmlspecialchars($item['image_path']); ?>" 
+                                        <img src="../<?php echo htmlspecialchars($item['image_path']); ?>" 
                                                  alt="<?php echo htmlspecialchars($clean_name); ?>" 
                                                  class="product-image">
                                         </td>

@@ -96,7 +96,7 @@ $cart_total = 0;
                                 <tr class="cart-row">
                                     <td class="image-col" data-label="Image">
                                         <div class="item-image">
-                                            <img src="../uploads/itemlist/<?php echo htmlspecialchars($item['image_path']); ?>" 
+                                            <img src="../<?php echo htmlspecialchars($item['image_path']); ?>"
                                                 alt="<?php echo htmlspecialchars($item['item_name']); ?>">
                                         </div>
                                     </td>

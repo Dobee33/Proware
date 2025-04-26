@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initialize variables
   const productsGrid = document.querySelector(".products-grid");
   const filterInputs = document.querySelectorAll(".filter-group input");
-  const clearFiltersBtn = document.querySelector(".clear-filters");
   const applyFiltersBtn = document.querySelector(".apply-btn");
   const sortSelect = document.getElementById("sort-select");
   const searchInput = document.getElementById("search");
@@ -295,6 +294,24 @@ document.addEventListener("DOMContentLoaded", function () {
           ? "rotate(0deg)"
           : "rotate(180deg)";
 
+        // If course items are now shown, check all checkboxes
+        if (!courseItems.classList.contains("hidden")) {
+          courseItems
+            .querySelectorAll('input[type="checkbox"]')
+            .forEach((cb) => {
+              cb.checked = true;
+              cb.dispatchEvent(new Event("change"));
+            });
+        } else {
+          // If course items are now hidden, uncheck all checkboxes
+          courseItems
+            .querySelectorAll('input[type="checkbox"]')
+            .forEach((cb) => {
+              cb.checked = false;
+              cb.dispatchEvent(new Event("change"));
+            });
+        }
+
         // If course items are now hidden, remove this course from active subcategories
         if (courseItems.classList.contains("hidden")) {
           if (activeSubcategories.has(mainCategory)) {
@@ -415,36 +432,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Function to determine if a product belongs to a specific course
   function isProductInCourse(productName, courseValue) {
-    // Extract the course name and item type from the course value
-    // Format is typically like "bscm-blazer" or "bstm-polo"
-    const parts = courseValue.split("-");
-    if (parts.length < 2) return false;
-
-    const courseCode = parts[0];
-    const itemType = parts.slice(1).join("-");
-
-    // Direct match check for item type
-    if (productName.includes(itemType)) {
-      return true;
-    }
-
-    // Check for common variations and abbreviations
-    const courseVariations = getCourseVariations(courseCode);
-    for (const variation of courseVariations) {
-      if (productName.includes(variation)) {
-        return true;
-      }
-    }
-
-    // Check for keyword matching
-    const itemKeywords = getItemKeywords(itemType);
-    for (const keyword of itemKeywords) {
-      if (productName.includes(keyword)) {
-        return true;
-      }
-    }
-
-    return false;
+    // Normalize: lowercase, replace dashes/underscores with spaces, trim
+    const normalize = (str) =>
+      str.toLowerCase().replace(/[-_]/g, " ").replace(/\s+/g, " ").trim();
+    const normalizedProductName = normalize(productName);
+    const normalizedCourseValue = normalize(courseValue);
+    // Only match if the normalized product name or item code matches the normalized course value
+    return normalizedProductName === normalizedCourseValue;
   }
 
   // Function to get common variations of course names
@@ -511,6 +505,49 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     return keywords;
+  }
+
+  // Add clear filter button logic
+  const clearFiltersBtn = document.getElementById("clearFiltersBtn");
+  if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener("click", function () {
+      // 1. Uncheck all checkboxes
+      document
+        .querySelectorAll('.course-items input[type="checkbox"]')
+        .forEach((cb) => {
+          cb.checked = false;
+        });
+
+      // 2. Collapse all open main and subcategories
+      document
+        .querySelectorAll(".main-category-header.active")
+        .forEach((header) => {
+          header.classList.remove("active");
+          const icon = header.querySelector("i");
+          if (icon) icon.style.transform = "rotate(0deg)";
+          const subcategories = header.nextElementSibling;
+          if (subcategories) subcategories.classList.remove("active");
+        });
+      document.querySelectorAll(".course-header").forEach((header) => {
+        const icon = header.querySelector("i");
+        if (icon) icon.style.transform = "rotate(0deg)";
+        const courseItems = header.nextElementSibling;
+        if (courseItems && courseItems.classList.contains("course-items")) {
+          courseItems.classList.add("hidden");
+        }
+      });
+
+      // 3. Reset search input
+      if (searchInput) searchInput.value = "";
+      currentSearchTerm = "";
+
+      // 4. Clear filter state variables
+      activeMainCategories.clear();
+      activeSubcategories.clear();
+
+      // 5. Show all products (reset filter)
+      applyAllFilters();
+    });
   }
 });
 
@@ -710,11 +747,11 @@ function showSizeModal(element) {
     "modalProductStock"
   ).textContent = `Total Stock: ${currentProduct.stock}`;
 
-  // Generate size options - display all sizes XS to 7XL
+  // Generate size options - display all sizes XS to 7XL, and One Size if present
   const sizeOptionsContainer = document.querySelector(".size-options");
   sizeOptionsContainer.innerHTML = "";
 
-  const allSizes = [
+  let allSizes = [
     "XS",
     "S",
     "M",
@@ -728,13 +765,18 @@ function showSizeModal(element) {
     "7XL",
   ];
 
+  // If 'One Size' is present in the product's sizes, add it to the front
+  if (currentProduct.sizes.some((s) => s.trim().toLowerCase() === "one size")) {
+    allSizes = ["One Size", ...allSizes];
+  }
+
   allSizes.forEach((size) => {
     const sizeBtn = document.createElement("div");
     sizeBtn.className = "size-option";
     sizeBtn.textContent = size;
 
     const idx = currentProduct.sizes.findIndex(
-      (s) => s.toUpperCase() === size.toUpperCase()
+      (s) => s.trim().toLowerCase() === size.trim().toLowerCase()
     );
     const stock = idx >= 0 ? parseInt(currentProduct.stocks[idx]) || 0 : 0;
     const itemCode =
