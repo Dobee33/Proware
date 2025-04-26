@@ -12,6 +12,10 @@ session_start();
     <link rel="stylesheet" href="../PAMO CSS/inventory.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="../PAMO JS/inventory.js"></script>
+    <script src="../PAMO JS/backend/addItem.js"></script>
+    <script src="../PAMO JS/backend/editItem.js"></script>
+    <script src="../PAMO JS/backend/addQuantity.js"></script>
+    <script src="../PAMO JS/backend/deductQuantity.js"></script>
     <script>
         // Check for low stock filter on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -311,8 +315,8 @@ session_start();
             <h2>Edit Image</h2>
             <input type="hidden" id="imageItemId">
             <div class="input-group">
-                <label for="newImage">Upload New Image:</label>
-                <input type="file" id="newImage" accept="image/*" required>
+                <label for="editNewImage">Upload New Image:</label>
+                <input type="file" id="editNewImage" accept="image/*" required>
             </div>
             <div class="modal-buttons">
                 <button onclick="submitEditImage()" class="save-btn">Save</button>

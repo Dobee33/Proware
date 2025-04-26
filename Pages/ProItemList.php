@@ -226,7 +226,15 @@
                 while ($row = mysqli_fetch_assoc($result)) {
                     $itemCode = $row['item_code'];
                     $itemName = $row['item_name'];
-                    $itemImage = '../uploads/itemlist/' . $row['image_path'];
+                    // Handle both full paths and filenames
+                    $imagePath = $row['image_path'];
+                    if (strpos($imagePath, 'uploads/') === false) {
+                        // If it's just a filename, construct the full path
+                        $itemImage = '../uploads/itemlist/' . $imagePath;
+                    } else {
+                        // If it's already a full path, just add the parent directory reference
+                        $itemImage = '../' . $imagePath;
+                    }
                     $itemPrice = $row['price'];
                     $itemCategory = $row['category'];
                     $sizes = explode(',', $row['sizes']);

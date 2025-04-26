@@ -40,6 +40,7 @@ try {
         // Generate unique filename
         $uniqueName = uniqid('img_', true) . '.' . $imageExtension;
         $imagePath = $uploadDir . $uniqueName;
+        $dbFilePath = 'uploads/itemlist/' . $uniqueName;
 
         if (!move_uploaded_file($imageTmpPath, $imagePath)) {
             throw new Exception('Error moving uploaded file');
@@ -73,7 +74,7 @@ try {
         $damage,
         $sold_quantity,
         $status,
-        $uniqueName
+        $dbFilePath
     );
 
     if (!mysqli_stmt_execute($stmt)) {
