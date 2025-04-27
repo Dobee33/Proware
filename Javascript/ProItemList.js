@@ -412,18 +412,6 @@ document.addEventListener("DOMContentLoaded", function () {
       currentSearchTerm = "";
     });
   }
-
-  // Add arrow toggle for main-category-header
-  document.querySelectorAll(".main-category-header").forEach((header) => {
-    header.addEventListener("click", function () {
-      // Remove active from all
-      document
-        .querySelectorAll(".main-category-header")
-        .forEach((h) => h.classList.remove("active"));
-      // Add active to this
-      this.classList.add("active");
-    });
-  });
 });
 
 // Handle cart interaction - ONLY processing cart icon clicks
