@@ -127,7 +127,7 @@ function updateStockStatus(row) {
   const actualQuantity = parseInt(
     row.querySelector("td:nth-child(4)").textContent
   );
-  const statusCell = row.querySelector("td:nth-child(11)");
+  const statusCell = row.querySelector("td:nth-child(7)");
 
   let status, statusClass;
 
@@ -159,19 +159,19 @@ function applyFilters() {
 
   const rows = document.querySelectorAll(".inventory-table tbody tr");
   const sizeHeader = document.querySelector(
-    ".inventory-table thead th:nth-child(8)"
+    ".inventory-table thead th:nth-child(5)"
   );
 
   if (categoryFilter === "STI-Accessories") {
     if (sizeHeader) sizeHeader.style.display = "none";
     rows.forEach((row) => {
-      const sizeCell = row.querySelector("td:nth-child(8)");
+      const sizeCell = row.querySelector("td:nth-child(5)");
       if (sizeCell) sizeCell.style.display = "none";
     });
   } else {
     if (sizeHeader) sizeHeader.style.display = "";
     rows.forEach((row) => {
-      const sizeCell = row.querySelector("td:nth-child(8)");
+      const sizeCell = row.querySelector("td:nth-child(5)");
       if (sizeCell) sizeCell.style.display = "";
     });
   }
@@ -181,8 +181,8 @@ function applyFilters() {
       .querySelector("td:nth-child(2)")
       .textContent.toLowerCase();
     const category = row.querySelector("td:nth-child(3)").textContent;
-    const size = row.querySelector("td:nth-child(8)").textContent;
-    const status = row.querySelector("td:nth-child(11)").textContent.trim();
+    const size = row.querySelector("td:nth-child(5)").textContent;
+    const status = row.querySelector("td:nth-child(7)").textContent.trim();
 
     const matchesSearch =
       searchTerm === "" ||
@@ -210,13 +210,13 @@ function clearAllFilters() {
   document.getElementById("searchInput").value = "";
 
   const sizeHeader = document.querySelector(
-    ".inventory-table thead th:nth-child(8)"
+    ".inventory-table thead th:nth-child(5)"
   );
   if (sizeHeader) sizeHeader.style.display = "";
 
   const rows = document.querySelectorAll(".inventory-table tbody tr");
   rows.forEach((row) => {
-    const sizeCell = row.querySelector("td:nth-child(8)");
+    const sizeCell = row.querySelector("td:nth-child(5)");
     if (sizeCell) sizeCell.style.display = "";
   });
 
@@ -251,7 +251,7 @@ function populateFilters() {
   const tableRows = document.querySelectorAll(".inventory-table tbody tr");
   const uniqueSizes = new Set();
   tableRows.forEach((row) => {
-    const size = row.querySelector("td:nth-child(8)").textContent.trim();
+    const size = row.querySelector("td:nth-child(5)").textContent.trim();
     if (size) uniqueSizes.add(size);
   });
 
@@ -298,8 +298,10 @@ function initializeSizeColumnVisibility() {
 }
 
 function logout() {
-  // Redirect to logout.php
-  window.location.href = "../Pages/login.php";
+  // Show confirmation dialog before logging out
+  if (confirm("Are you sure you want to log out?")) {
+    window.location.href = "../Pages/login.php";
+  }
 }
 
 function saveEdit() {
@@ -401,7 +403,7 @@ function showMessage(message) {
 function updateInventoryDisplay(itemId, quantity, action) {
   const row = document.querySelector(`tr[data-item-code="${itemId}"]`);
   if (row) {
-    const quantityCell = row.cells[3]; // Assuming the quantity is in the 4th cell
+    const quantityCell = row.cells[3]; // 4th cell is Actual Quantity
     let currentQuantity = parseInt(quantityCell.textContent);
     if (action === "add") {
       quantityCell.textContent = currentQuantity + parseInt(quantity);
@@ -417,8 +419,8 @@ function updateInventoryDisplay(itemId, quantity, action) {
 function updatePriceDisplay(itemId, newPrice) {
   const row = document.querySelector(`tr[data-item-code="${itemId}"]`);
   if (row) {
-    const priceCell = row.cells[8]; // Assuming the price is in the 9th cell
-    priceCell.textContent = `₱${parseFloat(newPrice).toFixed(2)}`; // Format the price
+    const priceCell = row.cells[5]; // 6th cell is Price
+    priceCell.textContent = `₱${parseFloat(newPrice).toFixed(2)}`;
   }
 }
 

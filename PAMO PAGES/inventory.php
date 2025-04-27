@@ -118,14 +118,9 @@ session_start();
                                 <th>Item Name</th>
                                 <th>Category</th>
                                 <th>Actual Quantity</th>
-                                <th>New Delivery</th>
-                                <th>Beginning Quantity</th>
-                                <th>Damage</th>
                                 <th>Sizes</th>
                                 <th>Price</th>
-                                <th>Sold Quantity</th>
                                 <th>Status</th>
-                                <th>Date Delivered</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -164,14 +159,9 @@ session_start();
                                 echo "<td>" . $row['item_name'] . "</td>";
                                 echo "<td>" . $row['category'] . "</td>";
                                 echo "<td>" . (isset($row['actual_quantity']) ? $row['actual_quantity'] : '0') . "</td>";
-                                echo "<td>" . (isset($row['new_delivery']) ? $row['new_delivery'] : '0') . "</td>";
-                                echo "<td>" . (isset($row['beginning_quantity']) ? $row['beginning_quantity'] : '0') . "</td>";
-                                echo "<td>" . (isset($row['damage']) ? $row['damage'] : '0') . "</td>";
                                 echo "<td>" . $row['sizes'] . "</td>";
                                 echo "<td>₱" . number_format($row['price'], 2) . "</td>";
-                                echo "<td>" . (isset($row['sold_quantity']) ? $row['sold_quantity'] : '0') . "</td>";
                                 echo "<td class='" . $statusClass . "'>" . $status . "</td>";
-                                echo "<td>" . $row['created_at'] . "</td>";
                                 echo "<!-- Item Code: " . $row['item_code'] . " -->";
                                 echo "</tr>";
                             }

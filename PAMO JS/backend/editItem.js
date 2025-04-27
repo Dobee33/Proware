@@ -46,8 +46,9 @@ function handleEdit() {
   document.getElementById("editCategory").value = row.cells[2].textContent;
   document.getElementById("editActualQuantity").value =
     row.cells[3].textContent;
-  document.getElementById("editSize").value = row.cells[7].textContent;
-  document.getElementById("editPrice").value = row.cells[8].textContent;
+  document.getElementById("editSize").value = row.cells[4].textContent;
+  let priceText = row.cells[5].textContent.replace(/[^\d.-]/g, "");
+  document.getElementById("editPrice").value = priceText;
   document.getElementById("editItemModal").style.display = "block";
 }
 
@@ -179,7 +180,7 @@ function submitEditImage() {
 function updatePriceDisplay(itemId, newPrice) {
   const row = document.querySelector(`tr[data-item-code="${itemId}"]`);
   if (row) {
-    const priceCell = row.cells[8];
+    const priceCell = row.cells[5];
     priceCell.textContent = `₱${parseFloat(newPrice).toFixed(2)}`;
   }
 }
