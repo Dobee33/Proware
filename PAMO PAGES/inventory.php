@@ -417,59 +417,81 @@ session_start();
             </div>
             <div class="modal-body">
                 <form id="deductQuantityForm" onsubmit="submitDeductQuantity(event)">
-                    <div class="input-group">
-                        <label for="transactionNumber">Transaction Number:</label>
-                        <input type="text" id="transactionNumber" name="transactionNumber" required>
+                    <div class="order-section form-row">
+                        <div class="input-group">
+                            <label for="transactionNumber">Transaction Number:</label>
+                            <input type="text" id="transactionNumber" name="transactionNumber" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="roleCategory">Role:</label>
+                            <select id="roleCategory" name="roleCategory" required>
+                                <option value="">Select Role</option>
+                                <option value="EMPLOYEE">EMPLOYEE</option>
+                                <option value="COLLEGE STUDENT">COLLEGE STUDENT</option>
+                                <option value="SHS">SHS</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="studentName">Name:</label>
+                            <select id="studentName" name="studentName" required>
+                                <option value="">Select Name</option>
+                                <!-- Options will be populated by JS -->
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="studentIdNumber">ID Number:</label>
+                            <input type="text" id="studentIdNumber" name="studentIdNumber" readonly required>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label for="deductItemId">Item:</label>
-                        <select id="deductItemId" name="deductItemId" required onchange="updateItemDetails()">
-                            <option value="">Select Item</option>
-                            <?php
-                            $conn = mysqli_connect("localhost", "root", "", "proware");
-                            if (!$conn) {
-                                die("Connection failed: " . mysqli_connect_error());
-                            }
-
-                            $sql = "SELECT item_code, item_name, category, price FROM inventory ORDER BY item_name";
-                            $result = mysqli_query($conn, $sql);
-
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                echo "<option value='" . $row['item_code'] . "' data-price='" . $row['price'] . "'>" . $row['item_name'] . " (" . $row['item_code'] . ") - " . $row['category'] . "</option>";
-                            }
-                            mysqli_close($conn);
-                            ?>
-                        </select>
+                    <div id="salesItems">
+                        <div class="sales-item form-row">
+                            <div class="input-group">
+                                <label for="itemId">Product:</label>
+                                <select name="itemId[]" required>
+                                    <option value="">Select Product</option>
+                                    <?php
+                                    $conn = mysqli_connect("localhost", "root", "", "proware");
+                                    if (!$conn) {
+                                        die("Connection failed: " . mysqli_connect_error());
+                                    }
+                                    $sql = "SELECT item_code, item_name, category, price FROM inventory ORDER BY item_name";
+                                    $result = mysqli_query($conn, $sql);
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        echo "<option value='" . $row['item_code'] . "' data-price='" . $row['price'] . "'>" . $row['item_name'] . " (" . $row['item_code'] . ") - " . $row['category'] . "</option>";
+                                    }
+                                    mysqli_close($conn);
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="size">Size:</label>
+                                <select name="size[]" required>
+                                    <option value="">Select Size</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="quantityToDeduct">Quantity Sold:</label>
+                                <input type="number" name="quantityToDeduct[]" min="1" required onchange="calculateItemTotal(this)">
+                            </div>
+                            <div class="input-group">
+                                <label for="pricePerItem">Price per Item:</label>
+                                <input type="number" name="pricePerItem[]" step="0.01" min="0" required readonly>
+                            </div>
+                            <div class="input-group">
+                                <label for="itemTotal">SubTotal:</label>
+                                <input type="number" name="itemTotal[]" step="0.01" min="0" readonly>
+                            </div>
+                            <div class="item-close">&times;</div>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label for="size">Size:</label>
-                        <select id="size" name="size" required>
-                            <option value="">Select Size</option>
-                            <option value="XS">XS</option>
-                            <option value="S">S</option>
-                            <option value="M">M</option>
-                            <option value="L">L</option>
-                            <option value="XL">XL</option>
-                            <option value="XXL">XXL</option>
-                            <option value="3XL">3XL</option>
-                            <option value="4XL">4XL</option>
-                            <option value="5XL">5XL</option>
-                            <option value="6XL">6XL</option>
-                            <option value="7XL">7XL</option>
-                            <option value="One Size">One Size</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label for="quantityToDeduct">Quantity Sold:</label>
-                        <input type="number" id="quantityToDeduct" name="quantityToDeduct" min="1" required onchange="calculateTotal()">
-                    </div>
-                    <div class="input-group">
-                        <label for="pricePerItem">Price per Item:</label>
-                        <input type="number" id="pricePerItem" name="pricePerItem" step="0.01" min="0" required onchange="calculateTotal()">
-                    </div>
-                    <div class="input-group">
-                        <label for="totalAmount">Total Amount:</label>
-                        <input type="number" id="totalAmount" name="totalAmount" step="0.01" min="0" readonly>
+                    <button type="button" class="add-item-btn" onclick="addSalesItem()">
+                        <i class="material-icons">add_circle</i> Add Another Item
+                    </button>
+                    <div class="total-section">
+                        <div class="input-group">
+                            <label for="totalAmount">Total Amount:</label>
+                            <input type="number" id="totalAmount" name="totalAmount" step="0.01" min="0" readonly>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -554,6 +576,22 @@ session_start();
         </div>
     </div>
 
+    <div id="salesReceiptModal" class="modal">
+        <div class="modal-content" id="salesReceiptContent">
+            <div class="modal-header">
+                <h2>Sales Receipt</h2>
+                <span class="close" onclick="closeModal('salesReceiptModal')">&times;</span>
+            </div>
+            <div class="modal-body" id="salesReceiptBody">
+                <!-- Receipt content will be injected here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="printSalesReceipt()" class="save-btn">Print</button>
+                <button type="button" onclick="closeModal('salesReceiptModal')" class="cancel-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         function showAddQuantityModal() {
             document.getElementById('addQuantityModal').style.display = 'block';
@@ -565,68 +603,6 @@ session_start();
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
-        }
-
-        function updateItemDetails() {
-            const itemSelect = document.getElementById('deductItemId');
-            const selectedOption = itemSelect.options[itemSelect.selectedIndex];
-            const price = selectedOption.getAttribute('data-price');
-            
-            if (price) {
-                document.getElementById('pricePerItem').value = price;
-                calculateTotal();
-            }
-        }
-
-        function calculateTotal() {
-            const quantity = parseFloat(document.getElementById('quantityToDeduct').value) || 0;
-            const price = parseFloat(document.getElementById('pricePerItem').value) || 0;
-            const total = quantity * price;
-            
-            document.getElementById('totalAmount').value = total.toFixed(2);
-        }
-
-        function submitDeductQuantity(event) {
-            event.preventDefault();
-            
-            const transactionNumber = document.getElementById('transactionNumber').value;
-            const itemId = document.getElementById('deductItemId').value;
-            const size = document.getElementById('size').value;
-            const quantityToDeduct = document.getElementById('quantityToDeduct').value;
-            const pricePerItem = document.getElementById('pricePerItem').value;
-            const totalAmount = document.getElementById('totalAmount').value;
-            
-            if (!transactionNumber || !itemId || !size || !quantityToDeduct || !pricePerItem) {
-                alert('Please fill in all required fields');
-                return;
-            }
-            
-            const formData = new FormData();
-            formData.append('transactionNumber', transactionNumber);
-            formData.append('itemId', itemId);
-            formData.append('size', size);
-            formData.append('quantityToDeduct', quantityToDeduct);
-            formData.append('pricePerItem', pricePerItem);
-            formData.append('totalAmount', totalAmount);
-            
-            fetch('../PAMO Inventory backend/process_deduct_quantity.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Sale recorded successfully!');
-                    closeModal('deductQuantityModal');
-                    location.reload();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while processing your request');
-            });
         }
 
         function updateItemCodePrefix() {
