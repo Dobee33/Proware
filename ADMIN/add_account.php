@@ -180,11 +180,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Remove any non-digit characters
             input.value = input.value.replace(/\D/g, '');
 
-            // Limit to 11 digits
+            // Prevent input if length would exceed 11 digits
             if (input.value.length > 11) {
                 input.value = input.value.slice(0, 11);
+                // Show a warning message
+                alert('ID Number must be exactly 11 digits');
             }
         });
+
+        // Add maxlength attribute to the input field
+        document.getElementById('idNumber').setAttribute('maxlength', '11');
 
         // Function to validate name input
         function validateNameInput(input) {
