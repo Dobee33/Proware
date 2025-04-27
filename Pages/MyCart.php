@@ -129,7 +129,7 @@ $cart_total = 0;
                                                 alt="<?php echo htmlspecialchars($item['item_name']); ?>">
                                                 
                                         </div>
-                                    </td>s
+                                    </td>
                                     <td class="item-col" data-label="Item Name">
                                         <div class="item-name"><?php echo htmlspecialchars($item['item_name']); ?></div>
                                     </td>
