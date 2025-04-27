@@ -3,6 +3,10 @@
 function showAddQuantityModal() {
   document.getElementById("addQuantityModal").style.display = "block";
   document.getElementById("addQuantityForm").reset();
+  // Reset all select elements to their default state
+  document.querySelectorAll('select[name="itemId[]"]').forEach((select) => {
+    select.value = "";
+  });
 }
 
 function addDeliveryItem() {
@@ -24,6 +28,13 @@ function addDeliveryItem() {
     };
   }
 
+  // Add change event listener to the new select element
+  if (select) {
+    select.addEventListener("change", function () {
+      validateProductSelection(this);
+    });
+  }
+
   deliveryItems.appendChild(newItem);
 }
 
@@ -34,6 +45,31 @@ function removeDeliveryItem(closeButton) {
   if (items.length > 1) {
     const deliveryItem = closeButton.closest(".delivery-item");
     deliveryItem.remove();
+    // Revalidate all remaining select elements
+    document.querySelectorAll('select[name="itemId[]"]').forEach((select) => {
+      validateProductSelection(select);
+    });
+  }
+}
+
+function validateProductSelection(selectElement) {
+  const selectedValue = selectElement.value;
+  if (!selectedValue) return;
+
+  const allSelects = document.querySelectorAll('select[name="itemId[]"]');
+  let duplicateFound = false;
+
+  allSelects.forEach((select) => {
+    if (select !== selectElement && select.value === selectedValue) {
+      duplicateFound = true;
+    }
+  });
+
+  if (duplicateFound) {
+    alert(
+      "This product has already been selected. Please choose a different product."
+    );
+    selectElement.value = "";
   }
 }
 
@@ -92,21 +128,11 @@ function submitAddQuantity(event) {
     formData.append("quantityToAdd[]", quantities[index]);
   });
 
-  // Debug: Log the data being sent
-  console.log("Form Data Contents:");
-  for (let pair of formData.entries()) {
-    console.log(pair[0] + ": " + pair[1]);
-  }
-
   fetch("../PAMO Inventory backend/process_add_quantity.php", {
     method: "POST",
     body: formData,
   })
-    .then((response) => response.text())
-    .then((text) => {
-      console.log("Raw server response:", text);
-      return JSON.parse(text);
-    })
+    .then((response) => response.json())
     .then((data) => {
       if (data.success) {
         alert("Delivery recorded successfully!");
@@ -118,9 +144,7 @@ function submitAddQuantity(event) {
     })
     .catch((error) => {
       console.error("Error:", error);
-      alert(
-        "An error occurred while processing your request. Check console for details."
-      );
+      alert("An error occurred while processing your request");
     });
 }
 
@@ -132,5 +156,12 @@ document.addEventListener("DOMContentLoaded", function () {
     btn.onclick = function () {
       removeDeliveryItem(this);
     };
+  });
+
+  // Add change event listeners to all select elements
+  document.querySelectorAll('select[name="itemId[]"]').forEach((select) => {
+    select.addEventListener("change", function () {
+      validateProductSelection(this);
+    });
   });
 });

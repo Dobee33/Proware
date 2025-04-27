@@ -5,9 +5,6 @@ header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Debug: Log the raw POST data
-error_log("Raw POST data: " . print_r($_POST, true));
-
 $conn = mysqli_connect("localhost", "root", "", "proware");
 
 if (!$conn) {
@@ -19,11 +16,6 @@ if (!$conn) {
 
 // Get form data
 $orderNumber = isset($_POST['orderNumber']) ? mysqli_real_escape_string($conn, $_POST['orderNumber']) : '';
-
-// Debug: Log the received data
-error_log("Order Number: " . $orderNumber);
-error_log("ItemId Array: " . print_r($_POST['itemId'], true));
-error_log("Quantity Array: " . print_r($_POST['quantityToAdd'], true));
 
 // Validate order number
 if (empty($orderNumber)) {

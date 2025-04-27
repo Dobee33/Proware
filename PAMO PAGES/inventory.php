@@ -567,45 +567,6 @@ session_start();
             document.getElementById(modalId).style.display = 'none';
         }
 
-        function submitAddQuantity(event) {
-            event.preventDefault();
-            
-            const orderNumber = document.getElementById('orderNumber').value;
-            const itemIds = document.querySelectorAll('[name="itemId[]"]');
-            const quantities = document.querySelectorAll('[name="quantityToAdd[]"]');
-            
-            if (!orderNumber || itemIds.length === 0 || quantities.length === 0) {
-                alert('Please fill in all required fields');
-                return;
-            }
-            
-            const formData = new FormData();
-            formData.append('orderNumber', orderNumber);
-            for (let i = 0; i < itemIds.length; i++) {
-                formData.append('itemId', itemIds[i].value);
-                formData.append('quantityToAdd', quantities[i].value);
-            }
-            
-            fetch('../PAMO Inventory backend/process_add_quantity.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Quantity added successfully!');
-                    closeModal('addQuantityModal');
-                    location.reload();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while processing your request');
-            });
-        }
-
         function updateItemDetails() {
             const itemSelect = document.getElementById('deductItemId');
             const selectedOption = itemSelect.options[itemSelect.selectedIndex];
