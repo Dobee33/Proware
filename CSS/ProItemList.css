@@ -969,3 +969,8 @@ body {
 .clear-filters {
   color: #333 !important;
 }
+
+.main-category-header.active {
+  color: #fdf005 !important;
+  font-weight: 600;
+}

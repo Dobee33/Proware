@@ -163,6 +163,12 @@ document.addEventListener("DOMContentLoaded", function () {
           courseIcons.forEach(
             (icon) => (icon.style.transform = "rotate(0deg)")
           );
+          // Uncheck all subcategory checkboxes when main category is closed
+          subcategories
+            .querySelectorAll(".course-filter-checkbox")
+            .forEach((cb) => {
+              cb.checked = false;
+            });
         }
       }
 
@@ -278,37 +284,27 @@ document.addEventListener("DOMContentLoaded", function () {
   // Add multi-select course filter logic
   document.querySelectorAll(".course-filter-checkbox").forEach((checkbox) => {
     checkbox.addEventListener("change", function () {
-      filterProductsBySelectedCourses();
+      // Find the main category for this checkbox
+      const mainCategoryDiv = this.closest(".category-item");
+      const mainCategoryHeader = mainCategoryDiv.querySelector(
+        ".main-category-header"
+      );
+      const mainCategory = mainCategoryHeader.dataset.category;
+
+      // Get all checked subcategories for this main category
+      const checked = Array.from(
+        mainCategoryDiv.querySelectorAll(".course-filter-checkbox:checked")
+      ).map((cb) => cb.value);
+
+      if (checked.length > 0) {
+        activeSubcategories.set(mainCategory, checked);
+      } else {
+        activeSubcategories.delete(mainCategory);
+      }
+
+      applyAllFilters();
     });
   });
-
-  function filterProductsBySelectedCourses() {
-    const selectedCourses = Array.from(
-      document.querySelectorAll(".course-filter-checkbox:checked")
-    ).map((cb) => cb.value.toLowerCase());
-    const productContainers = document.querySelectorAll(".product-container");
-    let visibleCount = 0;
-    productContainers.forEach((container) => {
-      const productCourses = container.dataset.courses
-        ? container.dataset.courses.toLowerCase().split(",")
-        : [];
-      // If no courses selected, show all
-      if (
-        selectedCourses.length === 0 ||
-        selectedCourses.some((course) => productCourses.includes(course))
-      ) {
-        container.style.display = "block";
-        visibleCount++;
-      } else {
-        container.style.display = "none";
-      }
-    });
-    // Update no results message
-    const noResultsMessage = document.getElementById("no-results-message");
-    if (noResultsMessage) {
-      noResultsMessage.style.display = visibleCount === 0 ? "flex" : "none";
-    }
-  }
 
   // Add these helper functions before applyAllFilters
   function normalizeText(text) {
@@ -339,19 +335,18 @@ document.addEventListener("DOMContentLoaded", function () {
         ? container.dataset.courses.toLowerCase().split(",")
         : [];
 
-      // Check if product matches active categories
-      let matchesCategory = true;
+      // --- UPDATED LOGIC: Combine subcategory and main category filters across all selected main categories ---
+      let matchesCategory = false;
       if (activeMainCategories.size > 0) {
-        matchesCategory = Array.from(activeMainCategories).some((category) =>
-          productCategory.includes(category.toLowerCase())
-        );
-
-        // Check subcategories if main category matches
-        if (matchesCategory && activeSubcategories.size > 0) {
-          matchesCategory = false; // Reset to false and check subcategories
-          for (const [mainCategory, courses] of activeSubcategories.entries()) {
-            if (productCategory.includes(mainCategory.toLowerCase())) {
-              for (const courseValue of courses) {
+        for (const mainCategory of activeMainCategories) {
+          if (productCategory.includes(mainCategory.toLowerCase())) {
+            // If this main category has subcategories checked
+            if (
+              activeSubcategories.has(mainCategory) &&
+              activeSubcategories.get(mainCategory).length > 0
+            ) {
+              // Only show if product matches one of the selected subcategories
+              for (const courseValue of activeSubcategories.get(mainCategory)) {
                 if (
                   productCourses.includes(courseValue.toLowerCase()) ||
                   isProductInCourse(itemName, courseValue.toLowerCase()) ||
@@ -361,9 +356,15 @@ document.addEventListener("DOMContentLoaded", function () {
                   break;
                 }
               }
+            } else {
+              // No subcategories checked, show all products in this main category
+              matchesCategory = true;
             }
           }
+          if (matchesCategory) break; // If already matched, no need to check other categories
         }
+      } else {
+        matchesCategory = true; // No main category filter, show all
       }
 
       // Enhanced search matching using partial matches
@@ -405,11 +406,24 @@ document.addEventListener("DOMContentLoaded", function () {
       document
         .querySelectorAll(".course-filter-checkbox")
         .forEach((cb) => (cb.checked = false));
-      // Show all products
-      filterProductsBySelectedCourses();
+      // Collapse all main categories
+      document
+        .querySelectorAll(".main-category-header.active")
+        .forEach((header) => {
+          header.classList.remove("active");
+          const subcategories = header.nextElementSibling;
+          if (subcategories) subcategories.classList.remove("active");
+          const icon = header.querySelector("i");
+          if (icon) icon.style.transform = "rotate(0deg)";
+        });
+      // Clear activeMainCategories and activeSubcategories
+      activeMainCategories.clear();
+      activeSubcategories.clear();
       // Reset search input if you have one
       if (searchInput) searchInput.value = "";
       currentSearchTerm = "";
+      // Apply all filters
+      applyAllFilters();
     });
   }
 });

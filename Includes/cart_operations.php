@@ -199,20 +199,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $quantity = intval($_POST['quantity']);
                 $user_id = $_SESSION['user_id'];
 
-                // Get item details from cart and inventory
-                $stmt = $conn->prepare("
-                    SELECT c.item_code, c.quantity as current_cart_quantity, i.actual_quantity 
-                    FROM cart c 
-                    JOIN inventory i ON c.item_code = i.item_code 
-                    WHERE c.id = ? AND c.user_id = ?
-                ");
+                // Get the cart row
+                $stmt = $conn->prepare("SELECT item_code, quantity as current_cart_quantity FROM cart WHERE id = ? AND user_id = ?");
                 $stmt->execute([$item_id, $user_id]);
-                $item = $stmt->fetch(PDO::FETCH_ASSOC);
+                $cart_item = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                if (!$item) {
+                if (!$cart_item) {
                     $response['message'] = 'Item not found in cart';
                     break;
                 }
+
+                // Try to get inventory row (exact match first)
+                $stmt = $conn->prepare("SELECT actual_quantity FROM inventory WHERE item_code = ?");
+                $stmt->execute([$cart_item['item_code']]);
+                $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if (!$inventory_item) {
+                    // Try LIKE match for variants
+                    $stmt = $conn->prepare("SELECT actual_quantity FROM inventory WHERE ? LIKE CONCAT(item_code, '-%') LIMIT 1");
+                    $stmt->execute([$cart_item['item_code']]);
+                    $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
+                }
+
+                if (!$inventory_item) {
+                    $response['message'] = 'Item not found in inventory';
+                    break;
+                }
+
+                $item = [
+                    'item_code' => $cart_item['item_code'],
+                    'current_cart_quantity' => $cart_item['current_cart_quantity'],
+                    'actual_quantity' => $inventory_item['actual_quantity']
+                ];
 
                 // Get total quantity in cart for this item (excluding current item)
                 $stmt = $conn->prepare("

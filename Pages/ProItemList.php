@@ -250,7 +250,7 @@
                         data-stocks="<?php echo implode(',', array_values($stocksBySize)); ?>"
                         data-item-codes="<?php echo implode(',', array_values($itemCodesBySize)); ?>"
                         data-stock="<?php echo $product['stock']; ?>"
-                        data-item-code="<?php echo htmlspecialchars($baseItemCode); ?>"
+                        data-item-code="<?php echo htmlspecialchars($product['variants'][0]['item_code']); ?>"
                         data-item-name="<?php echo htmlspecialchars($product['name']); ?>"
                         data-courses="<?php echo htmlspecialchars(implode(',', $courses)); ?>">
                         <?php
