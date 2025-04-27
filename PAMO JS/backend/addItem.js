@@ -55,17 +55,45 @@ function submitNewItem(event) {
 
 // Event listener for category change
 document.addEventListener("DOMContentLoaded", function () {
+  // Initialize Select2 for course and shirt type
+  if (window.jQuery && $("#courseSelect").length) {
+    $("#courseSelect").select2({
+      placeholder: "Select course(s)",
+      ajax: {
+        url: "../PAMO Inventory backend/get_courses.php",
+        dataType: "json",
+        processResults: function (data) {
+          return {
+            results: data.map(function (course) {
+              return { id: course.id, text: course.course_name };
+            }),
+          };
+        },
+      },
+    });
+  }
+  if (window.jQuery && $("#shirtTypeSelect").length) {
+    $("#shirtTypeSelect").select2({
+      placeholder: "Select shirt type",
+      allowClear: true,
+    });
+  }
+
+  // Only declare categorySelect once
   const categorySelect = document.getElementById("newCategory");
   if (categorySelect) {
     categorySelect.addEventListener("change", function () {
-      const sizeGroup = document.querySelector(".input-group:has(#newSize)");
-      if (this.value === "STI-Accessories") {
-        sizeGroup.style.display = "none";
-        document.getElementById("newSize").value = "One Size";
-        document.getElementById("newSize").removeAttribute("required");
+      const courseGroup = document.getElementById("courseGroup");
+      const shirtTypeGroup = document.getElementById("shirtTypeGroup");
+      if (this.value === "Tertiary-Uniform") {
+        courseGroup.style.display = "block";
+        shirtTypeGroup.style.display = "none";
+      } else if (this.value === "STI-Shirts") {
+        courseGroup.style.display = "none";
+        shirtTypeGroup.style.display = "block";
       } else {
-        sizeGroup.style.display = "block";
-        document.getElementById("newSize").setAttribute("required", "required");
+        courseGroup.style.display = "none";
+        shirtTypeGroup.style.display = "none";
       }
     });
   }

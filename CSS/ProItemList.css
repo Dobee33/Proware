@@ -910,36 +910,6 @@ body {
   transform: rotate(180deg);
 }
 
-.course-items {
-  padding-left: 15px;
-  margin: 8px 0;
-  display: block;
-  transition: all 0.3s ease;
-}
-
-.course-items.hidden {
-  display: none;
-}
-
-.course-items label {
-  display: block;
-  padding: 6px 0;
-  font-size: 16px;
-  cursor: pointer;
-  transition: color 0.3s ease;
-  margin-left: 0;
-  font-weight: 500; /* Add some weight to match parent style */
-}
-
-.course-items label:hover {
-  color: #007bff;
-}
-
-.course-items input[type="checkbox"] {
-  margin-right: 8px;
-  vertical-align: middle;
-}
-
 /* Ensure consistent spacing for all category items */
 .category-item {
   margin-bottom: 1.5rem;
@@ -956,11 +926,6 @@ body {
 .main-category-header.active,
 .course-header.active {
   color: #007bff;
-}
-
-.course-items label input[type="checkbox"]:checked + span {
-  color: #007bff;
-  font-weight: 600;
 }
 
 /* --- Clear Filter Button --- */

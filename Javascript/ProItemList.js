@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const sortSelect = document.getElementById("sort-select");
   const searchInput = document.getElementById("search");
   const quantityInputs = document.querySelectorAll(".quantity input");
-  const wishlistBtns = document.querySelectorAll(".wishlist-btn");
 
   // Initialize AOS
   if (typeof AOS !== "undefined") {
@@ -275,88 +274,41 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Handle course category toggles (for nested categories only)
-  courseHeaders.forEach((header) => {
-    header.addEventListener("click", function (e) {
-      e.stopPropagation(); // Prevent triggering parent category
-      const courseItems = this.nextElementSibling;
-      const icon = this.querySelector("i");
-      const courseName = this.querySelector("span").textContent.trim();
-      const mainCategory =
-        this.closest(".subcategories").previousElementSibling.dataset.category;
-
-      if (courseItems && courseItems.classList.contains("course-items")) {
-        // Toggle visibility of course items
-        courseItems.classList.toggle("hidden");
-
-        // Rotate icon
-        icon.style.transform = courseItems.classList.contains("hidden")
-          ? "rotate(0deg)"
-          : "rotate(180deg)";
-
-        // If course items are now shown, check all checkboxes
-        if (!courseItems.classList.contains("hidden")) {
-          courseItems
-            .querySelectorAll('input[type="checkbox"]')
-            .forEach((cb) => {
-              cb.checked = true;
-              cb.dispatchEvent(new Event("change"));
-            });
-        } else {
-          // If course items are now hidden, uncheck all checkboxes
-          courseItems
-            .querySelectorAll('input[type="checkbox"]')
-            .forEach((cb) => {
-              cb.checked = false;
-              cb.dispatchEvent(new Event("change"));
-            });
-        }
-
-        // If course items are now hidden, remove this course from active subcategories
-        if (courseItems.classList.contains("hidden")) {
-          if (activeSubcategories.has(mainCategory)) {
-            const courses = activeSubcategories.get(mainCategory);
-            courses.delete(courseName);
-            if (courses.size === 0) {
-              activeSubcategories.delete(mainCategory);
-            }
-          }
-        }
-      }
-    });
-  });
-
-  // Handle checkbox changes
-  const filterCheckboxes = document.querySelectorAll(
-    '.course-items input[type="checkbox"]'
-  );
-  filterCheckboxes.forEach((checkbox) => {
+  // Remove previous course-header click logic
+  // Add multi-select course filter logic
+  document.querySelectorAll(".course-filter-checkbox").forEach((checkbox) => {
     checkbox.addEventListener("change", function () {
-      const checkboxValue = this.value;
-      const mainCategory =
-        this.closest(".subcategories").previousElementSibling.dataset.category;
-
-      // Initialize or update active subcategories
-      if (!activeSubcategories.has(mainCategory)) {
-        activeSubcategories.set(mainCategory, new Set());
-      }
-
-      const courses = activeSubcategories.get(mainCategory);
-
-      // Add or remove course based on checkbox state
-      if (this.checked) {
-        courses.add(checkboxValue);
-      } else {
-        courses.delete(checkboxValue);
-        if (courses.size === 0) {
-          activeSubcategories.delete(mainCategory);
-        }
-      }
-
-      // Apply all filters
-      applyAllFilters();
+      filterProductsBySelectedCourses();
     });
   });
+
+  function filterProductsBySelectedCourses() {
+    const selectedCourses = Array.from(
+      document.querySelectorAll(".course-filter-checkbox:checked")
+    ).map((cb) => cb.value.toLowerCase());
+    const productContainers = document.querySelectorAll(".product-container");
+    let visibleCount = 0;
+    productContainers.forEach((container) => {
+      const productCourses = container.dataset.courses
+        ? container.dataset.courses.toLowerCase().split(",")
+        : [];
+      // If no courses selected, show all
+      if (
+        selectedCourses.length === 0 ||
+        selectedCourses.some((course) => productCourses.includes(course))
+      ) {
+        container.style.display = "block";
+        visibleCount++;
+      } else {
+        container.style.display = "none";
+      }
+    });
+    // Update no results message
+    const noResultsMessage = document.getElementById("no-results-message");
+    if (noResultsMessage) {
+      noResultsMessage.style.display = visibleCount === 0 ? "flex" : "none";
+    }
+  }
 
   // Add these helper functions before applyAllFilters
   function normalizeText(text) {
@@ -383,6 +335,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const productCategory = container.dataset.category.toLowerCase();
       const itemName = container.dataset.itemName.toLowerCase();
       const itemCode = container.dataset.itemCode.toLowerCase();
+      const productCourses = container.dataset.courses
+        ? container.dataset.courses.toLowerCase().split(",")
+        : [];
 
       // Check if product matches active categories
       let matchesCategory = true;
@@ -398,6 +353,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (productCategory.includes(mainCategory.toLowerCase())) {
               for (const courseValue of courses) {
                 if (
+                  productCourses.includes(courseValue.toLowerCase()) ||
                   isProductInCourse(itemName, courseValue.toLowerCase()) ||
                   itemCode.includes(courseValue.toLowerCase())
                 ) {
@@ -441,114 +397,33 @@ document.addEventListener("DOMContentLoaded", function () {
     return normalizedProductName === normalizedCourseValue;
   }
 
-  // Function to get common variations of course names
-  function getCourseVariations(courseCode) {
-    const variations = [];
-
-    // Common abbreviations and variations
-    const courseMap = {
-      bscm: ["business", "commerce", "management"],
-      bstm: ["tourism", "hospitality"],
-      bsit: ["information", "technology", "it"],
-      cpe: ["computer", "engineering"],
-      cs: ["computer", "science"],
-      bsba: ["business", "administration"],
-      bmma: ["multimedia", "arts"],
-    };
-
-    // Add variations based on the course code
-    if (courseMap[courseCode]) {
-      variations.push(...courseMap[courseCode]);
-    }
-
-    return variations;
-  }
-
-  // Function to get keywords associated with item types
-  function getItemKeywords(itemType) {
-    const keywords = [];
-
-    // Map of item types to their associated keywords
-    const itemKeywords = {
-      blazer: ["blazer", "coat", "jacket"],
-      polo: ["polo", "shirt"],
-      pants: ["pants", "trousers"],
-      skirt: ["skirt"],
-      blouse: ["blouse", "shirt"],
-      scarf: ["scarf"],
-      necktie: ["necktie", "tie"],
-      vest: ["vest"],
-      baret: ["baret", "hat"],
-      "long-sleeve": ["long sleeve", "longsleeve"],
-      "white-polo": ["white polo"],
-      "gray-polo": ["gray polo", "grey polo"],
-      "blue-polo": ["blue polo"],
-      "white-blouse": ["white blouse"],
-      "gray-blouse": ["gray blouse", "grey blouse"],
-      "blue-blouse": ["blue blouse"],
-      "red-scarf": ["red scarf"],
-      "yellow-scarf": ["yellow scarf"],
-      "blue-scarf": ["blue scarf"],
-      "red-necktie": ["red necktie", "red tie"],
-      "yellow-necktie": ["yellow necktie", "yellow tie"],
-      "blue-necktie": ["blue necktie", "blue tie"],
-      "gray-vest": ["gray vest", "grey vest"],
-      "dark-blue-pants": ["dark blue pants", "navy pants"],
-      "dark-blue-skirt": ["dark blue skirt", "navy skirt"],
-      "gray-skirt": ["gray skirt", "grey skirt"],
-      "tourism-blazer": ["tourism blazer", "tourism coat", "tourism jacket"],
-    };
-
-    // Add keywords based on the item type
-    if (itemKeywords[itemType]) {
-      keywords.push(...itemKeywords[itemType]);
-    }
-
-    return keywords;
-  }
-
-  // Add clear filter button logic
+  // Remove clear filter logic for checkboxes
   const clearFiltersBtn = document.getElementById("clearFiltersBtn");
   if (clearFiltersBtn) {
     clearFiltersBtn.addEventListener("click", function () {
-      // 1. Uncheck all checkboxes
+      // Uncheck all course checkboxes
       document
-        .querySelectorAll('.course-items input[type="checkbox"]')
-        .forEach((cb) => {
-          cb.checked = false;
-        });
-
-      // 2. Collapse all open main and subcategories
-      document
-        .querySelectorAll(".main-category-header.active")
-        .forEach((header) => {
-          header.classList.remove("active");
-          const icon = header.querySelector("i");
-          if (icon) icon.style.transform = "rotate(0deg)";
-          const subcategories = header.nextElementSibling;
-          if (subcategories) subcategories.classList.remove("active");
-        });
-      document.querySelectorAll(".course-header").forEach((header) => {
-        const icon = header.querySelector("i");
-        if (icon) icon.style.transform = "rotate(0deg)";
-        const courseItems = header.nextElementSibling;
-        if (courseItems && courseItems.classList.contains("course-items")) {
-          courseItems.classList.add("hidden");
-        }
-      });
-
-      // 3. Reset search input
+        .querySelectorAll(".course-filter-checkbox")
+        .forEach((cb) => (cb.checked = false));
+      // Show all products
+      filterProductsBySelectedCourses();
+      // Reset search input if you have one
       if (searchInput) searchInput.value = "";
       currentSearchTerm = "";
-
-      // 4. Clear filter state variables
-      activeMainCategories.clear();
-      activeSubcategories.clear();
-
-      // 5. Show all products (reset filter)
-      applyAllFilters();
     });
   }
+
+  // Add arrow toggle for main-category-header
+  document.querySelectorAll(".main-category-header").forEach((header) => {
+    header.addEventListener("click", function () {
+      // Remove active from all
+      document
+        .querySelectorAll(".main-category-header")
+        .forEach((h) => h.classList.remove("active"));
+      // Add active to this
+      this.classList.add("active");
+    });
+  });
 });
 
 // Handle cart interaction - ONLY processing cart icon clicks

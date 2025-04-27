@@ -249,6 +249,19 @@ session_start();
                             <option value="Tertiary-PE">Tertiary-PE</option>
                         </select>
                     </div>
+                    <div class="input-group" id="courseGroup" style="display:none;">
+                        <label for="courseSelect">Course:</label>
+                        <select id="courseSelect" name="course_id" style="width:100%;">
+                            <option value="">Select Course</option>
+                            <?php
+                            $conn = mysqli_connect("localhost", "root", "", "proware");
+                            $result = mysqli_query($conn, "SELECT id, course_name FROM course ORDER BY course_name ASC");
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo '<option value="' . $row['id'] . '">' . htmlspecialchars($row['course_name']) . '</option>';
+                            }
+                            ?>
+                        </select>
+                    </div>
                     <div class="input-group">
                         <label for="newItemName">Product Name:</label>
                         <input type="text" id="newItemName" name="newItemName" required>
@@ -286,6 +299,17 @@ session_start();
                     <div class="input-group">
                         <label for="newImage">Product Image:</label>
                         <input type="file" id="newImage" name="newImage" accept="image/*" required>
+                    </div>
+                    <div class="input-group" id="shirtTypeGroup" style="display:none;">
+                        <label for="shirtTypeSelect">Shirt Type:</label>
+                        <select id="shirtTypeSelect" name="shirt_type" style="width:100%;">
+                            <option value="">Select Shirt Type</option>
+                            <option value="Polo">Polo</option>
+                            <option value="T-shirt">T-shirt</option>
+                            <option value="Jacket">Jacket</option>
+                            <option value="Sweater">Sweater</option>
+                            <option value="Other">Other</option>
+                        </select>
                     </div>
                 </form>
             </div>

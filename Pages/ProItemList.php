@@ -45,165 +45,179 @@
 
             <button class="clear-filters" id="clearFiltersBtn" type="button">Clear Filters</button>
 
+            <?php
+            $conn = mysqli_connect("localhost", "root", "", "proware");
+            if (!$conn) {
+                die("Connection failed: " . mysqli_connect_error());
+            }
+
+            // UPDATED SQL: Join inventory with course_item and course, group by inventory.id
+            $sql = "SELECT inventory.*, GROUP_CONCAT(DISTINCT course.course_name) AS courses
+                    FROM inventory
+                    LEFT JOIN course_item ON inventory.id = course_item.inventory_id
+                    LEFT JOIN course ON course_item.course_id = course.id
+                    GROUP BY inventory.id
+                    ORDER BY inventory.created_at DESC";
+            $result = mysqli_query($conn, $sql);
+
+            $products = [];
+
+            while ($row = mysqli_fetch_assoc($result)) {
+                $itemCode = $row['item_code'];
+                $itemName = $row['item_name'];
+                $imagePath = $row['image_path'];
+                $itemPrice = $row['price'];
+                $itemCategory = $row['category'];
+                $sizes = array_map(function($s) { return trim($s); }, explode(',', $row['sizes']));
+                $baseItemCode = strtok($itemCode, '-');
+                $courses = isset($row['courses']) ? array_map('trim', explode(',', $row['courses'])) : [];
+
+                // Handle both full paths and filenames
+                if (!empty($imagePath)) {
+                    if (strpos($imagePath, 'uploads/') === false) {
+                        $itemImage = '../uploads/itemlist/' . $imagePath;
+                    } else {
+                        $itemImage = '../' . $imagePath;
+                    }
+                } else {
+                    $itemImage = '';
+                }
+
+                if (!isset($products[$baseItemCode])) {
+                    $products[$baseItemCode] = [
+                        'name' => $itemName,
+                        'image' => $itemImage,
+                        'prices' => [$itemPrice],
+                        'category' => $itemCategory,
+                        'sizes' => $sizes,
+                        'stock' => $row['actual_quantity'],
+                        'courses' => $courses,
+                        'variants' => [
+                            [
+                                'item_code' => $itemCode,
+                                'size' => isset($sizes[0]) ? $sizes[0] : '',
+                                'price' => $itemPrice,
+                                'stock' => $row['actual_quantity'],
+                                'image' => $itemImage
+                            ]
+                        ]
+                    ];
+                } else {
+                    $products[$baseItemCode]['sizes'] = array_unique(array_merge($products[$baseItemCode]['sizes'], $sizes));
+                    $products[$baseItemCode]['prices'][] = $itemPrice;
+                    $products[$baseItemCode]['stock'] += $row['actual_quantity'];
+                    $products[$baseItemCode]['courses'] = array_unique(array_merge($products[$baseItemCode]['courses'], $courses));
+                    // Fallback: use the first variant's image if this one is missing
+                    $variantImage = $itemImage;
+                    if (empty($variantImage)) {
+                        $variantImage = $products[$baseItemCode]['image'];
+                    }
+                    $products[$baseItemCode]['variants'][] = [
+                        'item_code' => $itemCode,
+                        'size' => isset($sizes[0]) ? $sizes[0] : '',
+                        'price' => $itemPrice,
+                        'stock' => $row['actual_quantity'],
+                        'image' => $variantImage
+                    ];
+                }
+            }
+            ?>
+            
+            <?php
+            // Build a set of categories that have products
+            $categoriesWithProducts = [];
+            foreach ($products as $product) {
+                $cat = strtolower(str_replace(' ', '-', $product['category']));
+                $categoriesWithProducts[$cat] = true;
+            }
+            ?>
             <div class="category-list">
-                <!-- Tertiary Uniform -->
+                <!-- Always show all main categories -->
                 <div class="category-item">
                     <div class="main-category-header" data-category="tertiary-uniform">
                         <span>Tertiary Uniform</span>
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="subcategories">
-                        <!-- BSCM -->
+                        <!-- Only show course checkboxes if there are products in those courses -->
+                        <?php if (isset($categoriesWithProducts['tertiary-uniform'])): ?>
                         <div class="course-category">
                             <div class="course-header">
-                                <span>BSCM</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            <div class="course-items hidden">
-                                <label><input type="checkbox" value="female-blazer">Female Blazer</label>
-                                <label><input type="checkbox" value="long-sleeve-uniform"> Long Sleeve Uniform</label>
-                                <label><input type="checkbox" value="pants"> Pants</label>
-                                <label><input type="checkbox" value="skirt"> Skirt</label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" class="course-filter-checkbox" value="BSCM">
+                                    <span>BSCM</span>
+                                </label>
                             </div>
                         </div>
-
-                        <!-- BSTM -->
                         <div class="course-category">
                             <div class="course-header">
-                                <span>BSTM</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            <div class="course-items hidden">
-                                <label><input type="checkbox" value="TM-SKIRT"> TM Skirt</label>
-                                <label><input type="checkbox" value="TM-CLOTH-PANTS">TM Cloth Pants</label>
-                                <label><input type="checkbox" value="TM-BLAZER-FEMALE">TM Blazer Female</label>
-                                <label><input type="checkbox" value="TM-BLAZER-MALE">TM Blazer Male</label>
-                                <label><input type="checkbox" value="TM-FEMALE-BLOUSE"> TM Female Blouse</label>
-                                <label><input type="checkbox" value="TM-MALE-POLO">TM Male Polo</label>
-                                <label><input type="checkbox" value="TM-BERET">TM Beret</label>
-                                <label><input type="checkbox" value="TM-NECKTIE">TM NECKTIE </label>
-                                <label><input type="checkbox" value="TM-SCARF">TM SCARF</label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" class="course-filter-checkbox" value="BSTM">
+                                    <span>BSTM</span>
+                                </label>
                             </div>
                         </div>
-
-                        <!-- BSIT/CPE/CS -->
                         <div class="course-category">
                             <div class="course-header">
-                                <span>BSIT/CPE/CS</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            <div class="course-items hidden">
-                                <label><input type="checkbox" value="Pants"> Pants</label>
-                                <label><input type="checkbox" value="Skirt"> Skirt</label>
-                                <label><input type="checkbox" value="IT 3/4 Polo"> IT 3/4 Polo </label>
-                                <label><input type="checkbox" value="IT 3/4 Blouse"> IT 3/4 Blouse</label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" class="course-filter-checkbox" value="BSIT/BSCS/BSCPE">
+                                    <span>BSIT/BSCS/BSCPE</span>
+                                </label>
                             </div>
                         </div>
-
-                        <!-- BSBA -->
                         <div class="course-category">
                             <div class="course-header">
-                                <span>BSBA</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            <div class="course-items hidden">
-                                <label><input type="checkbox" value="bsba-red-scarf"> Red Scarf</label>
-                                <label><input type="checkbox" value="bsba-blue-blouse"> Blue long sleeve blouse</label>
-                                <label><input type="checkbox" value="bsba-blue-polo"> Blue long sleeve polo</label>
-                                <label><input type="checkbox" value="bsba-blazer"> Blazer</label>
-                                <label><input type="checkbox" value="bsba-red-necktie"> Red necktie</label>
-                                <label><input type="checkbox" value="bsba-pants"> Pants</label>
-                                <label><input type="checkbox" value="bsba-skirt"> Skirt</label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" class="course-filter-checkbox" value="BSBA">
+                                    <span>BSBA</span>
+                                </label>
                             </div>
                         </div>
-
-                        <!-- BMMA -->
                         <div class="course-category">
                             <div class="course-header">
-                                <span>BMMA</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            <div class="course-items hidden">
-                                <label><input type="checkbox" value="bmma-blue-scarf"> Blue Scarf</label>
-                                <label><input type="checkbox" value="bmma-blue-necktie"> Blue necktie</label>
-                                <label><input type="checkbox" value="bmma-blue-blouse"> Blue long sleeve blouse</label>
-                                <label><input type="checkbox" value="bmma-blue-polo"> Blue long sleeve polo</label>
-                                <label><input type="checkbox" value="bmma-blazer"> Blazer</label>
-                                <label><input type="checkbox" value="bmma-skirt"> Skirt</label>
-                                <label><input type="checkbox" value="bmma-pants"> Pants</label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" class="course-filter-checkbox" value="BMMA">
+                                    <span>BMMA</span>
+                                </label>
                             </div>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </div>
-
-                <!-- SHS Uniform -->
                 <div class="category-item">
                     <div class="main-category-header" data-category="shs-uniform">
                         <span>SHS Uniform</span>
                         <i class="fas fa-chevron-down"></i>
                     </div>
-                    <div class="subcategories">
-                        <div class="course-items hidden">
-                            <label><input type="checkbox" value="shs-white-polo"> White Polo</label>
-                            <label><input type="checkbox" value="shs-gray-vest"> Gray Vest</label>
-                            <label><input type="checkbox" value="shs-necktie"> Necktie</label>
-                            <label><input type="checkbox" value="shs-dark-blue-pants"> Dark blue pants</label>
-                            <label><input type="checkbox" value="shs-white-blouse"> White Blouse</label>
-                            <label><input type="checkbox" value="shs-dark-blue-skirt"> Dark blue pencil-cut skirt</label>
-                        </div>
-                    </div>
+                    <div class="subcategories"></div>
                 </div>
-
-                <!-- STI Accessories -->
                 <div class="category-item">
                     <div class="main-category-header" data-category="sti-accessories">
                         <span>STI Accessories</span>
                         <i class="fas fa-chevron-down"></i>
                     </div>
-                    <div class="subcategories">
-                        <div class="course-items hidden">
-                            <!-- Add accessories items here -->
-                        </div>
-                    </div>
+                    <div class="subcategories"></div>
                 </div>
-
-                <!-- STI Shirt -->
                 <div class="category-item">
                     <div class="main-category-header" data-category="sti-shirt">
                         <span>STI Shirt</span>
                         <i class="fas fa-chevron-down"></i>
                     </div>
-                    <div class="subcategories">
-                        <div class="course-items hidden">
-                            <!-- Add STI shirt items here -->
-                        </div>
-                    </div>
+                    <div class="subcategories"></div>
                 </div>
-
-                <!-- SHS PE -->
                 <div class="category-item">
                     <div class="main-category-header" data-category="shs-pe">
                         <span>SHS PE</span>
                         <i class="fas fa-chevron-down"></i>
                     </div>
-                    <div class="subcategories">
-                        <div class="course-items hidden">
-                            <!-- Add SHS PE items here -->
-                        </div>
-                    </div>
+                    <div class="subcategories"></div>
                 </div>
-
-                <!-- Tertiary PE -->
                 <div class="category-item">
                     <div class="main-category-header" data-category="tertiary-pe">
                         <span>Tertiary PE</span>
                         <i class="fas fa-chevron-down"></i>
                     </div>
-                    <div class="subcategories">
-                        <div class="course-items hidden">
-                            <!-- Add Tertiary PE items here -->
-                        </div>
-                    </div>
+                    <div class="subcategories"></div>
                 </div>
             </div>
         </aside>
@@ -215,79 +229,10 @@
         <main class="content">
             <div class="products-grid">
                 <?php
-                $conn = mysqli_connect("localhost", "root", "", "proware");
-                if (!$conn) {
-                    die("Connection failed: " . mysqli_connect_error());
-                }
-
-                $sql = "SELECT * FROM inventory ORDER BY created_at DESC";
-                $result = mysqli_query($conn, $sql);
-
-                $products = [];
-
-                while ($row = mysqli_fetch_assoc($result)) {
-                    $itemCode = $row['item_code'];
-                    $itemName = $row['item_name'];
-                    $imagePath = $row['image_path'];
-                    $itemPrice = $row['price'];
-                    $itemCategory = $row['category'];
-                    $sizes = array_map(function($s) { return trim($s); }, explode(',', $row['sizes']));
-                    $baseItemCode = strtok($itemCode, '-');
-
-                    // Handle both full paths and filenames
-                    if (!empty($imagePath)) {
-                        if (strpos($imagePath, 'uploads/') === false) {
-                            $itemImage = '../uploads/itemlist/' . $imagePath;
-                        } else {
-                            $itemImage = '../' . $imagePath;
-                        }
-                    } else {
-                        $itemImage = '';
-                    }
-
-                    if (!isset($products[$baseItemCode])) {
-                        $products[$baseItemCode] = [
-                            'name' => $itemName,
-                            'image' => $itemImage,
-                            'prices' => [$itemPrice],
-                            'category' => $itemCategory,
-                            'sizes' => $sizes,
-                            'stock' => $row['actual_quantity'],
-                            'variants' => [
-                                [
-                                    'item_code' => $itemCode,
-                                    'size' => isset($sizes[0]) ? $sizes[0] : '',
-                                    'price' => $itemPrice,
-                                    'stock' => $row['actual_quantity'],
-                                    'image' => $itemImage
-                                ]
-                            ]
-                        ];
-                    } else {
-                        $products[$baseItemCode]['sizes'] = array_unique(array_merge($products[$baseItemCode]['sizes'], $sizes));
-                        $products[$baseItemCode]['prices'][] = $itemPrice;
-                        $products[$baseItemCode]['stock'] += $row['actual_quantity'];
-                        // Fallback: use the first variant's image if this one is missing
-                        $variantImage = $itemImage;
-                        if (empty($variantImage)) {
-                            $variantImage = $products[$baseItemCode]['image'];
-                        }
-                        $products[$baseItemCode]['variants'][] = [
-                            'item_code' => $itemCode,
-                            'size' => isset($sizes[0]) ? $sizes[0] : '',
-                            'price' => $itemPrice,
-                            'stock' => $row['actual_quantity'],
-                            'image' => $variantImage
-                        ];
-                    }
-                }
-                ?>
-                
-                <?php
                 foreach ($products as $baseItemCode => $product):
                     $availableSizes = $product['sizes'];
                     $prices = $product['prices'];
-                    
+                    $courses = $product['courses'];
                     // Create stocksBySize array with item_code for each size
                     $stocksBySize = [];
                     $itemCodesBySize = [];
@@ -306,7 +251,8 @@
                         data-item-codes="<?php echo implode(',', array_values($itemCodesBySize)); ?>"
                         data-stock="<?php echo $product['stock']; ?>"
                         data-item-code="<?php echo htmlspecialchars($baseItemCode); ?>"
-                        data-item-name="<?php echo htmlspecialchars($product['name']); ?>">
+                        data-item-name="<?php echo htmlspecialchars($product['name']); ?>"
+                        data-courses="<?php echo htmlspecialchars(implode(',', $courses)); ?>">
                         <?php
 // Find the first non-empty image among variants
 $productImage = '';

@@ -92,7 +92,7 @@ try {
     if (!mysqli_stmt_execute($stmt)) {
         throw new Exception('Error executing statement: ' . mysqli_stmt_error($stmt));
     }
-
+    $new_inventory_id = mysqli_insert_id($conn);
     mysqli_stmt_close($stmt);
 
     // Log the activity in the audit trail
@@ -102,6 +102,16 @@ try {
     mysqli_stmt_bind_param($stmt, "ss", $description, $item_code);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
+
+    // After inventory insert, link to course_item if course_id is provided
+    if (!empty($_POST['course_id'])) {
+        $course_id = intval($_POST['course_id']);
+        $sql = "INSERT INTO course_item (inventory_id, course_id) VALUES (?, ?)";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "ii", $new_inventory_id, $course_id);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    }
 
     mysqli_close($conn);
 
