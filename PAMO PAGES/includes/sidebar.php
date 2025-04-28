@@ -15,7 +15,7 @@
         </li>
         <li <?php echo basename($_SERVER['PHP_SELF']) == 'preorders.php' ? 'class="active"' : ''; ?>
             onclick="window.location.href='preorders.php'">
-            <i class="material-icons">shopping_cart</i>Pre Orders
+            <i class="material-icons">shopping_cart</i>Orders
         </li>
         <li <?php echo basename($_SERVER['PHP_SELF']) == 'reports.php' ? 'class="active"' : ''; ?>
             onclick="window.location.href='reports.php'">

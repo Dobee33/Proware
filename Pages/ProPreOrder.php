@@ -87,9 +87,9 @@
     ?>
     <div class="preorder-container">
         <div class="process-steps">
-            <div class="step active">1. Pre Order Cart</div>
+            <div class="step active">1. Order Cart</div>
             <div class="step">2. Checkout Details</div>
-            <div class="step">3. Pre Order Details</div>
+            <div class="step">3. Order Details</div>
         </div>
 
         <h1>Cart</h1>

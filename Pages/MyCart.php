@@ -189,7 +189,7 @@ $cart_total = 0;
                         <div class="button-container">
                             <a href="ProPreOrder.php" class="checkout-btn">
                                 <i class="fas fa-lock"></i>
-                                Proceed to Pre Order
+                                Proceed to Order
                             </a>
                             <a href="ProItemList.php" class="continue-shopping">
                                 <i class="fas fa-arrow-left"></i>

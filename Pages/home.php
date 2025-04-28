@@ -49,7 +49,7 @@
             <?php endif; ?>
             <h1>GEAR UP</h1>
             <p>Your one-stop shop for all STI College Lucena essentials</p>
-            <a href="ProItemList.php"><button class="shop-now-button">Shop Now</button></a>
+            <a href="ProItemList.php"><button class="shop-now-button">Order Now</button></a>
         </div>
     </section>
 

@@ -11,6 +11,9 @@ session_start();
     <link rel="stylesheet" href="../PAMO CSS/styles.css">
     <link rel="stylesheet" href="../PAMO CSS/inventory.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="../PAMO JS/inventory.js"></script>
     <script src="../PAMO JS/backend/addItem.js"></script>
     <script src="../PAMO JS/backend/editItem.js"></script>
@@ -241,7 +244,7 @@ session_start();
                     </div>
                     <div class="input-group" id="courseGroup" style="display:none;">
                         <label for="courseSelect">Course:</label>
-                        <select id="courseSelect" name="course_id" style="width:100%;">
+                        <select id="courseSelect" name="course_id[]" multiple style="width:100%;">
                             <option value="">Select Course</option>
                             <?php
                             $conn = mysqli_connect("localhost", "root", "", "proware");

@@ -61,11 +61,18 @@ try {
         throw new Exception('Item code already exists. Please enter a unique item code.');
     }
 
+    // Calculate shared_in_courses
+    $course_ids = isset($_POST['course_id']) ? (is_array($_POST['course_id']) ? $_POST['course_id'] : [$_POST['course_id']]) : [];
+    $RTW = (count($course_ids) > 1) ? 1 : 0;
+
+    // Debug: Log course_ids
+    // error_log('Course IDs received: ' . print_r($course_ids, true));
+
     $sql = "INSERT INTO inventory (
         item_code, category, item_name, sizes, price, 
         actual_quantity, new_delivery, beginning_quantity, 
-        damage, sold_quantity, status, image_path, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+        damage, sold_quantity, status, image_path, RTW, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
 
     $stmt = mysqli_prepare($conn, $sql);
     if (!$stmt) {
@@ -74,7 +81,7 @@ try {
 
     mysqli_stmt_bind_param(
         $stmt,
-        "ssssdiiiiiss",
+        "ssssdiiiiissi",
         $item_code,
         $category,
         $item_name,
@@ -86,7 +93,8 @@ try {
         $damage,
         $sold_quantity,
         $status,
-        $dbFilePath
+        $dbFilePath,
+        $RTW
     );
 
     if (!mysqli_stmt_execute($stmt)) {
@@ -105,12 +113,18 @@ try {
 
     // After inventory insert, link to course_item if course_id is provided
     if (!empty($_POST['course_id'])) {
-        $course_id = intval($_POST['course_id']);
-        $sql = "INSERT INTO course_item (inventory_id, course_id) VALUES (?, ?)";
-        $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, "ii", $new_inventory_id, $course_id);
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
+        $course_ids = is_array($_POST['course_id']) ? $_POST['course_id'] : [$_POST['course_id']];
+        foreach ($course_ids as $course_id) {
+            $course_id = intval($course_id);
+            // error_log('Processing course_id: ' . $course_id); // Debug each course_id
+            if ($course_id > 0) {
+                $sql = "INSERT INTO course_item (inventory_id, course_id) VALUES (?, ?)";
+                $stmt = mysqli_prepare($conn, $sql);
+                mysqli_stmt_bind_param($stmt, "ii", $new_inventory_id, $course_id);
+                mysqli_stmt_execute($stmt);
+                mysqli_stmt_close($stmt);
+            }
+        }
     }
 
     mysqli_close($conn);

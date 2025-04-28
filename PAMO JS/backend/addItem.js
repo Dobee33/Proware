@@ -59,17 +59,8 @@ document.addEventListener("DOMContentLoaded", function () {
   if (window.jQuery && $("#courseSelect").length) {
     $("#courseSelect").select2({
       placeholder: "Select course(s)",
-      ajax: {
-        url: "../PAMO Inventory backend/get_courses.php",
-        dataType: "json",
-        processResults: function (data) {
-          return {
-            results: data.map(function (course) {
-              return { id: course.id, text: course.course_name };
-            }),
-          };
-        },
-      },
+      allowClear: true,
+      width: "100%",
     });
   }
   if (window.jQuery && $("#shirtTypeSelect").length) {

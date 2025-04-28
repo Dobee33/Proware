@@ -32,10 +32,10 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
             <?php endif; ?>
             <?php if (isset($_SESSION['user_id'])): ?>
                 <li><a href="ProPreOrder.php"
-                        class="<?php echo ($current_page == 'ProPreOrder.php') ? 'active' : ''; ?>">Pre Order</a></li>
+                        class="<?php echo ($current_page == 'ProPreOrder.php') ? 'active' : ''; ?>">Place Order</a></li>
             <?php else: ?>
                 <li><a href="javascript:void(0)" onclick="redirectToLogin('ProPreOrder.php')"
-                        class="<?php echo ($current_page == 'ProPreOrder.php') ? 'active' : ''; ?>">Pre Order</a></li>
+                        class="<?php echo ($current_page == 'ProPreOrder.php') ? 'active' : ''; ?>">Place Order</a></li>
             <?php endif; ?>
             <?php if (isset($_SESSION['user_id'])): ?>
                 <li><a href="MyOrders.php"
