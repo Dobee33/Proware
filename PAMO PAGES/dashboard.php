@@ -96,10 +96,28 @@ $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
                     </div>
                     <div class="activity-list">
                         <?php
+                        // Get current page number
+                        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                        $items_per_page = 10;
+                        $offset = ($page - 1) * $items_per_page;
+
+                        // Get total number of activities
+                        $total_query = "SELECT COUNT(*) as total FROM activities WHERE DATE(timestamp) = CURDATE()";
+                        $total_result = $conn->query($total_query);
+                        $total_activities = $total_result->fetch(PDO::FETCH_ASSOC)['total'];
+                        $total_pages = ceil($total_activities / $items_per_page);
+
+                        // Modified query with pagination
                         $activities_query = "SELECT * FROM activities 
                         WHERE DATE(timestamp) = CURDATE()
-                        ORDER BY timestamp DESC";
-                        $activities_result = $conn->query($activities_query);
+                        ORDER BY timestamp DESC
+                        LIMIT :offset, :items_per_page";
+                        
+                        $stmt = $conn->prepare($activities_query);
+                        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+                        $stmt->bindParam(':items_per_page', $items_per_page, PDO::PARAM_INT);
+                        $stmt->execute();
+                        $activities_result = $stmt;
 
                         if ($activities_result->rowCount() > 0) {
                             while ($activity = $activities_result->fetch(PDO::FETCH_ASSOC)) {
@@ -143,22 +161,30 @@ $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
                         }
                         ?>
                     </div>
+                    <?php if ($total_pages > 1): ?>
+                    <div class="pagination">
+                        <?php if ($page > 1): ?>
+                            <a href="?page=<?php echo $page - 1; ?>" class="page-link">
+                                <i class="material-icons">chevron_left</i>
+                            </a>
+                        <?php endif; ?>
+                        
+                        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                            <a href="?page=<?php echo $i; ?>" class="page-link <?php echo $i === $page ? 'active' : ''; ?>">
+                                <?php echo $i; ?>
+                            </a>
+                        <?php endfor; ?>
+                        
+                        <?php if ($page < $total_pages): ?>
+                            <a href="?page=<?php echo $page + 1; ?>" class="page-link">
+                                <i class="material-icons">chevron_right</i>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </main>
     </div>
-
-    <style>
-        .card {
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-    </style>
 </body>
-
 </html>

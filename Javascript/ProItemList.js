@@ -394,6 +394,16 @@ document.addEventListener("DOMContentLoaded", function () {
       str.toLowerCase().replace(/[-_]/g, " ").replace(/\s+/g, " ").trim();
     const normalizedProductName = normalize(productName);
     const normalizedCourseValue = normalize(courseValue);
+
+    // Special handling for STI Shirt subcategories
+    if (
+      normalizedCourseValue === "Anniversary Shirt" ||
+      normalizedCourseValue === "T SHIRT WASHDAY" ||
+      normalizedCourseValue === "NSTP Shirt"
+    ) {
+      return normalizedProductName.includes(normalizedCourseValue);
+    }
+
     // Only match if the normalized product name or item code matches the normalized course value
     return normalizedProductName === normalizedCourseValue;
   }

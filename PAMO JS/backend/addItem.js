@@ -25,6 +25,25 @@ function submitNewItem(event) {
     return;
   }
 
+  // If shirt type is visible and selected, add it to course_id[]
+  const shirtTypeGroup = document.getElementById("shirtTypeGroup");
+  if (shirtTypeGroup && shirtTypeGroup.style.display !== "none") {
+    const shirtTypeSelect = document.getElementById("shirtTypeSelect");
+    const shirtTypeValue = shirtTypeSelect.value;
+    if (shirtTypeValue) {
+      // Find the option in the course select with the same text/value
+      const courseSelect = document.getElementById("courseSelect");
+      if (courseSelect) {
+        for (let i = 0; i < courseSelect.options.length; i++) {
+          if (courseSelect.options[i].text === shirtTypeValue) {
+            formData.append("course_id[]", courseSelect.options[i].value);
+            break;
+          }
+        }
+      }
+    }
+  }
+
   const xhr = new XMLHttpRequest();
   xhr.open("POST", "../PAMO Inventory backend/add_item.php", true);
   xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");

@@ -34,7 +34,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PAMO - Pre Orders</title>
+    <title>PAMO - Orders</title>
     <link rel="stylesheet" href="../PAMO CSS/styles.css">
     <link rel="stylesheet" href="../PAMO CSS/preorders.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">

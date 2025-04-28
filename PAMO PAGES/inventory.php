@@ -244,6 +244,16 @@ session_start();
                             <option value="STI-Accessories">STI-Accessories</option>
                             <option value="SHS-PE">SHS-PE</option>
                             <option value="Tertiary-PE">Tertiary-PE</option>
+                            <option value="STI-Jacket">STI Jacket</option>
+                        </select>
+                    </div>
+                    <div class="input-group" id="shirtTypeGroup" style="display:none;">
+                        <label for="shirtTypeSelect">Shirt Type:</label>
+                        <select id="shirtTypeSelect" name="shirt_type" style="width:100%;">
+                            <option value="">Select Shirt Type</option>
+                            <option value="Anniversary Shirt">Anniversary Shirt</option>
+                            <option value="T SHIRT WASHDAY">T SHIRT WASHDAY</option>
+                            <option value="NSTP Shirt">NSTP Shirt</option>
                         </select>
                     </div>
                     <div class="input-group" id="courseGroup" style="display:none;">
@@ -296,17 +306,6 @@ session_start();
                     <div class="input-group">
                         <label for="newImage">Product Image:</label>
                         <input type="file" id="newImage" name="newImage" accept="image/*" required>
-                    </div>
-                    <div class="input-group" id="shirtTypeGroup" style="display:none;">
-                        <label for="shirtTypeSelect">Shirt Type:</label>
-                        <select id="shirtTypeSelect" name="shirt_type" style="width:100%;">
-                            <option value="">Select Shirt Type</option>
-                            <option value="Polo">Polo</option>
-                            <option value="T-shirt">T-shirt</option>
-                            <option value="Jacket">Jacket</option>
-                            <option value="Sweater">Sweater</option>
-                            <option value="Other">Other</option>
-                        </select>
                     </div>
                 </form>
             </div>

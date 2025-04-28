@@ -203,6 +203,38 @@
                         <span>STI Shirt</span>
                         <i class="fas fa-chevron-down"></i>
                     </div>
+                    <div class="subcategories">
+                        <div class="course-category">
+                            <div class="course-header">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" class="course-filter-checkbox" value="Anniversary Shirt">
+                                    <span>Anniversary Shirt</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="course-category">
+                            <div class="course-header">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" class="course-filter-checkbox" value="T SHIRT WASHDAY">
+                                    <span>T SHIRT WASHDAY</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="course-category">
+                            <div class="course-header">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" class="course-filter-checkbox" value="NSTP Shirt">
+                                    <span>NSTP Shirt</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="category-item">
+                    <div class="main-category-header" data-category="sti-jacket">
+                        <span>STI Jacket</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
                     <div class="subcategories"></div>
                 </div>
                 <div class="category-item">
