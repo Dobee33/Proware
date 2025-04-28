@@ -41,6 +41,10 @@ function submitNewItemSize(event) {
   formData.append("newSize", size);
   formData.append("newQuantity", document.getElementById("newQuantity").value);
   formData.append("newDamage", document.getElementById("newDamage").value);
+  formData.append(
+    "deliveryOrderNumber",
+    document.getElementById("deliveryOrderNumber").value
+  );
 
   fetch("../PAMO Inventory backend/process_add_item_size.php", {
     method: "POST",

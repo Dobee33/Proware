@@ -104,8 +104,9 @@ try {
     mysqli_stmt_close($stmt);
 
     // Log the activity in the audit trail
-    $description = "New item added: {$item_name} ({$item_code}) - Initial delivery: {$new_delivery}, Damage: {$damage}, Actual quantity: {$actual_quantity}";
-    $sql = "INSERT INTO activities (action_type, description, item_code, timestamp) VALUES ('new_item', ?, ?, NOW())";
+    $delivery_order = mysqli_real_escape_string($conn, $_POST['deliveryOrderNumber']);
+    $description = "New item added: {$item_name} ({$item_code}) - Delivery Order #: {$delivery_order}, Initial delivery: {$new_delivery}, Damage: {$damage}, Actual quantity: {$actual_quantity}";
+    $sql = "INSERT INTO activities (action_type, description, item_code, timestamp) VALUES ('New Item', ?, ?, NOW())";
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "ss", $description, $item_code);
     mysqli_stmt_execute($stmt);

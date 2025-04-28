@@ -227,6 +227,10 @@ session_start();
             <div class="modal-body">
                 <form id="addItemForm" onsubmit="submitNewItem(event)" enctype="multipart/form-data">
                     <div class="input-group">
+                        <label for="deliveryOrderNumber">Delivery Order #:</label>
+                        <input type="text" id="deliveryOrderNumber" name="deliveryOrderNumber" required>
+                    </div>
+                    <div class="input-group">
                         <label for="newProductItemCode">Item Code:</label>
                         <input type="text" id="newProductItemCode" name="newItemCode" required>
                     </div>
@@ -503,6 +507,10 @@ session_start();
             </div>
             <div class="modal-body">
                 <form id="addItemSizeForm" onsubmit="submitNewItemSize(event)">
+                    <div class="input-group">
+                        <label for="deliveryOrderNumber">Delivery Order #:</label>
+                        <input type="text" id="deliveryOrderNumber" name="deliveryOrderNumber" required>
+                    </div>
                     <div class="input-group">
                         <label for="existingItem">Select Item:</label>
                         <select id="existingItem" name="existingItem" required onchange="updateItemCodePrefix()">

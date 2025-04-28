@@ -32,7 +32,7 @@ try {
 
     // Log the activity with price change details
     $activity_description = "Price updated for {$item['item_name']} ({$itemId}) - Old price: ₱" . number_format($oldPrice, 2) . ", New price: ₱" . number_format($newPrice, 2);
-    $log_activity_query = "INSERT INTO activities (action_type, description, item_code, timestamp) VALUES ('price_update', ?, ?, NOW())";
+    $log_activity_query = "INSERT INTO activities (action_type, description, item_code, timestamp) VALUES ('Edit Price', ?, ?, NOW())";
     $stmt = $conn->prepare($log_activity_query);
     $stmt->bind_param("ss", $activity_description, $itemId);
     $stmt->execute();

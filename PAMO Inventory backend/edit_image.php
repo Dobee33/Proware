@@ -86,7 +86,7 @@ try {
 
     // Log the activity
     $activity_description = "Updated image for item: $itemId";
-    $log_activity_query = "INSERT INTO activities (action_type, description, item_code, timestamp) VALUES ('edit_image', ?, ?, NOW())";
+    $log_activity_query = "INSERT INTO activities (action_type, description, item_code, timestamp) VALUES ('Edit Image', ?, ?, NOW())";
     $stmt = $conn->prepare($log_activity_query);
     $stmt->bind_param("ss", $activity_description, $itemId);
     $stmt->execute();

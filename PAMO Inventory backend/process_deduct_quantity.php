@@ -117,7 +117,7 @@ try {
 
         // Log the activity
         $activity_description = "Sale recorded - Transaction #: $transactionNumber, Item: $itemId, Size: $size, Quantity: $quantityToDeduct, Total: $itemTotal, Previous stock: {$item['actual_quantity']}, New stock: $new_actual_quantity";
-        $log_activity_query = "INSERT INTO activities (action_type, description, item_code, timestamp) VALUES ('sale', ?, ?, NOW())";
+        $log_activity_query = "INSERT INTO activities (action_type, description, item_code, timestamp) VALUES ('Sales', ?, ?, NOW())";
         $stmt = $conn->prepare($log_activity_query);
         $stmt->bind_param("ss", $activity_description, $itemId);
         

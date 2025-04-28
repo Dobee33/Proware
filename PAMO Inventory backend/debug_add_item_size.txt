@@ -1,0 +1,9 @@
+Array
+(
+    [existingItem] => 124124124
+    [newItemCode] => 124124124-002
+    [newSize] => XS
+    [newQuantity] => 11111
+    [newDamage] => 0
+    [deliveryOrderNumber] => 
+)

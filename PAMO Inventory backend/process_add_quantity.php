@@ -110,7 +110,7 @@ try {
 
         // Log the activity
         $activity_description = "New delivery added - Order #: $orderNumber, Item: $itemId, Quantity: $quantityToAdd, Previous stock: $beginning_quantity, New total: $actual_quantity";
-        $log_activity_query = "INSERT INTO activities (action_type, description, item_code, timestamp) VALUES ('new_delivery', ?, ?, NOW())";
+        $log_activity_query = "INSERT INTO activities (action_type, description, item_code, timestamp) VALUES ('Restock Item', ?, ?, NOW())";
         $stmt = $conn->prepare($log_activity_query);
         $stmt->bind_param("ss", $activity_description, $itemId);
         
