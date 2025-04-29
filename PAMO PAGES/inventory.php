@@ -83,6 +83,7 @@ session_start();
                         <option value="Tertiary-Uniform">Tertiary-Uniform</option>
                         <option value="SHS-Uniform">SHS-Uniform</option>
                         <option value="STI-Shirts">STI-Shirts</option>
+                        <option value="STI-Jacket">STI Jacket</option>
                         <option value="STI-Accessories">STI-Accessories</option>
                         <option value="SHS-PE">SHS-PE</option>
                         <option value="Tertiary-PE">Tertiary-PE</option>

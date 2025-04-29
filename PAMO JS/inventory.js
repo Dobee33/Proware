@@ -225,7 +225,7 @@ function clearAllFilters() {
 
 function populateFilters() {
   const sizeFilter = document.getElementById("sizeFilter");
-  const sizes = [
+  const sizeOrder = [
     "XS",
     "S",
     "M",
@@ -237,14 +237,7 @@ function populateFilters() {
     "5XL",
     "6XL",
     "7XL",
-  ];
-  const categories = [
-    "Tertiary-Uniform",
-    "SHS-Uniform",
-    "STI-Shirts",
-    "STI-Accessories",
-    "SHS-PE",
-    "Tertiary-PE",
+    "One Size",
   ];
 
   // Get all unique sizes from the table
@@ -258,17 +251,17 @@ function populateFilters() {
   // Keep the "All Sizes" option
   const allSizesOption = sizeFilter.querySelector('option[value=""]');
   sizeFilter.innerHTML = "";
-  sizeFilter.appendChild(allSizesOption);
+  if (allSizesOption) sizeFilter.appendChild(allSizesOption);
 
-  // Add unique sizes from the table
-  Array.from(uniqueSizes)
-    .sort()
-    .forEach((size) => {
+  // Add sizes in the defined order if they exist in the inventory
+  sizeOrder.forEach((size) => {
+    if (uniqueSizes.has(size)) {
       const option = document.createElement("option");
       option.value = size;
       option.textContent = size;
       sizeFilter.appendChild(option);
-    });
+    }
+  });
 }
 
 // Call populateFilters when page loads

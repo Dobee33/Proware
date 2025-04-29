@@ -595,6 +595,9 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         left: 50%;
         transform: translateX(-50%);
         justify-content: center;
+        white-space: nowrap;
+        overflow-x: auto;
+        flex-wrap: nowrap !important;
     }
 
     .nav-links li {
@@ -610,6 +613,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         font-size: 16px;
         transition: .3s ease-out;
         letter-spacing: 0.3px;
+        white-space: nowrap;
     }
 
     .nav-links > li:hover {
@@ -641,6 +645,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         height: 36px; /* Increased height */
         text-decoration: none;
         transition: all 0.3s ease;
+        white-space: nowrap;
     }
 
     /* Hover effects for icons */
@@ -683,16 +688,14 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     }
 
     /* Mobile responsive design */
-    @media screen and (max-width: 1024px) {
+    @media screen and (max-width: 1250px) {
         .navbar {
             padding: 0.5rem;
         }
-
         .logo-container {
             width: auto;
             padding-left: 10px;
         }
-
         .nav-links {
             display: none;
             position: absolute;
@@ -700,37 +703,33 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
             left: 0;
             width: 100%;
             transform: none;
-        }
-
-        .nav-links.active {
-            display: flex;
             flex-direction: column;
             background-color: white;
             padding: 1rem 0;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             z-index: 1000;
+            margin-right: 0;
         }
-
+        .nav-links.active {
+            display: flex;
+        }
         .nav-links li {
             margin: 0.5rem 0;
             text-align: center;
         }
-
         .icons {
             padding-right: 10px;
             gap: 0.5rem;
+            margin-left: 0;
         }
-
         .icon {
             padding: 4px;
         }
-
         .icon a {
             width: 32px;
             height: 32px;
             font-size: 1rem;
         }
-
         .cart-count, .notification-count {
             top: -3px;
             right: -8px;
@@ -739,13 +738,10 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
             height: 12px;
             padding: 1px;
         }
-
         .login-button {
             padding: 8px 15px;
             font-size: 0.9rem;
         }
-
-        /* Ensure all icons are visible */
         .icons {
             display: flex;
             align-items: center;
@@ -753,22 +749,16 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
             flex-wrap: nowrap;
             min-width: fit-content;
         }
-
-        /* Adjust hamburger position */
         .hamburger {
             display: block !important;
             z-index: 1001;
         }
-
-        /* Hamburger animation */
         .hamburger.active .bar:nth-child(2) {
             opacity: 0;
         }
-
         .hamburger.active .bar:nth-child(1) {
             transform: translateY(8px) rotate(45deg);
         }
-
         .hamburger.active .bar:nth-child(3) {
             transform: translateY(-8px) rotate(-45deg);
         }
@@ -1723,5 +1713,16 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         .drawer-overlay.active {
             display: block;
         }
+    }
+
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .nav-links::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .nav-links {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;     /* Firefox */
     }
 </style>
