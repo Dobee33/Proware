@@ -16,7 +16,11 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
                 <img src="../Images/STI-LOGO.png" alt="STI Logo" class="logo-image">
             </a>
         </div>
-
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
         <!-- Middle - Navigation Links -->
         <ul class="nav-links">
             <li><a href="home.php"
@@ -49,12 +53,7 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
         </ul>
     </div>
 
-    <!-- Hamburger Menu for Mobile -->
-    <div class="hamburger">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-    </div>
+    
 
     <?php if (isset($_SESSION['user_id'])): ?>
         <div class="icons">
@@ -583,7 +582,12 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
     }
 
     .logo {
-        margin-right: 20px;
+        margin-right: 10px;
+    }
+
+    .hamburger {
+        margin-right: 0;
+        margin-left: 5px;
     }
 
     .nav-links {
