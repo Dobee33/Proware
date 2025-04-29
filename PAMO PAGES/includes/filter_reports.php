@@ -37,6 +37,7 @@ function displayReport($reportType, $startDate, $endDate, $conn) {
                 
                 echo '<div class="report-table">';
                 echo '<h3>Inventory Report</h3>';
+                echo '<div class="scroll-table-container">';
                 echo '<table>';
                 echo '<thead><tr>
                         <th>Item Code</th>
@@ -65,7 +66,7 @@ function displayReport($reportType, $startDate, $endDate, $conn) {
                     echo "<td>{$row['created_at']}</td>";
                     echo "</tr>";
                 }
-                echo '</tbody></table></div>';
+                echo '</tbody></table></div></div>';
                 break;
 
             case 'sales':
@@ -88,6 +89,7 @@ function displayReport($reportType, $startDate, $endDate, $conn) {
                 echo '<div class="total-amount-display">';
                 echo '<h4>Total Sales Amount: <span id="totalSalesAmount">₱0.00</span></h4>';
                 echo '</div>';
+                echo '<div class="scroll-table-container">';
                 echo '<table>';
                 echo '<thead><tr>
                         <th>Order Number</th>
@@ -112,7 +114,7 @@ function displayReport($reportType, $startDate, $endDate, $conn) {
                     echo "<td>{$row['sale_date']}</td>";
                     echo "</tr>";
                 }
-                echo '</tbody></table></div>';
+                echo '</tbody></table></div></div>';
                 break;
 
             case 'audit':
@@ -132,6 +134,7 @@ function displayReport($reportType, $startDate, $endDate, $conn) {
                 
                 echo '<div class="report-table">';
                 echo '<h3>Audit Trail</h3>';
+                echo '<div class="scroll-table-container">';
                 echo '<table>';
                 echo '<thead><tr>
                         <th>Date/Time</th>
@@ -148,7 +151,7 @@ function displayReport($reportType, $startDate, $endDate, $conn) {
                     echo "<td>{$row['description']}</td>";
                     echo "</tr>";
                 }
-                echo '</tbody></table></div>';
+                echo '</tbody></table></div></div>';
                 break;
         }
     } catch (PDOException $e) {

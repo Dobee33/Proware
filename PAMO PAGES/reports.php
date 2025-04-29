@@ -67,6 +67,7 @@ session_start();
                 <!-- Inventory Report Table -->
                 <div id="inventoryReport" class="report-table">
                     <h3>Inventory Report</h3>
+                    <div class="scroll-table-container">
                     <table>
                         <thead>
                             <tr>
@@ -105,6 +106,7 @@ session_start();
                             ?>
                         </tbody>
                     </table>
+                    </div>
                 </div>
 
                 <!-- Sales Report Table -->
@@ -113,6 +115,7 @@ session_start();
                     <div class="total-amount-display" style="display: none;">
                         <h4>Total Sales Amount: <span id="totalSalesAmount">₱0.00</span></h4>
                     </div>
+                    <div class="scroll-table-container">
                     <table>
                         <thead>
                             <tr>
@@ -149,11 +152,13 @@ session_start();
                             ?>
                         </tbody>
                     </table>
+                    </div>
                 </div>
 
                 <!-- Audit Trail Table -->
                 <div id="auditReport" class="report-table" style="display: none;">
                     <h3>Audit Trail</h3>
+                    <div class="scroll-table-container">
                     <table>
                         <thead>
                             <tr>
@@ -180,6 +185,7 @@ session_start();
                             ?>
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
         </main>

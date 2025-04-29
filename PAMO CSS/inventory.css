@@ -835,3 +835,21 @@
 .sales-item:not(:first-child) .item-close {
   display: block;
 }
+
+.scroll-table-container {
+  max-height: 400px; /* Adjust as needed */
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.scroll-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.scroll-table-container thead th {
+  position: sticky;
+  top: 0;
+  background: #f8f9fa;
+  z-index: 2;
+}

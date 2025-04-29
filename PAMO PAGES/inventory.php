@@ -115,6 +115,8 @@ session_start();
                 </div>
 
                 <div class="inventory-table">
+                  <!-- Added scrollable container -->
+                  <div class="scroll-table-container">
                     <table>
                         <thead>
                             <tr>
@@ -173,6 +175,7 @@ session_start();
                             ?>
                         </tbody>
                     </table>
+                  </div>
                 </div>
             </div>
         </main>
