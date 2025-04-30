@@ -33,6 +33,16 @@ session_start();
                 sessionStorage.removeItem('applyLowStockFilter');
             }
         });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            if (window.jQuery && $("#existingItem").length) {
+                $("#existingItem").select2({
+                    placeholder: "Select Item",
+                    allowClear: true,
+                    width: "100%"
+                });
+            }
+        });
     </script>
 </head>
 
@@ -236,7 +246,7 @@ session_start();
                     </div>
                     <div class="input-group">
                         <label for="newProductItemCode">Item Code:</label>
-                        <input type="text" id="newProductItemCode" name="newItemCode" required>
+                        <input type="text" id="newProductItemCode" name="newItemCode" required readonly>
                     </div>
                     <div class="input-group">
                         <label for="newCategory">Category:</label>
@@ -542,10 +552,6 @@ session_start();
                         </select>
                     </div>
                     <div class="input-group">
-                        <label for="newItemCode">Item Code:</label>
-                        <input type="text" id="newItemCode" name="newItemCode" required>
-                    </div>
-                    <div class="input-group">
                         <label for="newSize">Size:</label>
                         <select id="newSize" name="newSize" required>
                             <option value="">Select Size</option>
@@ -563,6 +569,11 @@ session_start();
                             <option value="One Size">One Size</option>
                         </select>
                     </div>
+                    <div class="input-group">
+                        <label for="newItemCode">Item Code:</label>
+                        <input type="text" id="newItemCode" name="newItemCode" required readonly>
+                    </div>
+                    
                     <div class="input-group">
                         <label for="newQuantity">Initial Stock:</label>
                         <input type="number" id="newQuantity" name="newQuantity" min="0" required>
@@ -607,16 +618,14 @@ session_start();
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
-        }
-
-        function updateItemCodePrefix() {
-            const select = document.getElementById('existingItem');
-            const selectedOption = select.options[select.selectedIndex];
-            const prefix = selectedOption.value;
-            const itemCodeField = document.getElementById('newItemCode');
-            // Only set the prefix if the field is empty or if the prefix changed
-            if (!itemCodeField.value || !itemCodeField.value.startsWith(prefix + '-')) {
-                itemCodeField.value = prefix + '-';
+            // Reset the form if it's the Add Item Size modal
+            if (modalId === 'addItemSizeModal') {
+                const form = document.getElementById('addItemSizeForm');
+                if (form) form.reset();
+                // Reset Select2 for Select Item
+                if (window.jQuery && $('#existingItem').length) {
+                    $('#existingItem').val(null).trigger('change');
+                }
             }
         }
     </script>
@@ -735,6 +744,14 @@ session_start();
 
     .cancel-btn:hover {
         background: #c82333;
+    }
+
+    .select2-container--default .select2-selection--single {
+        height: 38px;
+        padding: 4px 12px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        font-size: 14px;
     }
     </style>
 </body>
