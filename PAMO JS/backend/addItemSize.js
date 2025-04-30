@@ -55,8 +55,12 @@ const allSizes = [
 function updateSizeDropdown(existingSizes) {
   const sizeSelect = document.getElementById("newSize");
   sizeSelect.innerHTML = '<option value="">Select Size</option>';
-  // Normalize existing sizes for comparison
-  const normalizedExisting = existingSizes.map((s) => s.trim().toLowerCase());
+  // Normalize for both string and object
+  const normalizedExisting = existingSizes.map((s) =>
+    typeof s === "string"
+      ? s.trim().toLowerCase()
+      : (s.size || "").trim().toLowerCase()
+  );
   allSizes.forEach((size) => {
     if (!normalizedExisting.includes(size.toLowerCase())) {
       const option = document.createElement("option");

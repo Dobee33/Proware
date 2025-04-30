@@ -11,7 +11,15 @@ function showDeductQuantityModal() {
 
 function addSalesItem() {
   const salesItems = document.getElementById("salesItems");
-  const newItem = salesItems.querySelector(".sales-item").cloneNode(true);
+  const originalItem = salesItems.querySelector(".sales-item");
+
+  // Destroy Select2 on the original select before cloning
+  const originalSelect = originalItem.querySelector('select[name="itemId[]"]');
+  if (window.jQuery && $(originalSelect).data("select2")) {
+    $(originalSelect).select2("destroy");
+  }
+
+  const newItem = originalItem.cloneNode(true);
 
   // Reset the values in the cloned item
   const select = newItem.querySelector('select[name="itemId[]"]');
@@ -49,7 +57,21 @@ function addSalesItem() {
     select.addEventListener("change", function () {
       validateProductSelection(this);
       updateAvailableSizes(this);
+      updateSalesProductOptions();
     });
+    // Re-initialize Select2 for the new select
+    if (window.jQuery && $(select).length) {
+      $(select).select2({
+        placeholder: "Select Product",
+        allowClear: true,
+        width: "100%",
+      });
+      // Attach event after Select2
+      $(select).on("change", function () {
+        updateAvailableSizes(this);
+        updateSalesProductOptions();
+      });
+    }
   }
 
   if (sizeSelect) {
@@ -60,10 +82,26 @@ function addSalesItem() {
 
   salesItems.appendChild(newItem);
 
+  // Re-initialize Select2 for the original select
+  if (window.jQuery && $(originalSelect).length) {
+    $(originalSelect).select2({
+      placeholder: "Select Product",
+      allowClear: true,
+      width: "100%",
+    });
+    // Attach event after Select2
+    $(originalSelect).on("change", function () {
+      updateAvailableSizes(this);
+      updateSalesProductOptions();
+    });
+  }
+
   // Show close buttons for all but the first item
   document.querySelectorAll(".sales-item .item-close").forEach((btn, idx) => {
     btn.style.display = idx === 0 ? "none" : "block";
   });
+
+  updateSalesProductOptions();
 }
 
 function removeSalesItem(closeButton) {
@@ -84,7 +122,8 @@ function removeSalesItem(closeButton) {
 
 function updateItemPrice(sizeSelect) {
   const itemContainer = sizeSelect.closest(".sales-item");
-  const itemSelect = itemContainer.querySelector('select[name="itemId[]"]');
+  const selectedOption = sizeSelect.options[sizeSelect.selectedIndex];
+  const itemCode = selectedOption.getAttribute("data-item-code");
   const priceInput = itemContainer.querySelector(
     'input[name="pricePerItem[]"]'
   );
@@ -93,15 +132,15 @@ function updateItemPrice(sizeSelect) {
   );
   const totalInput = itemContainer.querySelector('input[name="itemTotal[]"]');
 
-  if (!itemSelect.value || !sizeSelect.value) {
+  if (!itemCode || !sizeSelect.value) {
     priceInput.value = "";
     totalInput.value = "";
     return;
   }
 
-  // Fetch the price from the server
+  // Fetch the price from the server using the correct item_code
   fetch(
-    `../PAMO Inventory backend/get_item_price.php?item_code=${itemSelect.value}&size=${sizeSelect.value}`
+    `../PAMO Inventory backend/get_item_price.php?item_code=${itemCode}&size=${sizeSelect.value}`
   )
     .then((response) => response.json())
     .then((data) => {
@@ -117,7 +156,7 @@ function updateItemPrice(sizeSelect) {
       }
     })
     .catch((error) => {
-      console.error("Error:", error);
+      console.error("Error getting price:", error);
       alert("Error getting price");
       priceInput.value = "";
       totalInput.value = "";
@@ -192,14 +231,16 @@ function updateAvailableSizes(itemSelect) {
 
   if (!itemCode) return;
 
+  // Use item_code param for backend
   fetch(`../PAMO Inventory backend/get_item_sizes.php?item_code=${itemCode}`)
     .then((response) => response.json())
     .then((data) => {
       if (data.success) {
-        data.sizes.forEach((size) => {
+        data.sizes.forEach((obj) => {
           const option = document.createElement("option");
-          option.value = size;
-          option.textContent = size;
+          option.value = obj.size;
+          option.textContent = obj.size;
+          option.setAttribute("data-item-code", obj.item_code);
           sizeSelect.appendChild(option);
         });
       }
@@ -452,7 +493,15 @@ document.addEventListener("DOMContentLoaded", function () {
     select.addEventListener("change", function () {
       validateProductSelection(this);
       updateAvailableSizes(this);
+      updateSalesProductOptions();
     });
+    // Attach event after Select2
+    if (window.jQuery && $(select).data("select2")) {
+      $(select).on("change", function () {
+        updateAvailableSizes(this);
+        updateSalesProductOptions();
+      });
+    }
   });
 
   document.querySelectorAll('select[name="size[]"]').forEach((select) => {
@@ -460,4 +509,92 @@ document.addEventListener("DOMContentLoaded", function () {
       updateItemPrice(this);
     });
   });
+
+  // Add resetDeductQuantityModal to reset the modal on close
+  const deductQuantityModal = document.getElementById("deductQuantityModal");
+  if (deductQuantityModal) {
+    const closeBtns = deductQuantityModal.querySelectorAll(
+      ".close, .cancel-btn"
+    );
+    closeBtns.forEach((btn) => {
+      btn.addEventListener("click", function () {
+        resetDeductQuantityModal();
+      });
+    });
+  }
+
+  updateSalesProductOptions();
 });
+
+function resetDeductQuantityModal() {
+  const form = document.getElementById("deductQuantityForm");
+  if (form) form.reset();
+
+  // Remove all sales-item divs except the first one
+  const salesItems = document.getElementById("salesItems");
+  if (salesItems) {
+    const items = salesItems.querySelectorAll(".sales-item");
+    items.forEach((item, idx) => {
+      if (idx > 0) item.remove();
+    });
+  }
+
+  // Reset Select2 for all product selects
+  if (window.jQuery && $('select[name="itemId[]"]').length) {
+    $('select[name="itemId[]"]').val(null).trigger("change");
+  }
+}
+
+function updateSalesProductOptions() {
+  const allSelects = document.querySelectorAll('select[name="itemId[]"]');
+  const selectedValues = Array.from(allSelects)
+    .map((select) => select.value)
+    .filter((val) => val);
+
+  allSelects.forEach((select) => {
+    const currentValue = select.value;
+    // Store all option values and text
+    const allOptions = Array.from(select.querySelectorAll("option")).map(
+      (opt) => ({
+        value: opt.value,
+        text: opt.text,
+        selected: opt.selected,
+        dataset: opt.dataset,
+      })
+    );
+
+    // Remove all options except the placeholder and the current value
+    select.innerHTML = "";
+    // Add placeholder
+    const placeholderOption = document.createElement("option");
+    placeholderOption.value = "";
+    placeholderOption.textContent = "Select Product";
+    select.appendChild(placeholderOption);
+
+    // Add back only options that are not selected in other selects, or the current value
+    allOptions.forEach((opt) => {
+      if (
+        opt.value === "" ||
+        opt.value === currentValue ||
+        !selectedValues.includes(opt.value)
+      ) {
+        const option = document.createElement("option");
+        option.value = opt.value;
+        option.text = opt.text;
+        if (opt.selected) option.selected = true;
+        // Copy data attributes (for price, etc.)
+        if (opt.dataset) {
+          for (const key in opt.dataset) {
+            option.dataset[key] = opt.dataset[key];
+          }
+        }
+        select.appendChild(option);
+      }
+    });
+
+    // Refresh Select2
+    if (window.jQuery && $(select).data("select2")) {
+      $(select).trigger("change.select2");
+    }
+  });
+}

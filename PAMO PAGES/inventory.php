@@ -246,7 +246,7 @@ session_start();
                     </div>
                     <div class="input-group">
                         <label for="newProductItemCode">Item Code:</label>
-                        <input type="text" id="newProductItemCode" name="newItemCode" required readonly>
+                        <input type="text" id="newProductItemCode" name="newItemCode" required>
                     </div>
                     <div class="input-group">
                         <label for="newCategory">Category:</label>

@@ -1,8 +1,8 @@
 Array
 (
     [existingItem] => UITB001
-    [newItemCode] => UITB001-003
-    [newSize] => M
+    [newItemCode] => UITB001-005
+    [newSize] => XL
     [newQuantity] => 1
     [newDamage] => 0
     [deliveryOrderNumber] => 
