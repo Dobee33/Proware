@@ -11,7 +11,16 @@ function showAddQuantityModal() {
 
 function addDeliveryItem() {
   const deliveryItems = document.getElementById("deliveryItems");
-  const newItem = deliveryItems.querySelector(".delivery-item").cloneNode(true);
+  const originalItem = deliveryItems.querySelector(".delivery-item");
+
+  // Destroy Select2 on the original select before cloning
+  const originalSelect = originalItem.querySelector('select[name="itemId[]"]');
+  if (window.jQuery && $(originalSelect).data("select2")) {
+    $(originalSelect).select2("destroy");
+  }
+
+  // Clone the item
+  const newItem = originalItem.cloneNode(true);
 
   // Reset the values in the cloned item
   const select = newItem.querySelector('select[name="itemId[]"]');
@@ -32,10 +41,30 @@ function addDeliveryItem() {
   if (select) {
     select.addEventListener("change", function () {
       validateProductSelection(this);
+      updateProductOptions();
     });
   }
 
   deliveryItems.appendChild(newItem);
+
+  // Re-initialize Select2 for both the original and the new select
+  if (window.jQuery) {
+    $(originalSelect)
+      .select2({
+        placeholder: "Select Product",
+        allowClear: true,
+        width: "100%",
+      })
+      .on("change", updateProductOptions);
+    $(select)
+      .select2({
+        placeholder: "Select Product",
+        allowClear: true,
+        width: "100%",
+      })
+      .on("change", updateProductOptions);
+  }
+  updateProductOptions();
 }
 
 function removeDeliveryItem(closeButton) {
@@ -178,6 +207,72 @@ function submitAddQuantity(event) {
   }
 }
 
+function updateProductOptions() {
+  const allSelects = document.querySelectorAll('select[name="itemId[]"]');
+  const selectedValues = Array.from(allSelects)
+    .map((select) => select.value)
+    .filter((val) => val);
+
+  allSelects.forEach((select) => {
+    const currentValue = select.value;
+    // Store all option values and text
+    const allOptions = Array.from(select.querySelectorAll("option")).map(
+      (opt) => ({
+        value: opt.value,
+        text: opt.text,
+        selected: opt.selected,
+      })
+    );
+
+    // Remove all options except the placeholder and the current value
+    select.innerHTML = "";
+    // Add placeholder
+    const placeholderOption = document.createElement("option");
+    placeholderOption.value = "";
+    placeholderOption.textContent = "Select Product";
+    select.appendChild(placeholderOption);
+
+    // Add back only options that are not selected in other selects, or the current value
+    allOptions.forEach((opt) => {
+      if (
+        opt.value === "" ||
+        opt.value === currentValue ||
+        !selectedValues.includes(opt.value)
+      ) {
+        const option = document.createElement("option");
+        option.value = opt.value;
+        option.text = opt.text;
+        if (opt.value === currentValue) option.selected = true;
+        select.appendChild(option);
+      }
+    });
+
+    // Refresh Select2
+    if (window.jQuery && $(select).data("select2")) {
+      $(select).trigger("change.select2");
+    }
+  });
+}
+
+function resetAddQuantityModal() {
+  const form = document.getElementById("addQuantityForm");
+  if (form) form.reset();
+
+  // Remove all delivery-item divs except the first one
+  const deliveryItems = document.getElementById("deliveryItems");
+  if (deliveryItems) {
+    const items = deliveryItems.querySelectorAll(".delivery-item");
+    items.forEach((item, idx) => {
+      if (idx > 0) item.remove();
+    });
+  }
+
+  // Reset Select2 for all product selects
+  if (window.jQuery && $('select[name="itemId[]"]').length) {
+    $('select[name="itemId[]"]').val(null).trigger("change");
+  }
+}
+
 // Event Listeners
 document.addEventListener("DOMContentLoaded", function () {
   // Add click handlers to existing close buttons
@@ -199,8 +294,32 @@ document.addEventListener("DOMContentLoaded", function () {
       if (select) {
         select.addEventListener("change", function () {
           validateProductSelection(this);
+          updateProductOptions();
         });
       }
+    });
+  }
+
+  // Initialize Select2 for all product dropdowns
+  if (window.jQuery && $('select[name="itemId[]"]').length) {
+    $('select[name="itemId[]"]')
+      .select2({
+        placeholder: "Select Product",
+        allowClear: true,
+        width: "100%",
+      })
+      .on("change", updateProductOptions);
+  }
+  updateProductOptions();
+
+  const addQuantityModal = document.getElementById("addQuantityModal");
+  if (addQuantityModal) {
+    // Find all close buttons inside the modal
+    const closeBtns = addQuantityModal.querySelectorAll(".close, .cancel-btn");
+    closeBtns.forEach((btn) => {
+      btn.addEventListener("click", function () {
+        resetAddQuantityModal();
+      });
     });
   }
 });
