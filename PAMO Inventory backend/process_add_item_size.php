@@ -72,9 +72,10 @@ mysqli_stmt_bind_param($stmt, "ssssiid",
 if (mysqli_stmt_execute($stmt)) {
     // Log the activity
     $activity_description = "New size added for {$originalItem['item_name']} ({$newItemCode}) - Size: {$newSize}, Initial stock: {$newQuantity}, Damage: {$newDamage}";
-    $log_activity_query = "INSERT INTO activities (action_type, description, item_code, timestamp) VALUES ('Add Item Size', ?, ?, NOW())";
+    $log_activity_query = "INSERT INTO activities (action_type, description, item_code, user_id, timestamp) VALUES ('Add Item Size', ?, ?, ?, NOW())";
     $stmt = mysqli_prepare($conn, $log_activity_query);
-    mysqli_stmt_bind_param($stmt, "ss", $activity_description, $newItemCode);
+    $user_id = $_SESSION['user_id'] ?? null;
+    mysqli_stmt_bind_param($stmt, "ssi", $activity_description, $newItemCode, $user_id);
     mysqli_stmt_execute($stmt);
 
     echo json_encode(['success' => true, 'message' => 'New size added successfully']);

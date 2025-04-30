@@ -86,9 +86,11 @@ try {
 
     // Log the activity
     $activity_description = "Updated image for item: $itemId";
-    $log_activity_query = "INSERT INTO activities (action_type, description, item_code, timestamp) VALUES ('Edit Image', ?, ?, NOW())";
+    $log_activity_query = "INSERT INTO activities (action_type, description, item_code, user_id, timestamp) VALUES ('Edit Image', ?, ?, ?, NOW())";
     $stmt = $conn->prepare($log_activity_query);
-    $stmt->bind_param("ss", $activity_description, $itemId);
+    session_start();
+    $user_id = $_SESSION['user_id'] ?? null;
+    $stmt->bind_param("ssi", $activity_description, $itemId, $user_id);
     $stmt->execute();
 
     echo json_encode([

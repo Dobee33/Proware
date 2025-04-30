@@ -76,92 +76,131 @@ function validateProductSelection(selectElement) {
 function submitAddQuantity(event) {
   event.preventDefault();
 
-  const orderNumber = document.getElementById("orderNumber").value;
-  const deliveryItems = document.querySelectorAll(".delivery-item");
+  try {
+    const orderNumber = document.getElementById("orderNumber").value;
+    const deliveryItems = document.querySelectorAll(".delivery-item");
 
-  if (!orderNumber || deliveryItems.length === 0) {
-    alert("Please fill in all required fields");
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("orderNumber", orderNumber);
-
-  // Arrays to store multiple items
-  const itemIds = [];
-  const quantities = [];
-
-  // Validate and collect all items data
-  let hasErrors = false;
-  deliveryItems.forEach((item, index) => {
-    const itemSelect = item.querySelector('select[name="itemId[]"]');
-    const quantityInput = item.querySelector('input[name="quantityToAdd[]"]');
-
-    if (
-      !itemSelect ||
-      !quantityInput ||
-      !itemSelect.value ||
-      !quantityInput.value
-    ) {
-      alert(`Please fill in all fields for item ${index + 1}`);
-      hasErrors = true;
-      return;
+    if (!orderNumber || orderNumber.trim() === "") {
+      alert("Please enter a delivery order number");
+      return false;
     }
 
-    if (parseInt(quantityInput.value) <= 0) {
-      alert(`Quantity must be greater than 0 for item ${index + 1}`);
-      hasErrors = true;
-      return;
+    if (!deliveryItems || deliveryItems.length === 0) {
+      alert("Please add at least one item");
+      return false;
     }
 
-    itemIds.push(itemSelect.value);
-    quantities.push(quantityInput.value);
-  });
+    const formData = new FormData();
+    formData.append("orderNumber", orderNumber);
 
-  if (hasErrors) {
-    return;
-  }
+    const itemIds = [];
+    const quantities = [];
 
-  // Append arrays to FormData
-  itemIds.forEach((id, index) => {
-    formData.append("itemId[]", id);
-    formData.append("quantityToAdd[]", quantities[index]);
-  });
+    for (let i = 0; i < deliveryItems.length; i++) {
+      const item = deliveryItems[i];
+      const itemSelect = item.querySelector('select[name="itemId[]"]');
+      const quantityInput = item.querySelector('input[name="quantityToAdd[]"]');
 
-  fetch("../PAMO Inventory backend/process_add_quantity.php", {
-    method: "POST",
-    body: formData,
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        alert("Delivery recorded successfully!");
-        closeModal("addQuantityModal");
-        location.reload();
-      } else {
-        alert("Error: " + data.message);
+      if (!itemSelect || !quantityInput) {
+        alert(`Invalid form elements for item ${i + 1}`);
+        return false;
       }
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      alert("An error occurred while processing your request");
+
+      if (!itemSelect.value) {
+        alert(`Please select a product for item ${i + 1}`);
+        itemSelect.focus();
+        return false;
+      }
+
+      const quantity = parseInt(quantityInput.value);
+      if (!quantity || quantity <= 0) {
+        alert(`Please enter a valid quantity greater than 0 for item ${i + 1}`);
+        quantityInput.focus();
+        return false;
+      }
+
+      if (itemIds.includes(itemSelect.value)) {
+        alert(
+          `Duplicate product selected for item ${
+            i + 1
+          }. Please select different products.`
+        );
+        itemSelect.focus();
+        return false;
+      }
+
+      itemIds.push(itemSelect.value);
+      quantities.push(quantity);
+    }
+
+    itemIds.forEach((id, index) => {
+      formData.append("itemId[]", id);
+      formData.append("quantityToAdd[]", quantities[index]);
     });
+
+    const submitButton = document.querySelector('button[type="submit"]');
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Processing...";
+    }
+
+    fetch("../PAMO Inventory backend/process_add_quantity.php", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to process request");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.success) {
+          alert("Delivery recorded successfully!");
+          closeModal("addQuantityModal");
+          location.reload();
+        } else {
+          throw new Error(data.message || "Failed to record delivery");
+        }
+      })
+      .catch((error) => {
+        alert(error.message);
+      })
+      .finally(() => {
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = "Record Delivery";
+        }
+      });
+  } catch (error) {
+    alert("An error occurred while processing your request");
+    return false;
+  }
 }
 
 // Event Listeners
 document.addEventListener("DOMContentLoaded", function () {
   // Add click handlers to existing close buttons
   const closeButtons = document.querySelectorAll(".item-close");
-  closeButtons.forEach((btn) => {
-    btn.onclick = function () {
-      removeDeliveryItem(this);
-    };
-  });
+  if (closeButtons) {
+    closeButtons.forEach((btn) => {
+      if (btn) {
+        btn.onclick = function () {
+          removeDeliveryItem(this);
+        };
+      }
+    });
+  }
 
   // Add change event listeners to all select elements
-  document.querySelectorAll('select[name="itemId[]"]').forEach((select) => {
-    select.addEventListener("change", function () {
-      validateProductSelection(this);
+  const selectElements = document.querySelectorAll('select[name="itemId[]"]');
+  if (selectElements) {
+    selectElements.forEach((select) => {
+      if (select) {
+        select.addEventListener("change", function () {
+          validateProductSelection(this);
+        });
+      }
     });
-  });
+  }
 });

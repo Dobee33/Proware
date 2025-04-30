@@ -1,9 +1,9 @@
 Array
 (
-    [existingItem] => 124124124
-    [newItemCode] => 124124124-002
+    [existingItem] => STITESTT
+    [newItemCode] => STITESTT-001
     [newSize] => XS
-    [newQuantity] => 11111
+    [newQuantity] => 2
     [newDamage] => 0
     [deliveryOrderNumber] => 
 )

@@ -124,10 +124,9 @@ function searchItems() {
 }
 
 function updateStockStatus(row) {
-  const actualQuantity = parseInt(
-    row.querySelector("td:nth-child(4)").textContent
-  );
+  const quantityCell = row.querySelector("td:nth-child(4)");
   const statusCell = row.querySelector("td:nth-child(7)");
+  const actualQuantity = parseInt(quantityCell.textContent);
 
   let status, statusClass;
 
@@ -142,13 +141,8 @@ function updateStockStatus(row) {
     statusClass = "status-in-stock";
   }
 
-  statusCell.classList.remove(
-    "status-in-stock",
-    "status-low-stock",
-    "status-out-of-stock"
-  );
-  statusCell.classList.add(statusClass);
   statusCell.textContent = status;
+  statusCell.className = statusClass;
 }
 
 function applyFilters() {
@@ -330,6 +324,10 @@ function submitEditPrice() {
   const itemId = document.getElementById("priceItemId").value;
   const newPrice = document.getElementById("newPrice").value;
 
+  if (!validatePrice(newPrice)) {
+    return;
+  }
+
   fetch("../PAMO Inventory backend/edit_price.php", {
     method: "POST",
     headers: {
@@ -340,17 +338,14 @@ function submitEditPrice() {
     .then((response) => response.json())
     .then((data) => {
       if (data.success) {
-        // Update the UI
         updatePriceDisplay(itemId, newPrice);
-        showMessage(`Updated price for item ${itemId} to ${newPrice}.`);
+        showMessage("Price updated successfully");
         closeModal("editPriceModal");
-        // Clear input field
-        document.getElementById("newPrice").value = "";
       } else {
-        alert("Error updating price");
+        throw new Error(data.message || "Failed to update price");
       }
     })
-    .catch((error) => console.error("Error:", error));
+    .catch(handleError);
 }
 
 function submitEditImage() {
@@ -380,31 +375,78 @@ function submitEditImage() {
 }
 
 // Function to show a message
-function showMessage(message) {
-  const messageBox = document.createElement("div");
-  messageBox.className = "message-box";
-  messageBox.innerText = message;
-  document.body.appendChild(messageBox);
+function showMessage(message, type = "info") {
+  const messageDiv = document.createElement("div");
+  messageDiv.className = `message ${type}`;
+  messageDiv.textContent = message;
+  document.body.appendChild(messageDiv);
 
-  // Automatically remove the message after a few seconds
   setTimeout(() => {
-    messageBox.remove();
+    messageDiv.remove();
   }, 3000);
+}
+
+// Function to handle errors
+function handleError(error) {
+  console.error("Error:", error);
+  showMessage(error.message || "An error occurred", "error");
+}
+
+// Function to validate quantity
+function validateQuantity(quantity, available) {
+  if (isNaN(quantity) || quantity <= 0) {
+    showMessage("Please enter a valid quantity", "error");
+    return false;
+  }
+  if (quantity > available) {
+    showMessage("Cannot exceed available quantity", "error");
+    return false;
+  }
+  return true;
 }
 
 // Function to update inventory display
 function updateInventoryDisplay(itemId, quantity, action) {
-  const row = document.querySelector(`tr[data-item-code="${itemId}"]`);
-  if (row) {
-    const quantityCell = row.cells[3]; // 4th cell is Actual Quantity
-    let currentQuantity = parseInt(quantityCell.textContent);
-    if (action === "add") {
-      quantityCell.textContent = currentQuantity + parseInt(quantity);
-    } else if (action === "deduct") {
-      quantityCell.textContent = currentQuantity - parseInt(quantity);
+  try {
+    const row = document.querySelector(`tr[data-item-code="${itemId}"]`);
+    if (!row) {
+      console.error(`Row not found for item ${itemId}`);
+      return false;
     }
-    // Update the stock status immediately after changing the quantity
+
+    const quantityCell = row.cells[3]; // 4th cell is Actual Quantity
+    if (!quantityCell) {
+      console.error(`Quantity cell not found for item ${itemId}`);
+      return false;
+    }
+
+    let currentQuantity = parseInt(quantityCell.textContent);
+    if (isNaN(currentQuantity)) {
+      console.error(`Invalid current quantity for item ${itemId}`);
+      return false;
+    }
+
+    let newQuantity;
+    if (action === "add") {
+      newQuantity = currentQuantity + parseInt(quantity);
+    } else if (action === "deduct") {
+      newQuantity = currentQuantity - parseInt(quantity);
+      if (newQuantity < 0) {
+        showMessage("Cannot deduct more than available quantity", "error");
+        return false;
+      }
+    } else {
+      console.error(`Invalid action: ${action}`);
+      return false;
+    }
+
+    quantityCell.textContent = newQuantity;
     updateStockStatus(row);
+    return true;
+  } catch (error) {
+    console.error("Error in updateInventoryDisplay:", error);
+    showMessage("An error occurred while updating the display", "error");
+    return false;
   }
 }
 
@@ -415,6 +457,15 @@ function updatePriceDisplay(itemId, newPrice) {
     const priceCell = row.cells[5]; // 6th cell is Price
     priceCell.textContent = `₱${parseFloat(newPrice).toFixed(2)}`;
   }
+}
+
+// Function to validate price
+function validatePrice(price) {
+  if (isNaN(price) || price <= 0) {
+    showMessage("Please enter a valid price", "error");
+    return false;
+  }
+  return true;
 }
 
 document.addEventListener("DOMContentLoaded", function () {

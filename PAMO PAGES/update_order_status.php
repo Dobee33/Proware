@@ -1,4 +1,8 @@
 <?php
+ob_start();
+error_reporting(0);
+ini_set('display_errors', 0);
+
 session_start();
 require_once '../Includes/connection.php';
 require_once '../Includes/notifications.php';
@@ -15,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!isset($_POST['order_id']) || !isset($_POST['status'])) {
         $response['message'] = 'Missing required parameters';
         echo json_encode($response);
+        ob_end_flush();
         exit;
     }
 
@@ -29,14 +34,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_log("Fetching order details for ID: " . $order_id);
 
         // Get order details first
-        $stmt = $conn->prepare("SELECT po.*, a.id as user_id, a.first_name, a.last_name 
-                               FROM pre_orders po 
-                               JOIN account a ON po.user_id = a.id 
-                               WHERE po.id = ?");
+        $stmt = $conn->prepare("SELECT * FROM pre_orders WHERE id = ? FOR UPDATE");
         
         if (!$stmt->execute([$order_id])) {
-            $error = $stmt->errorInfo();
-            throw new Exception('Failed to fetch order details: ' . json_encode($error));
+            throw new Exception('Failed to get order details');
         }
         
         $order = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -45,79 +46,137 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_log("Order query result: " . json_encode($order));
 
         if (!$order) {
-            throw new Exception('Order not found for ID: ' . $order_id);
+            throw new Exception('Order not found');
         }
 
-        // If status is being changed to completed, deduct items from inventory
+        // If status is being changed to completed, process inventory updates
         if ($status === 'completed') {
-            error_log("Deducting items from inventory for order: " . $order_id);
+            error_log("Processing completed order: " . $order_id);
             
             // Decode the items JSON
             $order_items = json_decode($order['items'], true);
+            if (!$order_items) {
+                throw new Exception('Invalid order items data');
+            }
             
             foreach ($order_items as $item) {
-                // Debug log the item details
                 error_log("Processing item: " . json_encode($item));
                 
-                // Get current actual_quantity from inventory using item_code
-                $stockStmt = $conn->prepare("SELECT * FROM inventory WHERE item_code = ?");
+                // Get current inventory with lock
+                $stockStmt = $conn->prepare("SELECT * FROM inventory WHERE item_code = ? FOR UPDATE");
                 if (!$stockStmt->execute([$item['item_code']])) {
-                    throw new Exception('Failed to get inventory for item code: ' . $item['item_code']);
+                    throw new Exception('Failed to get inventory for item: ' . $item['item_code']);
                 }
                 
                 $inventory = $stockStmt->fetch(PDO::FETCH_ASSOC);
                 if (!$inventory) {
-                    throw new Exception('Item not found in inventory: ' . $item['item_code']);
+                    throw new Exception('Item no longer exists in inventory: ' . $item['item_code']);
                 }
                 
-                error_log("Found inventory: " . json_encode($inventory));
+                error_log("Current inventory state: " . json_encode($inventory));
                 
+                // Verify sufficient quantity
                 $new_quantity = $inventory['actual_quantity'] - $item['quantity'];
                 if ($new_quantity < 0) {
-                    throw new Exception('Insufficient actual quantity for item: ' . $inventory['item_name']);
+                    throw new Exception('Insufficient quantity for item: ' . $inventory['item_name']);
                 }
                 
-                // Update inventory actual_quantity
-                $updateStockStmt = $conn->prepare("UPDATE inventory SET actual_quantity = ? WHERE item_code = ?");
-                if (!$updateStockStmt->execute([$new_quantity, $item['item_code']])) {
+                // Update inventory with optimistic locking
+                $updateStockStmt = $conn->prepare(
+                    "UPDATE inventory 
+                    SET actual_quantity = ?,
+                        sold_quantity = sold_quantity + ?,
+                        status = CASE 
+                            WHEN ? <= 0 THEN 'Out of Stock'
+                            WHEN ? <= 20 THEN 'Low Stock'
+                            ELSE 'In Stock'
+                        END
+                    WHERE item_code = ? AND actual_quantity = ?"
+                );
+                
+                if (!$updateStockStmt->execute([
+                    $new_quantity,
+                    $item['quantity'],
+                    $new_quantity,
+                    $new_quantity,
+                    $item['item_code'],
+                    $inventory['actual_quantity']
+                ])) {
                     throw new Exception('Failed to update inventory for item: ' . $inventory['item_name']);
                 }
                 
-                error_log("Updated actual quantity for {$inventory['item_name']}: {$inventory['actual_quantity']} -> {$new_quantity}");
-
-                // Record the sale in the sales table
-                $saleStmt = $conn->prepare("INSERT INTO sales (transaction_number, item_code, size, quantity, price_per_item, total_amount, sale_date) 
-                                          VALUES (?, ?, ?, ?, ?, ?, NOW())");
-                                          
+                if ($updateStockStmt->rowCount() === 0) {
+                    throw new Exception('Item ' . $inventory['item_name'] . ' was modified by another transaction. Please try again.');
+                }
+                
+                error_log("Updated inventory quantity for {$inventory['item_name']}: {$inventory['actual_quantity']} -> {$new_quantity}");
+                
+                // Record the sale
+                $saleStmt = $conn->prepare(
+                    "INSERT INTO sales (
+                        transaction_number, 
+                        item_code, 
+                        size, 
+                        quantity, 
+                        price_per_item, 
+                        total_amount, 
+                        sale_date
+                    ) VALUES (?, ?, ?, ?, ?, ?, NOW())"
+                );
+                
                 $transaction_number = $order['order_number'];
                 $size = $item['size'] ?? 'One Size';
                 $quantity = $item['quantity'];
                 $price_per_item = $item['price'];
                 $total_amount = $item['price'] * $item['quantity'];
                 
-                if (!$saleStmt->execute([$transaction_number, $item['item_code'], $size, $quantity, $price_per_item, $total_amount])) {
+                if (!$saleStmt->execute([
+                    $transaction_number,
+                    $item['item_code'],
+                    $size,
+                    $quantity,
+                    $price_per_item,
+                    $total_amount
+                ])) {
                     throw new Exception('Failed to record sale for item: ' . $inventory['item_name']);
                 }
                 
-                error_log("Recorded sale for {$inventory['item_name']} in sales table");
+                // Log activity
+                $activity_description = "Order completed - Order #: {$order['order_number']}, Item: {$inventory['item_name']}, Quantity: {$item['quantity']}";
+                $activityStmt = $conn->prepare(
+                    "INSERT INTO activities (
+                        action_type,
+                        description,
+                        item_code,
+                        user_id,
+                        timestamp
+                    ) VALUES (?, ?, ?, ?, NOW())"
+                );
+                
+                if (!$activityStmt->execute([
+                    'Order Completed',
+                    $activity_description,
+                    $item['item_code'],
+                    $order['user_id']
+                ])) {
+                    throw new Exception('Failed to log activity for item: ' . $inventory['item_name']);
+                }
+                
+                error_log("Recorded sale and activity for {$inventory['item_name']}");
             }
         }
 
         // Update order status
         $updateStmt = $conn->prepare("UPDATE pre_orders SET status = ? WHERE id = ?");
         if (!$updateStmt->execute([$status, $order_id])) {
-            $error = $updateStmt->errorInfo();
-            throw new Exception('Failed to update order status: ' . json_encode($error));
+            throw new Exception('Failed to update order status');
         }
         
         // If status is completed, record the payment date
         if ($status === 'completed') {
-            error_log("Recording payment date for order: " . $order_id);
-            
             $paymentDateStmt = $conn->prepare("UPDATE pre_orders SET payment_date = NOW() WHERE id = ?");
             if (!$paymentDateStmt->execute([$order_id])) {
-                $error = $paymentDateStmt->errorInfo();
-                throw new Exception('Failed to record payment date: ' . json_encode($error));
+                throw new Exception('Failed to record payment date');
             }
         }
 
@@ -166,9 +225,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     echo json_encode($response);
+    ob_end_flush();
 } else {
     echo json_encode([
         'success' => false,
         'message' => 'Invalid request method'
     ]);
+    ob_end_flush();
 } 

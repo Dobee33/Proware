@@ -1,9 +1,23 @@
 <?php
 try {
-    $conn = mysqli_connect("localhost", "root", "", "proware");
+    // Enable error reporting
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
 
+    $conn = mysqli_connect("localhost", "root", "", "proware");
     if (!$conn) {
-        throw new Exception('Connection failed: ' . mysqli_connect_error());
+        throw new Exception("Connection failed: " . mysqli_connect_error());
+    }
+
+    // Start transaction
+    mysqli_begin_transaction($conn);
+
+    // Validate required fields
+    $required_fields = ['newItemCode', 'newCategory', 'newItemName', 'newSize', 'newItemPrice', 'newItemQuantity', 'deliveryOrderNumber'];
+    foreach ($required_fields as $field) {
+        if (!isset($_POST[$field]) || empty($_POST[$field])) {
+            throw new Exception("Missing required field: $field");
+        }
     }
 
     $item_code = mysqli_real_escape_string($conn, $_POST['newItemCode']);
@@ -12,32 +26,49 @@ try {
     $sizes = mysqli_real_escape_string($conn, $_POST['newSize']);
     $price = floatval($_POST['newItemPrice']);
     $quantity = intval($_POST['newItemQuantity']);
-    $damage = intval($_POST['newItemDamage']);
+    $damage = intval($_POST['newItemDamage'] ?? 0);
+    $delivery_order = mysqli_real_escape_string($conn, $_POST['deliveryOrderNumber']);
 
-    // For new items, beginning_quantity starts at 0 since it's a new entry
+    // Validate numeric fields
+    if ($price <= 0) {
+        throw new Exception("Price must be greater than zero");
+    }
+    if ($quantity < 0) {
+        throw new Exception("Quantity cannot be negative");
+    }
+    if ($damage < 0) {
+        throw new Exception("Damage count cannot be negative");
+    }
+
+    // Calculate quantities
     $beginning_quantity = 0;
-    // New delivery is the initial quantity being added
     $new_delivery = $quantity;
-    // Actual quantity is beginning_quantity + new_delivery - damage
     $actual_quantity = $beginning_quantity + $new_delivery - $damage;
     $sold_quantity = 0;
     $status = ($actual_quantity <= 0) ? 'Out of Stock' : (($actual_quantity <= 20) ? 'Low Stock' : 'In Stock');
 
+    // Handle image upload
+    $dbFilePath = null;
     if (isset($_FILES['newImage']) && $_FILES['newImage']['error'] === UPLOAD_ERR_OK) {
         $imageTmpPath = $_FILES['newImage']['tmp_name'];
         $imageName = $_FILES['newImage']['name'];
         $imageSize = $_FILES['newImage']['size'];
         $imageType = $_FILES['newImage']['type'];
 
-        $uploadDir = '../uploads/itemlist/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
+        // Validate image
+        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!in_array($imageType, $allowed_types)) {
+            throw new Exception('Invalid image type. Allowed types: JPG, PNG, GIF');
         }
 
-        // Get file extension
-        $imageExtension = pathinfo($imageName, PATHINFO_EXTENSION);
+        $uploadDir = '../uploads/itemlist/';
+        if (!is_dir($uploadDir)) {
+            if (!mkdir($uploadDir, 0755, true)) {
+                throw new Exception('Failed to create upload directory');
+            }
+        }
 
-        // Generate unique filename
+        $imageExtension = pathinfo($imageName, PATHINFO_EXTENSION);
         $uniqueName = uniqid('img_', true) . '.' . $imageExtension;
         $imagePath = $uploadDir . $uniqueName;
         $dbFilePath = 'uploads/itemlist/' . $uniqueName;
@@ -46,17 +77,22 @@ try {
             throw new Exception('Error moving uploaded file');
         }
     } else {
-        throw new Exception('Error uploading image');
+        throw new Exception('Image upload is required');
     }
 
     // Check if item_code already exists
     $check_sql = "SELECT COUNT(*) FROM inventory WHERE item_code = ?";
     $check_stmt = mysqli_prepare($conn, $check_sql);
+    if (!$check_stmt) {
+        throw new Exception("Prepare failed: " . mysqli_error($conn));
+    }
+
     mysqli_stmt_bind_param($check_stmt, "s", $item_code);
     mysqli_stmt_execute($check_stmt);
     mysqli_stmt_bind_result($check_stmt, $item_code_count);
     mysqli_stmt_fetch($check_stmt);
     mysqli_stmt_close($check_stmt);
+
     if ($item_code_count > 0) {
         throw new Exception('Item code already exists. Please enter a unique item code.');
     }
@@ -65,9 +101,7 @@ try {
     $course_ids = isset($_POST['course_id']) ? (is_array($_POST['course_id']) ? $_POST['course_id'] : [$_POST['course_id']]) : [];
     $RTW = (count($course_ids) > 1) ? 1 : 0;
 
-    // Debug: Log course_ids
-    // error_log('Course IDs received: ' . print_r($course_ids, true));
-
+    // Insert into inventory
     $sql = "INSERT INTO inventory (
         item_code, category, item_name, sizes, price, 
         actual_quantity, new_delivery, beginning_quantity, 
@@ -76,7 +110,7 @@ try {
 
     $stmt = mysqli_prepare($conn, $sql);
     if (!$stmt) {
-        throw new Exception('Error preparing statement: ' . mysqli_error($conn));
+        throw new Exception("Prepare failed: " . mysqli_error($conn));
     }
 
     mysqli_stmt_bind_param(
@@ -98,45 +132,68 @@ try {
     );
 
     if (!mysqli_stmt_execute($stmt)) {
-        throw new Exception('Error executing statement: ' . mysqli_stmt_error($stmt));
+        throw new Exception("Error executing statement: " . mysqli_stmt_error($stmt));
     }
+
     $new_inventory_id = mysqli_insert_id($conn);
     mysqli_stmt_close($stmt);
 
-    // Log the activity in the audit trail
-    $delivery_order = mysqli_real_escape_string($conn, $_POST['deliveryOrderNumber']);
+    // Log the activity
     $description = "New item added: {$item_name} ({$item_code}) - Delivery Order #: {$delivery_order}, Initial delivery: {$new_delivery}, Damage: {$damage}, Actual quantity: {$actual_quantity}";
-    $sql = "INSERT INTO activities (action_type, description, item_code, timestamp) VALUES ('New Item', ?, ?, NOW())";
+    $sql = "INSERT INTO activities (action_type, description, item_code, user_id, timestamp) VALUES ('New Item', ?, ?, ?, NOW())";
     $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "ss", $description, $item_code);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_close($stmt);
-
-    // After inventory insert, link to course_item if course_id is provided
-    if (!empty($_POST['course_id'])) {
-        $course_ids = is_array($_POST['course_id']) ? $_POST['course_id'] : [$_POST['course_id']];
-        foreach ($course_ids as $course_id) {
-            $course_id = intval($course_id);
-            // error_log('Processing course_id: ' . $course_id); // Debug each course_id
-            if ($course_id > 0) {
-                $sql = "INSERT INTO course_item (inventory_id, course_id) VALUES (?, ?)";
-                $stmt = mysqli_prepare($conn, $sql);
-                mysqli_stmt_bind_param($stmt, "ii", $new_inventory_id, $course_id);
-                mysqli_stmt_execute($stmt);
-                mysqli_stmt_close($stmt);
-            }
-        }
+    if (!$stmt) {
+        throw new Exception("Prepare failed: " . mysqli_error($conn));
     }
 
-    mysqli_close($conn);
+    $user_id = $_SESSION['user_id'] ?? null;
+    mysqli_stmt_bind_param($stmt, "ssi", $description, $item_code, $user_id);
+    
+    if (!mysqli_stmt_execute($stmt)) {
+        throw new Exception("Error logging activity: " . mysqli_stmt_error($stmt));
+    }
+    mysqli_stmt_close($stmt);
 
-    echo json_encode(['success' => true]);
+    // Link to course_item if course_ids provided
+    if (!empty($course_ids)) {
+        $sql = "INSERT INTO course_item (course_id, inventory_id) VALUES (?, ?)";
+        $stmt = mysqli_prepare($conn, $sql);
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . mysqli_error($conn));
+        }
+
+        foreach ($course_ids as $course_id) {
+            mysqli_stmt_bind_param($stmt, "ii", $course_id, $new_inventory_id);
+            if (!mysqli_stmt_execute($stmt)) {
+                throw new Exception("Error linking course: " . mysqli_stmt_error($stmt));
+            }
+        }
+        mysqli_stmt_close($stmt);
+    }
+
+    // If everything succeeded, commit the transaction
+    mysqli_commit($conn);
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Item added successfully'
+    ]);
 
 } catch (Exception $e) {
-    error_log("Error in add_item.php: " . $e->getMessage());
+    // If anything failed, roll back the transaction
+    if (isset($conn)) {
+        mysqli_rollback($conn);
+    }
+
     echo json_encode([
         'success' => false,
-        'message' => $e->getMessage()
+        'message' => 'Error: ' . $e->getMessage()
     ]);
+
+} finally {
+    // Close the connection
+    if (isset($conn)) {
+        mysqli_close($conn);
+    }
 }
 ?>

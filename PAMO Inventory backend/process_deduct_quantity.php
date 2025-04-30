@@ -41,6 +41,11 @@ try {
     $success = true;
     $errors = [];
 
+    // Validate transaction number
+    if (empty($transactionNumber)) {
+        throw new Exception("Transaction number is required");
+    }
+
     // Process each item
     for ($i = 0; $i < count($itemIds); $i++) {
         $itemId = mysqli_real_escape_string($conn, $itemIds[$i]);
@@ -49,28 +54,29 @@ try {
         $pricePerItem = floatval($pricesPerItem[$i]);
         $itemTotal = floatval($itemTotals[$i]);
 
-        // Get current quantities
-        $sql = "SELECT actual_quantity, beginning_quantity FROM inventory WHERE item_code = ?";
+        // Verify item exists and get current quantities with row lock
+        $sql = "SELECT actual_quantity, beginning_quantity FROM inventory WHERE item_code = ? FOR UPDATE";
         $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
         $stmt->bind_param("s", $itemId);
         $stmt->execute();
         $result = $stmt->get_result();
         $item = $result->fetch_assoc();
 
         if (!$item) {
-            $errors[] = "Item not found: $itemId";
-            continue;
+            throw new Exception("Item not found or no longer exists in inventory: $itemId");
         }
 
         if ($item['actual_quantity'] < $quantityToDeduct) {
-            $errors[] = "Insufficient stock for item $itemId. Current stock: " . $item['actual_quantity'];
-            continue;
+            throw new Exception("Insufficient stock for item $itemId. Current stock: " . $item['actual_quantity']);
         }
 
         // Calculate new quantities
         $new_actual_quantity = $item['actual_quantity'] - $quantityToDeduct;
         
-        // Update inventory
+        // Update inventory with optimistic locking
         $sql = "UPDATE inventory SET 
                 actual_quantity = ?,
                 sold_quantity = sold_quantity + ?,
@@ -79,27 +85,38 @@ try {
                     WHEN ? <= 20 THEN 'Low Stock'
                     ELSE 'In Stock'
                 END
-                WHERE item_code = ?";
+                WHERE item_code = ? AND actual_quantity = ?";
                 
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iiiis", 
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+
+        $stmt->bind_param("iiiiss", 
             $new_actual_quantity,
             $quantityToDeduct,
             $new_actual_quantity,
             $new_actual_quantity,
-            $itemId
+            $itemId,
+            $item['actual_quantity']
         );
         
         if (!$stmt->execute()) {
-            $errors[] = "Error updating item $itemId: " . $stmt->error;
-            $success = false;
-            break;
+            throw new Exception("Error updating item $itemId: " . $stmt->error);
+        }
+
+        if ($stmt->affected_rows === 0) {
+            throw new Exception("Item $itemId was modified by another transaction. Please try again.");
         }
 
         // Record the sale in sales table
         $sql = "INSERT INTO sales (transaction_number, item_code, size, quantity, price_per_item, total_amount, sale_date) 
                 VALUES (?, ?, ?, ?, ?, ?, NOW())";
         $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+
         $stmt->bind_param("sssidd", 
             $transactionNumber,
             $itemId,
@@ -110,37 +127,31 @@ try {
         );
         
         if (!$stmt->execute()) {
-            $errors[] = "Error recording sale for item $itemId: " . $stmt->error;
-            $success = false;
-            break;
+            throw new Exception("Error recording sale for item $itemId: " . $stmt->error);
         }
 
         // Log the activity
         $activity_description = "Sale recorded - Transaction #: $transactionNumber, Item: $itemId, Size: $size, Quantity: $quantityToDeduct, Total: $itemTotal, Previous stock: {$item['actual_quantity']}, New stock: $new_actual_quantity";
-        $log_activity_query = "INSERT INTO activities (action_type, description, item_code, timestamp) VALUES ('Sales', ?, ?, NOW())";
+        $log_activity_query = "INSERT INTO activities (action_type, description, item_code, user_id, timestamp) VALUES ('Sales', ?, ?, ?, NOW())";
         $stmt = $conn->prepare($log_activity_query);
-        $stmt->bind_param("ss", $activity_description, $itemId);
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+
+        $user_id = $_SESSION['user_id'] ?? null;
+        $stmt->bind_param("ssi", $activity_description, $itemId, $user_id);
         
         if (!$stmt->execute()) {
-            $errors[] = "Error logging activity for item $itemId: " . $stmt->error;
-            $success = false;
-            break;
+            throw new Exception("Error logging activity for item $itemId: " . $stmt->error);
         }
     }
 
-    if ($success && empty($errors)) {
-        mysqli_commit($conn);
-        echo json_encode([
-            'success' => true,
-            'message' => 'All sales recorded successfully'
-        ]);
-    } else {
-        mysqli_rollback($conn);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Errors occurred: ' . implode(', ', $errors)
-        ]);
-    }
+    // If we got here, everything succeeded
+    mysqli_commit($conn);
+    echo json_encode([
+        'success' => true,
+        'message' => 'All sales recorded successfully'
+    ]);
 
 } catch (Exception $e) {
     mysqli_rollback($conn);
@@ -148,7 +159,9 @@ try {
         'success' => false,
         'message' => 'Error: ' . $e->getMessage()
     ]);
+} finally {
+    if (isset($conn)) {
+        mysqli_close($conn);
+    }
 }
-
-mysqli_close($conn);
 ?> 

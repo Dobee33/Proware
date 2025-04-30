@@ -1,83 +1,107 @@
 <?php
+// Disable error display in output
+error_reporting(0);
+ini_set('display_errors', 0);
+
+// Set JSON header
 header('Content-Type: application/json');
 
-// Enable error reporting for debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-$conn = mysqli_connect("localhost", "root", "", "proware");
-
-if (!$conn) {
-    die(json_encode([
-        'success' => false,
-        'message' => 'Connection failed: ' . mysqli_connect_error()
-    ]));
-}
-
-// Get form data
-$orderNumber = isset($_POST['orderNumber']) ? mysqli_real_escape_string($conn, $_POST['orderNumber']) : '';
-
-// Validate order number
-if (empty($orderNumber)) {
-    die(json_encode([
-        'success' => false,
-        'message' => 'Order number is required'
-    ]));
-}
-
-// Check if we have arrays of items and quantities
-if (!isset($_POST['itemId']) || !isset($_POST['quantityToAdd'])) {
-    die(json_encode([
-        'success' => false,
-        'message' => 'Missing item data'
-    ]));
-}
-
-// Ensure we have arrays
-$itemIds = is_array($_POST['itemId']) ? $_POST['itemId'] : [$_POST['itemId']];
-$quantitiesToAdd = is_array($_POST['quantityToAdd']) ? $_POST['quantityToAdd'] : [$_POST['quantityToAdd']];
-
-// Validate arrays have same length
-if (count($itemIds) !== count($quantitiesToAdd)) {
-    die(json_encode([
-        'success' => false,
-        'message' => 'Mismatched item and quantity data'
-    ]));
-}
-
-// Start transaction
-mysqli_begin_transaction($conn);
-
 try {
-    $success = true;
-    $errors = [];
+    // Connect to database
+    $conn = mysqli_connect("localhost", "root", "", "proware");
+    if (!$conn) {
+        throw new Exception('Connection failed: ' . mysqli_connect_error());
+    }
 
-    // Process each item
-    for ($i = 0; $i < count($itemIds); $i++) {
-        $itemId = mysqli_real_escape_string($conn, $itemIds[$i]);
-        $quantityToAdd = intval($quantitiesToAdd[$i]);
+    // Start session if not already started
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
-        if (empty($itemId) || $quantityToAdd <= 0) {
-            $errors[] = "Invalid data for item at position " . ($i + 1);
-            continue;
+    // Get and validate form data
+    $orderNumber = isset($_POST['orderNumber']) ? trim($_POST['orderNumber']) : '';
+    if (empty($orderNumber)) {
+        throw new Exception('Order number is required');
+    }
+
+    // Validate arrays
+    if (!isset($_POST['itemId']) || !isset($_POST['quantityToAdd'])) {
+        throw new Exception('Missing item data');
+    }
+
+    $itemIds = is_array($_POST['itemId']) ? $_POST['itemId'] : [$_POST['itemId']];
+    $quantitiesToAdd = is_array($_POST['quantityToAdd']) ? $_POST['quantityToAdd'] : [$_POST['quantityToAdd']];
+
+    if (count($itemIds) !== count($quantitiesToAdd)) {
+        throw new Exception('Mismatched item and quantity data');
+    }
+
+    if (empty($itemIds)) {
+        throw new Exception('No items provided');
+    }
+
+    // Validate all items before starting transaction
+    $validatedItems = [];
+    foreach ($itemIds as $i => $itemId) {
+        $itemId = trim(mysqli_real_escape_string($conn, $itemId));
+        $quantity = intval($quantitiesToAdd[$i]);
+
+        if (empty($itemId)) {
+            throw new Exception("Empty item ID at position " . ($i + 1));
         }
 
-        // Get current quantities
-        $sql = "SELECT actual_quantity, new_delivery, beginning_quantity FROM inventory WHERE item_code = ?";
-        $stmt = $conn->prepare($sql);
+        if ($quantity <= 0) {
+            throw new Exception("Invalid quantity for item $itemId: must be greater than 0");
+        }
+
+        // Check if item exists
+        $stmt = $conn->prepare("SELECT item_code FROM inventory WHERE item_code = ?");
+        if (!$stmt) {
+            throw new Exception("Database error");
+        }
+
         $stmt->bind_param("s", $itemId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $item = $result->fetch_assoc();
-
-        if (!$item) {
-            $errors[] = "Item not found: $itemId";
-            continue;
+        if (!$stmt->execute()) {
+            throw new Exception("Database error");
         }
 
-        // Update the quantities
-        $new_delivery = $quantityToAdd;
-        $beginning_quantity = $item['actual_quantity'];
+        $result = $stmt->get_result();
+        if (!$result->fetch_assoc()) {
+            throw new Exception("Item not found: $itemId");
+        }
+
+        $validatedItems[] = [
+            'itemId' => $itemId,
+            'quantity' => $quantity
+        ];
+    }
+
+    // Start transaction after all validation is complete
+    mysqli_begin_transaction($conn);
+
+    // Process each validated item
+    foreach ($validatedItems as $item) {
+        // Get current quantities with row lock
+        $sql = "SELECT actual_quantity, new_delivery, beginning_quantity FROM inventory WHERE item_code = ? FOR UPDATE";
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            throw new Exception("Database error");
+        }
+        
+        $stmt->bind_param("s", $item['itemId']);
+        if (!$stmt->execute()) {
+            throw new Exception("Database error");
+        }
+        
+        $result = $stmt->get_result();
+        $currentItem = $result->fetch_assoc();
+        if (!$currentItem) {
+            throw new Exception("Item not found: {$item['itemId']}");
+        }
+
+        // Calculate new quantities
+        $new_delivery = $item['quantity'];
+        $beginning_quantity = $currentItem['actual_quantity'];
         $actual_quantity = $beginning_quantity + $new_delivery;
 
         // Update inventory
@@ -93,55 +117,59 @@ try {
                 WHERE item_code = ?";
                 
         $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            throw new Exception("Database error");
+        }
+
         $stmt->bind_param("iiiiss", 
             $actual_quantity,
             $new_delivery,
             $beginning_quantity,
             $actual_quantity,
             $actual_quantity,
-            $itemId
+            $item['itemId']
         );
         
         if (!$stmt->execute()) {
-            $errors[] = "Error updating item $itemId: " . $stmt->error;
-            $success = false;
-            break;
+            throw new Exception("Failed to update inventory");
         }
 
         // Log the activity
-        $activity_description = "New delivery added - Order #: $orderNumber, Item: $itemId, Quantity: $quantityToAdd, Previous stock: $beginning_quantity, New total: $actual_quantity";
-        $log_activity_query = "INSERT INTO activities (action_type, description, item_code, timestamp) VALUES ('Restock Item', ?, ?, NOW())";
+        $activity_description = "New delivery added - Order #: $orderNumber, Item: {$item['itemId']}, Quantity: {$item['quantity']}, Previous stock: $beginning_quantity, New total: $actual_quantity";
+        $log_activity_query = "INSERT INTO activities (action_type, description, item_code, user_id, timestamp) VALUES ('Restock Item', ?, ?, ?, NOW())";
         $stmt = $conn->prepare($log_activity_query);
-        $stmt->bind_param("ss", $activity_description, $itemId);
+        if (!$stmt) {
+            throw new Exception("Database error");
+        }
+
+        $user_id = $_SESSION['user_id'] ?? null;
+        $stmt->bind_param("ssi", $activity_description, $item['itemId'], $user_id);
         
         if (!$stmt->execute()) {
-            $errors[] = "Error logging activity for item $itemId: " . $stmt->error;
-            $success = false;
-            break;
+            throw new Exception("Failed to log activity");
         }
     }
 
-    if ($success && empty($errors)) {
-        mysqli_commit($conn);
-        echo json_encode([
-            'success' => true,
-            'message' => 'All items in delivery recorded successfully'
-        ]);
-    } else {
-        mysqli_rollback($conn);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Errors occurred: ' . implode(', ', $errors)
-        ]);
-    }
+    // If we got here, everything succeeded
+    mysqli_commit($conn);
+    die(json_encode([
+        'success' => true,
+        'message' => 'All items in delivery recorded successfully'
+    ]));
 
 } catch (Exception $e) {
-    mysqli_rollback($conn);
-    echo json_encode([
+    // Rollback transaction if it was started
+    if (isset($conn) && $conn->ping()) {
+        mysqli_rollback($conn);
+    }
+    die(json_encode([
         'success' => false,
-        'message' => 'Error: ' . $e->getMessage()
-    ]);
+        'message' => $e->getMessage()
+    ]));
+} finally {
+    // Close connection if it exists
+    if (isset($conn) && $conn->ping()) {
+        mysqli_close($conn);
+    }
 }
-
-mysqli_close($conn);
 ?> 
