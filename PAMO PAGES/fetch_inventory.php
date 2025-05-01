@@ -101,5 +101,9 @@ mysqli_close($conn);
 header('Content-Type: application/json');
 echo json_encode([
     'tbody' => $tbody,
-    'pagination' => $pagination
+    'pagination' => $pagination,
+    'total_items' => $total_items,
+    'total_pages' => $total_pages,
+    'page' => $page,
+    'limit' => $limit
 ]); 

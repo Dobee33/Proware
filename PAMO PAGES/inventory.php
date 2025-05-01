@@ -34,11 +34,13 @@ function page_link($page, $query_string) {
         document.addEventListener('DOMContentLoaded', function() {
             const applyLowStockFilter = sessionStorage.getItem('applyLowStockFilter');
             if (applyLowStockFilter === 'true') {
-                // Set the status filter to Low Stock
-                document.getElementById('statusFilter').value = 'Low Stock';
-                // Apply the filters
-                applyFilters();
-                // Clear the session storage
+                // Only set the dropdown if no status is set in the URL
+                const urlParams = new URLSearchParams(window.location.search);
+                if (!urlParams.has('status')) {
+                    document.getElementById('statusFilter').value = 'Low Stock';
+                    // Submit the form to apply the filter
+                    document.getElementById('filterForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                }
                 sessionStorage.removeItem('applyLowStockFilter');
             }
         });
@@ -52,6 +54,11 @@ function page_link($page, $query_string) {
                 });
             }
         });
+        // Function to clear sessionStorage and reload for Clear Filters
+        function clearLowStockSessionAndReload() {
+            sessionStorage.removeItem('applyLowStockFilter');
+            window.location.href = 'inventory.php';
+        }
     </script>
 </head>
 
@@ -96,7 +103,7 @@ function page_link($page, $query_string) {
                     <option value="Low Stock"<?php if(($_GET['status'] ?? '')=='Low Stock') echo ' selected'; ?>>Low Stock</option>
                     <option value="Out of Stock"<?php if(($_GET['status'] ?? '')=='Out of Stock') echo ' selected'; ?>>Out of Stock</option>
                 </select>
-                <button type="button" onclick="window.location.href='inventory.php'" class="clear-filters-btn">
+                <button type="button" onclick="clearLowStockSessionAndReload()" class="clear-filters-btn">
                     <i class="material-icons">clear</i> Clear Filters
                 </button>
             </form>

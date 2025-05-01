@@ -342,7 +342,7 @@ function updateTableAndPagination(data) {
     var end = Math.min(data.page * data.limit, data.total_items);
     resultCountDiv.textContent = `Showing ${start}-${end} of ${data.total_items} results`;
   } else {
-    resultCountDiv.textContent = "";
+    resultCountDiv.textContent = "No items found.";
   }
 }
 
@@ -356,6 +356,22 @@ document.addEventListener("DOMContentLoaded", function () {
   if (filterForm) {
     filterForm.addEventListener("submit", function (e) {
       e.preventDefault();
+      // Always reset to page 1 on new filter
+      let pageInput = filterForm.querySelector('input[name="page"]');
+      if (!pageInput) {
+        pageInput = document.createElement("input");
+        pageInput.type = "hidden";
+        pageInput.name = "page";
+        filterForm.appendChild(pageInput);
+      }
+      pageInput.value = 1;
+      var formData = new FormData(filterForm);
+      var queryString = new URLSearchParams(formData).toString();
+      fetch("fetch_inventory.php?" + queryString)
+        .then(function (res) {
+          return res.json();
+        })
+        .then(updateTableAndPagination);
       return false;
     });
   }
