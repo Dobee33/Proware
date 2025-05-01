@@ -1,5 +1,14 @@
 <?php
 session_start();
+
+// Build query string for filters
+$query_params = $_GET;
+unset($query_params['page']);
+$query_string = http_build_query($query_params);
+
+function page_link($page, $query_string) {
+    return "?page=$page" . ($query_string ? "&$query_string" : "");
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,20 +60,47 @@ session_start();
         <?php include 'includes/sidebar.php'; ?>
 
         <main class="main-content">
-            <header>
-                <div class="search-bar">
-                    <i class="material-icons">search</i>
-                    <input type="text" id="searchInput" placeholder="Search by item name..." oninput="searchItems()">
-                </div>
-                <div class="header-actions">
-                    <i class="material-icons">notifications</i>
-                    <i class="material-icons">account_circle</i>
-                    <button onclick="logout()" class="logout-btn">
-                        <i class="material-icons">logout</i>
-                        <span>Logout</span>
-                    </button>
-                </div>
-            </header>
+
+        <div class="filters">
+            <h3>Filters</h3>
+            <form id="filterForm" method="get" style="margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <input type="text" id="searchInput" name="search" placeholder="Search by item name..." value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>" style="margin-right: 12px;">
+                <select name="category" id="categoryFilter" onchange="document.getElementById('filterForm').submit()">
+                    <option value="">All Categories</option>
+                    <option value="Tertiary-Uniform"<?php if(($_GET['category'] ?? '')=='Tertiary-Uniform') echo ' selected'; ?>>Tertiary-Uniform</option>
+                    <option value="SHS-Uniform"<?php if(($_GET['category'] ?? '')=='SHS-Uniform') echo ' selected'; ?>>SHS-Uniform</option>
+                    <option value="STI-Shirts"<?php if(($_GET['category'] ?? '')=='STI-Shirts') echo ' selected'; ?>>STI-Shirts</option>
+                    <option value="STI-Jacket"<?php if(($_GET['category'] ?? '')=='STI-Jacket') echo ' selected'; ?>>STI Jacket</option>
+                    <option value="STI-Accessories"<?php if(($_GET['category'] ?? '')=='STI-Accessories') echo ' selected'; ?>>STI-Accessories</option>
+                    <option value="SHS-PE"<?php if(($_GET['category'] ?? '')=='SHS-PE') echo ' selected'; ?>>SHS-PE</option>
+                    <option value="Tertiary-PE"<?php if(($_GET['category'] ?? '')=='Tertiary-PE') echo ' selected'; ?>>Tertiary-PE</option>
+                </select>
+                <select name="size" id="sizeFilter" onchange="document.getElementById('filterForm').submit()">
+                    <option value="">All Sizes</option>
+                    <option value="XS"<?php if(($_GET['size'] ?? '')=='XS') echo ' selected'; ?>>XS</option>
+                    <option value="S"<?php if(($_GET['size'] ?? '')=='S') echo ' selected'; ?>>S</option>
+                    <option value="M"<?php if(($_GET['size'] ?? '')=='M') echo ' selected'; ?>>M</option>
+                    <option value="L"<?php if(($_GET['size'] ?? '')=='L') echo ' selected'; ?>>L</option>
+                    <option value="XL"<?php if(($_GET['size'] ?? '')=='XL') echo ' selected'; ?>>XL</option>
+                    <option value="XXL"<?php if(($_GET['size'] ?? '')=='XXL') echo ' selected'; ?>>XXL</option>
+                    <option value="3XL"<?php if(($_GET['size'] ?? '')=='3XL') echo ' selected'; ?>>3XL</option>
+                    <option value="4XL"<?php if(($_GET['size'] ?? '')=='4XL') echo ' selected'; ?>>4XL</option>
+                    <option value="5XL"<?php if(($_GET['size'] ?? '')=='5XL') echo ' selected'; ?>>5XL</option>
+                    <option value="6XL"<?php if(($_GET['size'] ?? '')=='6XL') echo ' selected'; ?>>6XL</option>
+                    <option value="7XL"<?php if(($_GET['size'] ?? '')=='7XL') echo ' selected'; ?>>7XL</option>
+                    <option value="One Size"<?php if(($_GET['size'] ?? '')=='One Size') echo ' selected'; ?>>One Size</option>
+                </select>
+                <select name="status" id="statusFilter" onchange="document.getElementById('filterForm').submit()">
+                    <option value="">All Status</option>
+                    <option value="In Stock"<?php if(($_GET['status'] ?? '')=='In Stock') echo ' selected'; ?>>In Stock</option>
+                    <option value="Low Stock"<?php if(($_GET['status'] ?? '')=='Low Stock') echo ' selected'; ?>>Low Stock</option>
+                    <option value="Out of Stock"<?php if(($_GET['status'] ?? '')=='Out of Stock') echo ' selected'; ?>>Out of Stock</option>
+                </select>
+                <button type="button" onclick="window.location.href='inventory.php'" class="clear-filters-btn">
+                    <i class="material-icons">clear</i> Clear Filters
+                </button>
+            </form>
+        </div>
 
             <div class="inventory-content">
                 <div class="action-buttons-container">
@@ -85,108 +121,114 @@ session_start();
                     </button>
                 </div>
 
-                <div class="filters">
-                    <h3>Filters</h3>
-
-                    <select id="categoryFilter" onchange="applyFilters()">
-                        <option value="">All Categories</option>
-                        <option value="Tertiary-Uniform">Tertiary-Uniform</option>
-                        <option value="SHS-Uniform">SHS-Uniform</option>
-                        <option value="STI-Shirts">STI-Shirts</option>
-                        <option value="STI-Jacket">STI Jacket</option>
-                        <option value="STI-Accessories">STI-Accessories</option>
-                        <option value="SHS-PE">SHS-PE</option>
-                        <option value="Tertiary-PE">Tertiary-PE</option>
-                    </select>
-                    <select id="sizeFilter" onchange="applyFilters()">
-                        <option value="">All Sizes</option>
-                        <option value="XS">XS</option>
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
-                        <option value="XXL">XXL</option>
-                        <option value="3XL">3XL</option>
-                        <option value="4XL">4XL</option>
-                        <option value="5XL">5XL</option>
-                        <option value="6XL">6XL</option>
-                        <option value="7XL">7XL</option>
-
-                    </select>
-                    <select id="statusFilter" onchange="applyFilters()">
-                        <option value="">All Status</option>
-                        <option value="In Stock">In Stock</option>
-                        <option value="Low Stock">Low Stock</option>
-                        <option value="Out of Stock">Out of Stock</option>
-                    </select>
-                        <button onclick="clearAllFilters()" class="clear-filters-btn">
-                            <i class="material-icons">clear</i> Clear Filters
-                        </button>
-                </div>
+                
 
                 <div class="inventory-table">
-                  <!-- Added scrollable container -->
-                  <div class="scroll-table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Item Code</th>
-                                <th>Item Name</th>
-                                <th>Category</th>
-                                <th>Actual Quantity</th>
-                                <th>Sizes</th>
-                                <th>Price</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $conn = mysqli_connect("localhost", "root", "", "proware");
+                  <table>
+                      <thead>
+                          <tr>
+                              <th>Item Code</th>
+                              <th>Item Name</th>
+                              <th>Category</th>
+                              <th>Actual Quantity</th>
+                              <th>Sizes</th>
+                              <th>Price</th>
+                              <th>Status</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <?php
+                          $conn = mysqli_connect("localhost", "root", "", "proware");
 
-                            if (!$conn) {
-                                die("Connection failed: " . mysqli_connect_error());
-                            }
+                          if (!$conn) {
+                              die("Connection failed: " . mysqli_connect_error());
+                          }
 
-                            $search = isset($_POST['search']) ? mysqli_real_escape_string($conn, $_POST['search']) : '';
-                            $where_clause = '';
+                          $category = isset($_GET['category']) ? mysqli_real_escape_string($conn, $_GET['category']) : '';
+                          $size = isset($_GET['size']) ? mysqli_real_escape_string($conn, $_GET['size']) : '';
+                          $status = isset($_GET['status']) ? mysqli_real_escape_string($conn, $_GET['status']) : '';
+                          $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 
-                            if (!empty($search)) {
-                                $where_clause = "WHERE item_name LIKE '%$search%' OR item_code LIKE '%$search%'";
-                            }
+                          $where = [];
+                          if ($category) $where[] = "category = '$category'";
+                          if ($size) $where[] = "sizes = '$size'";
+                          if ($status) {
+                              if ($status == 'In Stock') $where[] = "actual_quantity > 10";
+                              else if ($status == 'Low Stock') $where[] = "actual_quantity > 0 AND actual_quantity <= 10";
+                              else if ($status == 'Out of Stock') $where[] = "actual_quantity <= 0";
+                          }
+                          if ($search) $where[] = "(item_name LIKE '%$search%' OR item_code LIKE '%$search%')";
 
-                            $sql = "SELECT * FROM inventory $where_clause ORDER BY created_at DESC";
-                            $result = mysqli_query($conn, $sql);
+                          $where_clause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                $statusClass = '';
-                                if ($row['actual_quantity'] <= 0) {
-                                    $status = 'Out of Stock';
-                                    $statusClass = 'status-out-of-stock';
-                                } else if ($row['actual_quantity'] <= 20) {
-                                    $status = 'Low Stock';
-                                    $statusClass = 'status-low-stock';
-                                } else {
-                                    $status = 'In Stock';
-                                    $statusClass = 'status-in-stock';
-                                }
+                          // Pagination parameters
+                          $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+                          $limit = 15; // Items per page (changed from 20 to 15)
+                          $offset = ($page - 1) * $limit;
 
-                                echo "<tr data-item-code='" . $row['item_code'] . "' data-created-at='" . $row['created_at'] . "' data-category='" . strtolower($row['category']) . "' onclick='selectRow(this, \"" . $row['item_code'] . "\", " . $row['price'] . ")'>";
-                                echo "<td>" . $row['item_code'] . "</td>";
-                                echo "<td>" . $row['item_name'] . "</td>";
-                                echo "<td>" . $row['category'] . "</td>";
-                                echo "<td>" . (isset($row['actual_quantity']) ? $row['actual_quantity'] : '0') . "</td>";
-                                echo "<td>" . $row['sizes'] . "</td>";
-                                echo "<td>₱" . number_format($row['price'], 2) . "</td>";
-                                echo "<td class='" . $statusClass . "'>" . $status . "</td>";
-                                echo "<!-- Item Code: " . $row['item_code'] . " -->";
-                                echo "</tr>";
-                            }
-                            mysqli_close($conn);
-                            ?>
-                        </tbody>
-                    </table>
-                  </div>
+                          // Count total items for pagination
+                          $total_sql = "SELECT COUNT(*) as total FROM inventory $where_clause";
+                          $total_result = mysqli_query($conn, $total_sql);
+                          $total_row = mysqli_fetch_assoc($total_result);
+                          $total_items = $total_row['total'];
+                          $total_pages = ceil($total_items / $limit);
+
+                          // Fetch only the items for the current page
+                          $sql = "SELECT * FROM inventory $where_clause ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
+                          $result = mysqli_query($conn, $sql);
+
+                          while ($row = mysqli_fetch_assoc($result)) {
+                              $statusClass = '';
+                              if ($row['actual_quantity'] <= 0) {
+                                  $status = 'Out of Stock';
+                                  $statusClass = 'status-out-of-stock';
+                              } else if ($row['actual_quantity'] <= 10) {
+                                  $status = 'Low Stock';
+                                  $statusClass = 'status-low-stock';
+                              } else {
+                                  $status = 'In Stock';
+                                  $statusClass = 'status-in-stock';
+                              }
+
+                              echo "<tr data-item-code='" . $row['item_code'] . "' data-created-at='" . $row['created_at'] . "' data-category='" . strtolower($row['category']) . "' onclick='selectRow(this, \"" . $row['item_code'] . "\", " . $row['price'] . ")'>";
+                              echo "<td>" . $row['item_code'] . "</td>";
+                              echo "<td>" . $row['item_name'] . "</td>";
+                              echo "<td>" . $row['category'] . "</td>";
+                              echo "<td>" . (isset($row['actual_quantity']) ? $row['actual_quantity'] : '0') . "</td>";
+                              echo "<td>" . $row['sizes'] . "</td>";
+                              echo "<td>₱" . number_format($row['price'], 2) . "</td>";
+                              echo "<td class='" . $statusClass . "'>" . $status . "</td>";
+                              echo "<!-- Item Code: " . $row['item_code'] . " -->";
+                              echo "</tr>";
+                          }
+                          mysqli_close($conn);
+                          ?>
+                      </tbody>
+                  </table>
                 </div>
+                <?php if ($total_pages > 1): ?>
+                <div class="pagination">
+                    <?php if ($page > 1): ?>
+                        <a href="<?php echo page_link($page-1, $query_string); ?>" class="ajax-page-link">&laquo; Prev</a>
+                    <?php endif; ?>
+                    <?php
+                    // Show a window of up to 5 pages around the current page
+                    $window = 2; // how many pages before/after current
+                    $start = max(1, $page - $window);
+                    $end = min($total_pages, $page + $window);
+                    if ($total_pages <= 5) {
+                        $start = 1;
+                        $end = $total_pages;
+                    }
+                    for ($i = $start; $i <= $end; $i++):
+                    ?>
+                        <a href="<?php echo page_link($i, $query_string); ?>" class="ajax-page-link<?php if ($i == $page) echo ' active'; ?>"><?php echo $i; ?></a>
+                    <?php endfor; ?>
+                    <?php if ($page < $total_pages): ?>
+                        <a href="<?php echo page_link($page+1, $query_string); ?>" class="ajax-page-link">Next &raquo;</a>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
             </div>
         </main>
     </div>
@@ -753,6 +795,51 @@ session_start();
         border: 1px solid #ddd;
         font-size: 14px;
     }
+
+    .pagination {
+    margin: 40px 0 20px 0;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+
+.pagination a {
+    display: inline-block;
+    min-width: 38px;
+    padding: 10px 16px;
+    margin: 0 2px;
+    border: 1.5px solid #007bff;
+    color: #007bff;
+    background: #fff;
+    text-decoration: none;
+    border-radius: 24px;
+    font-size: 1.1em;
+    font-weight: 500;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.pagination a.active, .pagination a:focus {
+    background: #007bff;
+    color: #fff;
+    border-color: #0056b3;
+    box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+}
+
+.pagination a:hover:not(.active):not([disabled]) {
+    background: #e6f0ff;
+    color: #0056b3;
+    border-color: #0056b3;
+}
+
+.pagination a[disabled], .pagination a.disabled {
+    color: #aaa;
+    border-color: #eee;
+    background: #f8f9fa;
+    cursor: not-allowed;
+    pointer-events: none;
+}
     </style>
 </body>
 

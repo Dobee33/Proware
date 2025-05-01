@@ -1,3 +1,5 @@
+console.log("inventory.js loaded");
+
 function handleAddQuantity() {
   if (!selectedItemCode) {
     alert("Please select an item first");
@@ -95,34 +97,6 @@ function updateQuantity() {
   closeModal("addQuantityModal");
 }
 
-function searchItems() {
-  const searchInput = document.getElementById("searchInput");
-  const searchTerm = searchInput.value.toLowerCase();
-  const tableRows = document.querySelectorAll(".inventory-table tbody tr");
-
-  tableRows.forEach((row) => {
-    const itemName = row
-      .querySelector("td:nth-child(2)")
-      .textContent.toLowerCase();
-    const category = row
-      .querySelector("td:nth-child(3)")
-      .textContent.toLowerCase();
-    const itemCode = row
-      .querySelector("td:nth-child(1)")
-      .textContent.toLowerCase();
-
-    if (
-      itemName.includes(searchTerm) ||
-      category.includes(searchTerm) ||
-      itemCode.includes(searchTerm)
-    ) {
-      row.style.display = "";
-    } else {
-      row.style.display = "none";
-    }
-  });
-}
-
 function updateStockStatus(row) {
   const quantityCell = row.querySelector("td:nth-child(4)");
   const statusCell = row.querySelector("td:nth-child(7)");
@@ -133,7 +107,7 @@ function updateStockStatus(row) {
   if (actualQuantity <= 0) {
     status = "Out of Stock";
     statusClass = "status-out-of-stock";
-  } else if (actualQuantity <= 20) {
+  } else if (actualQuantity <= 10) {
     status = "Low Stock";
     statusClass = "status-low-stock";
   } else {
@@ -143,145 +117,6 @@ function updateStockStatus(row) {
 
   statusCell.textContent = status;
   statusCell.className = statusClass;
-}
-
-function applyFilters() {
-  const searchTerm = document.getElementById("searchInput").value.toLowerCase();
-  const categoryFilter = document.getElementById("categoryFilter").value;
-  const sizeFilter = document.getElementById("sizeFilter").value;
-  const statusFilter = document.getElementById("statusFilter").value;
-
-  const rows = document.querySelectorAll(".inventory-table tbody tr");
-  const sizeHeader = document.querySelector(
-    ".inventory-table thead th:nth-child(5)"
-  );
-
-  if (categoryFilter === "STI-Accessories") {
-    if (sizeHeader) sizeHeader.style.display = "none";
-    rows.forEach((row) => {
-      const sizeCell = row.querySelector("td:nth-child(5)");
-      if (sizeCell) sizeCell.style.display = "none";
-    });
-  } else {
-    if (sizeHeader) sizeHeader.style.display = "";
-    rows.forEach((row) => {
-      const sizeCell = row.querySelector("td:nth-child(5)");
-      if (sizeCell) sizeCell.style.display = "";
-    });
-  }
-
-  rows.forEach((row) => {
-    const itemName = row
-      .querySelector("td:nth-child(2)")
-      .textContent.toLowerCase();
-    const category = row.querySelector("td:nth-child(3)").textContent;
-    const size = row.querySelector("td:nth-child(5)").textContent;
-    const status = row.querySelector("td:nth-child(7)").textContent.trim();
-
-    const matchesSearch =
-      searchTerm === "" ||
-      itemName.includes(searchTerm) ||
-      category.toLowerCase().includes(searchTerm);
-    const matchesCategory =
-      categoryFilter === "" || category === categoryFilter;
-    const matchesSize = sizeFilter === "" || size === sizeFilter;
-    const matchesStatus =
-      statusFilter === "" ||
-      status.toLowerCase() === statusFilter.toLowerCase();
-
-    if (matchesSearch && matchesCategory && matchesSize && matchesStatus) {
-      row.style.display = "";
-    } else {
-      row.style.display = "none";
-    }
-  });
-}
-
-function clearAllFilters() {
-  document.getElementById("categoryFilter").value = "";
-  document.getElementById("sizeFilter").value = "";
-  document.getElementById("statusFilter").value = "";
-  document.getElementById("searchInput").value = "";
-
-  const sizeHeader = document.querySelector(
-    ".inventory-table thead th:nth-child(5)"
-  );
-  if (sizeHeader) sizeHeader.style.display = "";
-
-  const rows = document.querySelectorAll(".inventory-table tbody tr");
-  rows.forEach((row) => {
-    const sizeCell = row.querySelector("td:nth-child(5)");
-    if (sizeCell) sizeCell.style.display = "";
-  });
-
-  applyFilters();
-}
-
-function populateFilters() {
-  const sizeFilter = document.getElementById("sizeFilter");
-  const sizeOrder = [
-    "XS",
-    "S",
-    "M",
-    "L",
-    "XL",
-    "XXL",
-    "3XL",
-    "4XL",
-    "5XL",
-    "6XL",
-    "7XL",
-    "One Size",
-  ];
-
-  // Get all unique sizes from the table
-  const tableRows = document.querySelectorAll(".inventory-table tbody tr");
-  const uniqueSizes = new Set();
-  tableRows.forEach((row) => {
-    const size = row.querySelector("td:nth-child(5)").textContent.trim();
-    if (size) uniqueSizes.add(size);
-  });
-
-  // Keep the "All Sizes" option
-  const allSizesOption = sizeFilter.querySelector('option[value=""]');
-  sizeFilter.innerHTML = "";
-  if (allSizesOption) sizeFilter.appendChild(allSizesOption);
-
-  // Add sizes in the defined order if they exist in the inventory
-  sizeOrder.forEach((size) => {
-    if (uniqueSizes.has(size)) {
-      const option = document.createElement("option");
-      option.value = size;
-      option.textContent = size;
-      sizeFilter.appendChild(option);
-    }
-  });
-}
-
-// Call populateFilters when page loads
-document.addEventListener("DOMContentLoaded", populateFilters);
-
-// Add event listeners for all filters
-document.getElementById("searchInput").addEventListener("input", applyFilters);
-document
-  .getElementById("categoryFilter")
-  .addEventListener("change", applyFilters);
-document.getElementById("sizeFilter").addEventListener("change", applyFilters);
-document
-  .getElementById("statusFilter")
-  .addEventListener("change", applyFilters);
-
-// Call applyFilters on page load
-document.addEventListener("DOMContentLoaded", function () {
-  applyFilters();
-});
-
-// Add this function to initialize the size column visibility
-function initializeSizeColumnVisibility() {
-  const categoryFilter = document.getElementById("categoryFilter").value;
-  if (categoryFilter === "STI-Accessories") {
-    applyFilters();
-  }
 }
 
 function logout() {
@@ -468,7 +303,107 @@ function validatePrice(price) {
   return true;
 }
 
+// Helper to update table and pagination
+function updateTableAndPagination(data) {
+  var tableBody = document.querySelector(".inventory-table tbody");
+  tableBody.innerHTML = data.tbody;
+  var oldPaginationDiv = document.querySelector(".pagination");
+  if (oldPaginationDiv) {
+    if (data.pagination) {
+      oldPaginationDiv.outerHTML = data.pagination;
+    } else {
+      oldPaginationDiv.parentNode.removeChild(oldPaginationDiv);
+    }
+  } else if (data.pagination) {
+    // If there was no pagination before but now there is, add it after the .inventory-table (not inside)
+    var inventoryTableDiv = document.querySelector(".inventory-table");
+    if (inventoryTableDiv && inventoryTableDiv.parentNode) {
+      var tempDiv = document.createElement("div");
+      tempDiv.innerHTML = data.pagination;
+      inventoryTableDiv.parentNode.insertBefore(
+        tempDiv.firstChild,
+        inventoryTableDiv.nextSibling
+      );
+    }
+  }
+  // Show result count
+  var resultCountDiv = document.getElementById("resultCount");
+  if (!resultCountDiv) {
+    var inventoryContent = document.querySelector(".inventory-content");
+    resultCountDiv = document.createElement("div");
+    resultCountDiv.id = "resultCount";
+    resultCountDiv.style.margin = "0 0 10px 0";
+    resultCountDiv.style.fontWeight = "500";
+    resultCountDiv.style.fontSize = "1.05em";
+    inventoryContent.insertBefore(resultCountDiv, inventoryContent.firstChild);
+  }
+  if (data.total_items > 0) {
+    var start = (data.page - 1) * data.limit + 1;
+    var end = Math.min(data.page * data.limit, data.total_items);
+    resultCountDiv.textContent = `Showing ${start}-${end} of ${data.total_items} results`;
+  } else {
+    resultCountDiv.textContent = "";
+  }
+}
+
+// Always bind search input event, even if DOMContentLoaded is missed
 document.addEventListener("DOMContentLoaded", function () {
-  document.getElementById("editBtn").addEventListener("click", handleEdit);
-  initializeSizeColumnVisibility();
+  var searchInput = document.getElementById("searchInput");
+  var filterForm = document.getElementById("filterForm");
+  var tableBody = document.querySelector(".inventory-table tbody");
+
+  // Prevent form submit on Enter or any input
+  if (filterForm) {
+    filterForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      return false;
+    });
+  }
+
+  if (searchInput && filterForm && tableBody) {
+    searchInput.addEventListener("input", function () {
+      // Always reset to page 1 on new search
+      let pageInput = filterForm.querySelector('input[name="page"]');
+      if (!pageInput) {
+        pageInput = document.createElement("input");
+        pageInput.type = "hidden";
+        pageInput.name = "page";
+        filterForm.appendChild(pageInput);
+      }
+      pageInput.value = 1;
+      var formData = new FormData(filterForm);
+      var queryString = new URLSearchParams(formData).toString();
+      fetch("fetch_inventory.php?" + queryString)
+        .then(function (res) {
+          return res.json();
+        })
+        .then(updateTableAndPagination);
+    });
+  }
+
+  // AJAX pagination
+  document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("ajax-page-link")) {
+      e.preventDefault();
+      // Instead of using the link's href, update the page input in the filter form and use current form data
+      const url = new URL(e.target.href, window.location.origin);
+      const page = url.searchParams.get("page") || 1;
+      let pageInput = filterForm.querySelector('input[name="page"]');
+      if (!pageInput) {
+        pageInput = document.createElement("input");
+        pageInput.type = "hidden";
+        pageInput.name = "page";
+        filterForm.appendChild(pageInput);
+      }
+      pageInput.value = page;
+      // Build query string from current form data (including search/filter)
+      var formData = new FormData(filterForm);
+      var queryString = new URLSearchParams(formData).toString();
+      fetch("fetch_inventory.php?" + queryString)
+        .then(function (res) {
+          return res.json();
+        })
+        .then(updateTableAndPagination);
+    }
+  });
 });

@@ -1,33 +1,40 @@
 <nav class="sidebar">
-    <div class="logo">
-        <img src="../Images/STI-LOGO.png" alt="PAMO Logo">
-        <h2>PAMO</h2>
+    <div class="logo-area">
+        <div class="logo">
+            <img src="../Images/STI-LOGO.png" alt="PAMO Logo">
+            <h2>PAMO</h2>
+        </div>
     </div>
     <ul class="nav-links">
         <li <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'class="active"' : ''; ?>
             onclick="window.location.href='dashboard.php'">
+            <span class="active-bar"></span>
             <i class="material-icons">dashboard</i>Dashboard
         </li>
 
         <li <?php echo basename($_SERVER['PHP_SELF']) == 'inventory.php' ? 'class="active"' : ''; ?>
             onclick="window.location.href='inventory.php'">
+            <span class="active-bar"></span>
             <i class="material-icons">inventory_2</i>Inventory
         </li>
         <li <?php echo basename($_SERVER['PHP_SELF']) == 'preorders.php' ? 'class="active"' : ''; ?>
             onclick="window.location.href='preorders.php'">
+            <span class="active-bar"></span>
             <i class="material-icons">shopping_cart</i>Orders
         </li>
         <li <?php echo basename($_SERVER['PHP_SELF']) == 'reports.php' ? 'class="active"' : ''; ?>
             onclick="window.location.href='reports.php'">
+            <span class="active-bar"></span>
             <i class="material-icons">assessment</i>Reports
         </li>
         <li <?php echo basename($_SERVER['PHP_SELF']) == 'content-edit.php' ? 'class="active"' : ''; ?>
             onclick="window.location.href='content-edit.php'">
+            <span class="active-bar"></span>
             <i class="material-icons">inventory_2</i>Content Management
         </li>
     </ul>
     <div class="user-info">
-        <img src="avatar.png" alt="User Avatar">
+        <img src="avatar.png" alt="User Avatar" onerror="this.onerror=null;this.src='../Images/default-avatar.png';">
         <div class="user-details">
             <h4>
                 <?php
@@ -62,6 +69,12 @@
             </p>
         </div>
     </div>
+    <div style="margin-top: auto; padding-bottom: 30px; width: 100%; display: flex; justify-content: center;">
+        <button onclick="logout()" class="logout-btn improved-logout" style="width: 90%; display: flex; align-items: center; gap: 12px; justify-content: center;">
+            <i class="material-icons">logout</i>
+            <span>Logout</span>
+        </button>
+    </div>
 </nav>
 
 <style>
@@ -71,24 +84,114 @@
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         margin-right: 0px;
         font-size: 20px;
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 100;
+    }
+
+    .logo-area {
+        background: #fffbe7;
+        border-bottom: 1.5px solid #f0e6b2;
+        padding: 18px 0 10px 0;
+        margin-bottom: 8px;
     }
 
     .logo {
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0px 20px 0px 20px;
+        gap: 16px;
     }
 
     .logo img {
-        width: 70px;
-        height: 70px;
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        background: #fff;
     }
 
     .logo h2 {
-        font-weight: bold;
-        margin-left: 10px;
-        font-size: 40px;
-        margin-top: 40px;
+        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+        font-weight: 800;
+        font-size: 2.1rem;
+        color: #0072bc;
+        letter-spacing: 2px;
+        margin: 0;
+        text-shadow: 0 1px 0 #fff, 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .nav-links li {
+        position: relative;
+        padding-left: 18px;
+        transition: background 0.2s;
+    }
+
+    .nav-links li .active-bar {
+        display: none;
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 6px;
+        background: #0072bc;
+        border-radius: 6px 0 0 6px;
+    }
+
+    .nav-links li.active .active-bar {
+        display: block;
+    }
+
+    .nav-links li.active {
+        background: #e3f2fd;
+        color: #0072bc;
+    }
+
+    .nav-links li.active i {
+        color: #0072bc;
+    }
+
+    .nav-links li:hover {
+        background: #f0f4fa;
+    }
+
+    .logout-btn.improved-logout {
+        background: linear-gradient(90deg, #263544 60%, #0072bc 100%);
+        color: #fff;
+        border: 1.5px solid #0072bc;
+        border-radius: 32px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        padding: 14px 0;
+        box-shadow: 0 2px 12px rgba(0,114,188,0.08);
+        transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        margin-top: 10px;
+        margin-bottom: 0;
+        letter-spacing: 0.5px;
+    }
+
+    .logout-btn.improved-logout:hover {
+        background: linear-gradient(90deg, #0072bc 60%, #263544 100%);
+        color: #fff;
+        box-shadow: 0 4px 18px rgba(0,114,188,0.13);
+        border-color: #263544;
+    }
+
+    .logout-btn.improved-logout i {
+        font-size: 24px;
+        color: #fff;
+        margin-right: 2px;
+    }
+
+    .user-info img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #eee;
     }
 </style>
