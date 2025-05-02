@@ -49,7 +49,11 @@
             <?php endif; ?>
             <h1>GEAR UP</h1>
             <p>Your one-stop shop for all STI College Lucena essentials</p>
-            <a href="ProItemList.php"><button class="shop-now-button">Order Now</button></a>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="ProItemList.php"><button class="shop-now-button">Order Now</button></a>
+            <?php else: ?>
+                <a href="login.php?redirect=ProItemList.php"><button class="shop-now-button">Order Now</button></a>
+            <?php endif; ?>
         </div>
     </section>
 
@@ -133,94 +137,93 @@
                 </div>
             </div>
         </div>
+        <div class="new-arrivals-order-btn-container">
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="ProItemList.php"><button class="shop-now-button">Order Now</button></a>
+            <?php else: ?>
+                <a href="login.php?redirect=ProItemList.php"><button class="shop-now-button">Order Now</button></a>
+            <?php endif; ?>
+        </div>
     </section>
 
     <!-- Best Sellers Section -->
     <section class="Best-Sellers">
         <div class="section-header">
-            <h2>Best Sellers</h2>
-            <p class="section-subtitle">Our most popular products</p>
+            <h2>Items Available to Request for Pre-Order</h2>
+            <p class="section-subtitle">These are items you can request in advance. If enough students request an item, PAMO will consider stocking it!</p>
         </div>
         <div class="best-sellers-grid">
             <div class="best-sellers-track">
                 <!-- Original Cards -->
                 <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="0">
-                    <div class="best-seller-badge">TOP SELLER</div>
                     <div class="product-image">
                         <img src="../Images/STI-TM.jpg" alt="STI TM Uniform" draggable="false" />
                         <div class="product-overlay">
-                            <button class="add-to-cart-btn">Add to Cart</button>
+                            <button class="add-to-cart-btn">Pre Order</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="100">
-                    <div class="best-seller-badge">TOP SELLER</div>
                     <div class="product-image">
                         <img src="../Images/STI-ICT.jpg" alt="STI ICT Uniform" draggable="false" />
                         <div class="product-overlay">
-                            <button class="add-to-cart-btn">Add to Cart</button>
+                            <button class="add-to-cart-btn">Pre Order</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="200">
-                    <div class="best-seller-badge">TOP SELLER</div>
                     <div class="product-image">
                         <img src="../Images/STI-HM.jpg" alt="STI HM Uniform" draggable="false" />
                         <div class="product-overlay">
-                            <button class="add-to-cart-btn">Add to Cart</button>
+                            <button class="add-to-cart-btn">Pre Order</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="300">
-                    <div class="best-seller-badge">TOP SELLER</div>
                     <div class="product-image">
                         <img src="../Images/STI-CM.jpg" alt="STI CM Uniform" draggable="false" />
                         <div class="product-overlay">
-                            <button class="add-to-cart-btn">Add to Cart</button>
+                            <button class="add-to-cart-btn">Pre Order</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Cloned Cards for Seamless Loop -->
                 <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="400">
-                    <div class="best-seller-badge">TOP SELLER</div>
                     <div class="product-image">
                         <img src="../Images/STI-TM.jpg" alt="STI TM Uniform" draggable="false" />
                         <div class="product-overlay">
-                            <button class="add-to-cart-btn">Add to Cart</button>
+                            <button class="add-to-cart-btn">Pre Order</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="500">
-                    <div class="best-seller-badge">TOP SELLER</div>
                     <div class="product-image">
                         <img src="../Images/STI-ICT.jpg" alt="STI ICT Uniform" draggable="false" />
                         <div class="product-overlay">
-                            <button class="add-to-cart-btn">Add to Cart</button>
+                            <button class="add-to-cart-btn">Pre Order</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="600">
-                    <div class="best-seller-badge">TOP SELLER</div>
                     <div class="product-image">
                         <img src="../Images/STI-HM.jpg" alt="STI HM Uniform" draggable="false" />
                         <div class="product-overlay">
-                            <button class="add-to-cart-btn">Add to Cart</button>
+                            <button class="add-to-cart-btn">Pre Order</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="700">
-                    <div class="best-seller-badge">TOP SELLER</div>
                     <div class="product-image">
                         <img src="../Images/STI-CM.jpg" alt="STI CM Uniform" draggable="false" />
                         <div class="product-overlay">
-                            <button class="add-to-cart-btn">Add to Cart</button>
+                            <button class="add-to-cart-btn">Pre Order</button>
                         </div>
                     </div>
                 </div>
@@ -240,7 +243,11 @@
                 <h2>Experience Our Collection</h2>
                 <p>Discover the perfect blend of style and professionalism with our exclusive STI uniforms and merchandise.</p>
             </div>
-            <a href="ProItemList.php" class="video-btn">Shop Now</a>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="ProItemList.php" class="video-btn">Order Now</a>
+            <?php else: ?>
+                <a href="login.php?redirect=ProItemList.php" class="video-btn">Order Now</a>
+            <?php endif; ?>
         </div>
     </section>
 

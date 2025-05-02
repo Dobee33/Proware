@@ -445,6 +445,12 @@ function handleAddToCart(element) {
     return;
   }
 
+  // Check if user is logged in
+  if (typeof window.isLoggedIn !== "undefined" && !window.isLoggedIn) {
+    window.location.href = "login.php?redirect=ProItemList.php";
+    return;
+  }
+
   const productContainer = element.closest(".product-container");
   if (!productContainer) {
     console.error("Product container not found");
