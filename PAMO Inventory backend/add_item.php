@@ -171,6 +171,21 @@ try {
         mysqli_stmt_close($stmt);
     }
 
+    // Link to shirt_type_item if shirt_type_id is provided and category is STI-Shirts
+    if ($category === 'STI-Shirts' && !empty($_POST['shirt_type_id'])) {
+        $shirt_type_id = intval($_POST['shirt_type_id']);
+        $sql = "INSERT INTO shirt_type_item (inventory_id, shirt_type_id) VALUES (?, ?)";
+        $stmt = mysqli_prepare($conn, $sql);
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . mysqli_error($conn));
+        }
+        mysqli_stmt_bind_param($stmt, "ii", $new_inventory_id, $shirt_type_id);
+        if (!mysqli_stmt_execute($stmt)) {
+            throw new Exception("Error linking shirt type: " . mysqli_stmt_error($stmt));
+        }
+        mysqli_stmt_close($stmt);
+    }
+
     // If everything succeeded, commit the transaction
     mysqli_commit($conn);
 

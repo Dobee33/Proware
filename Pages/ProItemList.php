@@ -65,6 +65,13 @@
 
             $products = [];
 
+            // Fetch shirt types for STI Shirt filter
+            $shirtTypes = [];
+            $shirtTypeRes = mysqli_query($conn, "SELECT id, name FROM shirt_type ORDER BY name ASC");
+            while ($row = mysqli_fetch_assoc($shirtTypeRes)) {
+                $shirtTypes[] = $row;
+            }
+
             while ($row = mysqli_fetch_assoc($result)) {
                 $itemCode = $row['item_code'];
                 $itemName = $row['item_name'];
@@ -86,6 +93,17 @@
                     $itemImage = '';
                 }
 
+                $shirtTypeId = '';
+                $shirtTypeName = '';
+                if ($itemCategory === 'STI-Shirts') {
+                    $shirtTypeSql = "SELECT st.id, st.name FROM shirt_type_item sti JOIN shirt_type st ON sti.shirt_type_id = st.id WHERE sti.inventory_id = " . intval($row['id']) . " LIMIT 1";
+                    $shirtTypeRes = mysqli_query($conn, $shirtTypeSql);
+                    if ($shirtTypeRow = mysqli_fetch_assoc($shirtTypeRes)) {
+                        $shirtTypeId = $shirtTypeRow['id'];
+                        $shirtTypeName = $shirtTypeRow['name'];
+                    }
+                }
+
                 if (!isset($products[$baseItemCode])) {
                     $products[$baseItemCode] = [
                         'name' => $itemName,
@@ -95,6 +113,8 @@
                         'sizes' => $sizes,
                         'stock' => $row['actual_quantity'],
                         'courses' => $courses,
+                        'shirt_type_id' => $shirtTypeId,
+                        'shirt_type_name' => $shirtTypeName,
                         'variants' => [
                             [
                                 'item_code' => $itemCode,
@@ -207,30 +227,16 @@
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="subcategories">
+                        <?php foreach ($shirtTypes as $type): ?>
                         <div class="course-category">
                             <div class="course-header">
                                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" class="course-filter-checkbox" value="Anniversary Shirt">
-                                    <span>Anniversary Shirt</span>
+                                    <input type="checkbox" class="shirt-type-filter-checkbox" value="<?= $type['id'] ?>">
+                                    <span><?= htmlspecialchars($type['name']) ?></span>
                                 </label>
                             </div>
                         </div>
-                        <div class="course-category">
-                            <div class="course-header">
-                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" class="course-filter-checkbox" value="T SHIRT WASHDAY">
-                                    <span>T SHIRT WASHDAY</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="course-category">
-                            <div class="course-header">
-                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                    <input type="checkbox" class="course-filter-checkbox" value="NSTP Shirt">
-                                    <span>NSTP Shirt</span>
-                                </label>
-                            </div>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
                 <div class="category-item">
@@ -287,7 +293,9 @@
                         data-stock="<?php echo $product['stock']; ?>"
                         data-item-code="<?php echo htmlspecialchars($product['variants'][0]['item_code']); ?>"
                         data-item-name="<?php echo htmlspecialchars($product['name']); ?>"
-                        data-courses="<?php echo htmlspecialchars(implode(',', $courses)); ?>">
+                        data-courses="<?php echo htmlspecialchars(implode(',', $courses)); ?>"
+                        data-shirt-type-id="<?php echo htmlspecialchars($product['shirt_type_id'] ?? ''); ?>"
+                        data-shirt-type-name="<?php echo htmlspecialchars($product['shirt_type_name'] ?? ''); ?>">
                         <?php
 // Find the first non-empty image among variants
 $productImage = '';

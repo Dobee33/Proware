@@ -306,6 +306,25 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  // Add multi-select shirt type filter logic for STI Shirt
+  document
+    .querySelectorAll(".shirt-type-filter-checkbox")
+    .forEach((checkbox) => {
+      checkbox.addEventListener("change", function () {
+        const mainCategory = "sti-shirt";
+        const checked = Array.from(
+          document.querySelectorAll(".shirt-type-filter-checkbox:checked")
+        ).map((cb) => cb.value);
+        if (checked.length > 0) {
+          activeSubcategories.set(mainCategory, checked);
+          activeMainCategories.add(mainCategory);
+        } else {
+          activeSubcategories.delete(mainCategory);
+        }
+        applyAllFilters();
+      });
+    });
+
   // Add these helper functions before applyAllFilters
   function normalizeText(text) {
     return text.toLowerCase().trim();
@@ -323,10 +342,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function applyAllFilters() {
     const productContainers = document.querySelectorAll(".product-container");
     let visibleCount = 0;
-
-    // Normalize search term once
     const normalizedSearchTerm = normalizeText(currentSearchTerm);
-
     productContainers.forEach((container) => {
       const productCategory = container.dataset.category.toLowerCase();
       const itemName = container.dataset.itemName.toLowerCase();
@@ -334,53 +350,65 @@ document.addEventListener("DOMContentLoaded", function () {
       const productCourses = container.dataset.courses
         ? container.dataset.courses.toLowerCase().split(",")
         : [];
-
-      // --- UPDATED LOGIC: Combine subcategory and main category filters across all selected main categories ---
+      const productShirtTypeId = container.dataset.shirtTypeId;
       let matchesCategory = false;
       if (activeMainCategories.size > 0) {
         for (const mainCategory of activeMainCategories) {
           if (productCategory.includes(mainCategory.toLowerCase())) {
-            // If this main category has subcategories checked
-            if (
-              activeSubcategories.has(mainCategory) &&
-              activeSubcategories.get(mainCategory).length > 0
-            ) {
-              // Only show if product matches one of the selected subcategories
-              for (const courseValue of activeSubcategories.get(mainCategory)) {
-                if (
-                  productCourses.includes(courseValue.toLowerCase()) ||
-                  isProductInCourse(itemName, courseValue.toLowerCase()) ||
-                  itemCode.includes(courseValue.toLowerCase())
-                ) {
-                  matchesCategory = true;
-                  break;
+            // STI Shirt: filter by shirt type
+            if (mainCategory === "sti-shirt") {
+              if (
+                activeSubcategories.has(mainCategory) &&
+                activeSubcategories.get(mainCategory).length > 0
+              ) {
+                for (const shirtTypeId of activeSubcategories.get(
+                  mainCategory
+                )) {
+                  if (productShirtTypeId === shirtTypeId) {
+                    matchesCategory = true;
+                    break;
+                  }
                 }
+              } else {
+                matchesCategory = true;
               }
             } else {
-              // No subcategories checked, show all products in this main category
-              matchesCategory = true;
+              // Other categories: filter by course
+              if (
+                activeSubcategories.has(mainCategory) &&
+                activeSubcategories.get(mainCategory).length > 0
+              ) {
+                for (const courseValue of activeSubcategories.get(
+                  mainCategory
+                )) {
+                  if (
+                    productCourses.includes(courseValue.toLowerCase()) ||
+                    isProductInCourse(itemName, courseValue.toLowerCase()) ||
+                    itemCode.includes(courseValue.toLowerCase())
+                  ) {
+                    matchesCategory = true;
+                    break;
+                  }
+                }
+              } else {
+                matchesCategory = true;
+              }
             }
           }
-          if (matchesCategory) break; // If already matched, no need to check other categories
+          if (matchesCategory) break;
         }
       } else {
-        matchesCategory = true; // No main category filter, show all
+        matchesCategory = true;
       }
-
-      // Enhanced search matching using partial matches
       const matchesSearch =
         normalizedSearchTerm === "" ||
         containsPartialMatch(itemName, normalizedSearchTerm) ||
         containsPartialMatch(itemCode, normalizedSearchTerm) ||
         containsPartialMatch(productCategory, normalizedSearchTerm);
-
-      // Show product only if it matches both category and search filters
       const shouldShow = matchesCategory && matchesSearch;
       container.style.display = shouldShow ? "block" : "none";
       if (shouldShow) visibleCount++;
     });
-
-    // Update no results message
     const noResultsMessage = document.getElementById("no-results-message");
     if (noResultsMessage) {
       noResultsMessage.style.display = visibleCount === 0 ? "flex" : "none";

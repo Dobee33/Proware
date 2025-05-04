@@ -312,11 +312,15 @@ function page_link($page, $query_string) {
                     </div>
                     <div class="input-group" id="shirtTypeGroup" style="display:none;">
                         <label for="shirtTypeSelect">Shirt Type:</label>
-                        <select id="shirtTypeSelect" name="shirt_type" style="width:100%;">
+                        <select id="shirtTypeSelect" name="shirt_type_id" style="width:100%;">
                             <option value="">Select Shirt Type</option>
-                            <option value="Anniversary Shirt">Anniversary Shirt</option>
-                            <option value="T SHIRT WASHDAY">T SHIRT WASHDAY</option>
-                            <option value="NSTP Shirt">NSTP Shirt</option>
+                            <?php
+                            $conn = mysqli_connect("localhost", "root", "", "proware");
+                            $result = mysqli_query($conn, "SELECT id, name FROM shirt_type ORDER BY name ASC");
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo '<option value="' . $row['id'] . '">' . htmlspecialchars($row['name']) . '</option>';
+                            }
+                            ?>
                         </select>
                     </div>
                     <div class="input-group" id="courseGroup" style="display:none;">
