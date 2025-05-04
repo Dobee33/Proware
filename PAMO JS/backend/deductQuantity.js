@@ -251,45 +251,300 @@ function updateAvailableSizes(itemSelect) {
 }
 
 function showSalesReceipt(formData) {
-  let html = `<p><strong>Transaction Number:</strong> ${formData.transactionNumber}</p>`;
-  html += `<p><strong>Name:</strong> ${formData.studentName}</p>`;
-  html += `<p><strong>ID Number:</strong> ${formData.studentIdNumber}</p>`;
-  html += `<table style="width:100%;border-collapse:collapse;" border="1">
-    <thead>
+  // Helper for the two copies
+  function renderReceipt(copyLabel) {
+    const dataRows = formData.itemIds
+      .map(
+        (id, i) => `
       <tr>
-        <th>Product</th>
-        <th>Size</th>
-        <th>Quantity</th>
-        <th>Price per Item</th>
-        <th>SubTotal</th>
+        <td>${formData.itemNames[i]} ${
+          formData.sizes[i] ? "(" + formData.sizes[i] + ")" : ""
+        }</td>
+        <td>PROWARE</td>
+        <td style="text-align:center;">${formData.quantities[i]}</td>
+        <td style="text-align:right;">${parseFloat(formData.prices[i]).toFixed(
+          2
+        )}</td>
+        <td style="text-align:right;">${parseFloat(
+          formData.itemTotals[i]
+        ).toFixed(2)}</td>
+        ${
+          i === 0
+            ? `<td class="signature-col" rowspan="${formData.itemIds.length}">
+          <div style="min-height:180px;display:flex;flex-direction:column;justify-content:space-between;height:100%;">
+            <div><b>Prepared by:</b><br><span class="sign-line"></span><br><span class="sign-name">Jason C. Amparo</span></div>
+            <div><b>OR Issued by:</b><br><span class="sign-line"></span><br><span class="sign-name">Agnes Eubion</span></div>
+            <div><b>Cashier:</b><br><span class="sign-line"></span></div>
+            <div><b>Released by & date:</b><br><span class="sign-line"></span></div>
+            <div style="margin-top:10px;"><b>RECEIVED BY:</b><br><span class="sign-line"></span><br><span class="sign-name" style="font-weight:bold;text-decoration:underline;">${formData.studentName}</span></div>
+          </div>
+        </td>`
+            : ""
+        }
       </tr>
-    </thead>
-    <tbody>`;
-  for (let i = 0; i < formData.itemIds.length; i++) {
-    html += `<tr>
-      <td>${formData.itemNames[i] || formData.itemIds[i]}</td>
-      <td>${formData.sizes[i]}</td>
-      <td>${formData.quantities[i]}</td>
-      <td>${formData.prices[i]}</td>
-      <td>${formData.itemTotals[i]}</td>
-    </tr>`;
+    `
+      )
+      .join("");
+    return `
+      <div class="receipt-header-flex">
+        <div class="receipt-header-logo"><img src="../Images/STI-LOGO.png" alt="STI Logo" /></div>
+        <div class="receipt-header-center">
+          <div class="sti-lucena">STI LUCENA</div>
+          <div class="sales-issuance-slip">SALES ISSUANCE SLIP</div>
+        </div>
+        <div class="receipt-header-copy">${copyLabel}</div>
+      </div>
+      <div class="receipt-section">
+        <table class="receipt-header-table">
+          <tr>
+            <td style="width:22%;font-size:0.98em;"><b>Student Name:</b></td>
+            <td style="width:22%;border-bottom:1px solid #222;">${
+              formData.studentName
+            }</td>
+            <td style="width:13%;font-size:0.98em;"><b>Student No.:</b></td>
+            <td style="width:15%;border-bottom:1px solid #222;">${
+              formData.studentIdNumber
+            }</td>
+            <td style="width:8%;font-size:0.98em;"><b>DATE:</b></td>
+            <td style="width:15%;border-bottom:1px solid #222;">${new Date().toLocaleDateString()}</td>
+          </tr>
+          <tr>
+            <td style="font-size:0.98em;"><b>Issuance Slip No.:</b></td>
+            <td style="border-bottom:1px solid #222;">${
+              formData.transactionNumber
+            }</td>
+            <td style="font-size:0.98em;"><b>Invoice No.:</b></td>
+            <td style="border-bottom:1px solid #222;"></td>
+            <td colspan="2" style="text-align:right;font-size:1.1em;font-weight:bold;"></td>
+          </tr>
+        </table>
+        <table class="receipt-main-table">
+          <thead>
+            <tr>
+              <th style="width:32%;">Item Description</th>
+              <th style="width:14%;">Item Type</th>
+              <th style="width:8%;">Qty</th>
+              <th style="width:12%;">SRP</th>
+              <th style="width:14%;">Amount</th>
+              <th style="width:20%;vertical-align:top;">Prepared by:</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${dataRows}
+          </tbody>
+        </table>
+        <div class="receipt-footer-flex">
+          <div class="receipt-footer-policy">
+            <b>ALL ITEMS ARE RECEIVED IN GOOD CONDITION</b><br>
+            <span style="font-size:0.97em;">(Exchange is allowed only within 3 days from the invoice date. Strictly no refund)</span>
+          </div>
+          <div class="receipt-total-row">
+            <b>TOTAL AMOUNT:</b> <span style="min-width:80px;display:inline-block;text-align:right;">${parseFloat(
+              formData.totalAmount
+            ).toFixed(2)}</span>
+          </div>
+        </div>
+      </div>
+    `;
   }
-  html += `</tbody></table>`;
-  html += `<p style="text-align:right;"><strong>Total Amount:</strong> ${formData.totalAmount}</p>`;
+
+  // Combine both copies in one A4 page
+  const html = `
+    <!-- PRINTING NOTE: For best results, set print scale to 100% or Actual Size in your print dialog. -->
+    <div class="receipt-a4">
+      <div class="receipt-half">${renderReceipt("PAMO COPY")}</div>
+      <div class="receipt-divider"></div>
+      <div class="receipt-half">${renderReceipt("STUDENT COPY")}</div>
+    </div>
+    <style>
+      .receipt-header-flex {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 2px;
+        margin-top: 2px;
+        min-height: 60px;
+      }
+      .receipt-header-logo img {
+        height: 60px;
+        width: auto;
+        display: block;
+      }
+      .receipt-header-logo {
+        flex: 0 0 80px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
+      .receipt-header-center {
+        flex: 1 1 auto;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+      }
+      .sti-lucena {
+        font-size: 1.35em;
+        font-weight: bold;
+        letter-spacing: 1px;
+        margin-bottom: 0px;
+      }
+      .sales-issuance-slip {
+        font-size: 1.1em;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+        margin-top: 0px;
+      }
+      .receipt-header-copy {
+        flex: 0 0 100px;
+        text-align: right;
+        font-size: 1em;
+        font-weight: bold;
+        margin-top: 2px;
+        margin-right: 2px;
+      }
+      .receipt-a4 {
+        width: 210mm;
+        height: 297mm;
+        padding: 0;
+        margin: 0 auto;
+        background: #fff;
+        font-family: Arial, sans-serif;
+        position: relative;
+      }
+      .receipt-half {
+        height: 148.5mm;
+        box-sizing: border-box;
+        padding: 10px 10px 6px 10px;
+        border-bottom: 2.5px dashed #333;
+        page-break-inside: avoid;
+        background: #fff;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+      }
+      .receipt-divider {
+        height: 2px;
+        background: transparent;
+      }
+      .receipt-header-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 8px;
+        font-size: 1em;
+      }
+      .receipt-header-table td {
+        padding: 2px 6px 2px 0;
+        vertical-align: bottom;
+      }
+      .receipt-main-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 1em;
+        margin-bottom: 0px;
+        table-layout: fixed;
+      }
+      .receipt-main-table th, .receipt-main-table td {
+        border: 1px solid #222;
+        padding: 6px 8px;
+        vertical-align: top;
+        word-break: break-word;
+      }
+      .receipt-main-table th {
+        background: #f2f2f2;
+        text-align: center;
+      }
+      .receipt-main-table td {
+        background: #fff;
+      }
+      .signature-col {
+        background: #fff;
+        vertical-align: top;
+        text-align: left;
+        min-width: 180px;
+        max-width: 220px;
+      }
+      .sign-line {
+        display: inline-block;
+        border-bottom: 1px solid #222;
+        width: 120px;
+        height: 18px;
+        margin-bottom: 2px;
+      }
+      .sign-name {
+        font-size: 0.95em;
+        color: #222;
+      }
+      .receipt-footer-flex {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-top: 0.5em;
+      }
+      .receipt-footer-policy {
+        font-size: 0.98em;
+        border-top: none;
+        padding-top: 0px;
+        text-align: left;
+        margin-bottom: 0;
+        max-width: 60%;
+      }
+      .receipt-total-row {
+        font-size: 1.05em;
+        font-weight: bold;
+        margin: 0 0 0 0;
+        text-align: right;
+        min-width: 180px;
+      }
+      @media print {
+        @page {
+          size: A4;
+          margin: 0;
+        }
+        html, body {
+          width: 210mm;
+          height: 297mm;
+          margin: 0 !important;
+          padding: 0 !important;
+          background: #fff !important;
+          overflow: visible !important;
+        }
+        .receipt-a4 {
+          width: 210mm !important;
+          height: 297mm !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+        body * { visibility: hidden !important; }
+        #salesReceiptModal, #salesReceiptModal * { visibility: visible !important; }
+        #salesReceiptModal {
+          position: fixed !important;
+          left: 0; top: 0; width: 210mm; height: 297mm;
+          background: #fff !important;
+          z-index: 9999;
+          overflow: visible !important;
+          box-shadow: none !important;
+        }
+        .receipt-half { height: 148.5mm !important; overflow: hidden !important; }
+        .receipt-divider { display: none; }
+        .modal-header, .modal-footer, .save-btn, .cancel-btn, .close { display: none !important; }
+      }
+    </style>
+  `;
 
   document.getElementById("salesReceiptBody").innerHTML = html;
   document.getElementById("salesReceiptModal").style.display = "block";
 }
 
 function printSalesReceipt() {
-  const printContents = document.getElementById(
-    "salesReceiptContent"
-  ).innerHTML;
-  const originalContents = document.body.innerHTML;
-  document.body.innerHTML = printContents;
   window.print();
-  document.body.innerHTML = originalContents;
-  window.location.reload();
 }
 
 function submitDeductQuantity(event) {
