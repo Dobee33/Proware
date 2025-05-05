@@ -251,16 +251,22 @@ function updateAvailableSizes(itemSelect) {
 }
 
 function showSalesReceipt(formData) {
+  // Debug: Log the PAMO_USER object and preparedByName
+  console.log("DEBUG: window.PAMO_USER =", window.PAMO_USER);
   // Helper for the two copies
   function renderReceipt(copyLabel) {
-    const dataRows = formData.itemIds
-      .map(
-        (id, i) => `
-      <tr>
-        <td>${formData.itemNames[i]} ${
-          formData.sizes[i] ? "(" + formData.sizes[i] + ")" : ""
-        }</td>
-        <td>PROWARE</td>
+    // Get the logged-in user's name from the global variable set by PHP
+    const preparedByName =
+      window.PAMO_USER && window.PAMO_USER.name ? window.PAMO_USER.name : "";
+    console.log("DEBUG: preparedByName =", preparedByName);
+    // Render each item as its own row for proper alignment
+    const dataRows = formData.itemNames
+      .map((name, i) => {
+        let cleanName = name.replace(/\s*\([^)]*\)/, ""); // Remove (item_code)
+        cleanName = cleanName.replace(/\s*-\s*[^-]*$/, ""); // Remove last dash and after
+        return `<tr>
+        <td>${cleanName} ${formData.sizes[i]}</td>
+        <td>${formData.itemCategories[i] || ""}</td>
         <td style="text-align:center;">${formData.quantities[i]}</td>
         <td style="text-align:right;">${parseFloat(formData.prices[i]).toFixed(
           2
@@ -270,21 +276,41 @@ function showSalesReceipt(formData) {
         ).toFixed(2)}</td>
         ${
           i === 0
-            ? `<td class="signature-col" rowspan="${formData.itemIds.length}">
-          <div style="min-height:180px;display:flex;flex-direction:column;justify-content:space-between;height:100%;">
-            <div><b>Prepared by:</b><br><span class="sign-line"></span><br><span class="sign-name">Jason C. Amparo</span></div>
-            <div><b>OR Issued by:</b><br><span class="sign-line"></span><br><span class="sign-name">Agnes Eubion</span></div>
-            <div><b>Cashier:</b><br><span class="sign-line"></span></div>
-            <div><b>Released by & date:</b><br><span class="sign-line"></span></div>
-            <div style="margin-top:10px;"><b>RECEIVED BY:</b><br><span class="sign-line"></span><br><span class="sign-name" style="font-weight:bold;text-decoration:underline;">${formData.studentName}</span></div>
-          </div>
+            ? `<td class="signature-col" rowspan="${formData.itemNames.length}">
+          <table class="signature-table">
+            <tr><td class="sig-label">Prepared by:</td></tr>
+            <tr><td class="sig-box">${preparedByName}</td></tr>
+            <tr><td class="sig-label">OR Issued by:</td></tr>
+            <tr><td class="sig-box">${formData.cashierName}<br><span style="font-weight:bold;">Cashier</span></td></tr>
+            <tr><td class="sig-label">Released by & date:</td></tr>
+            <tr><td class="sig-box"></td></tr>
+            <tr><td class="sig-label">RECEIVED BY:</td></tr>
+            <tr><td class="sig-box" style="height:40px;vertical-align:bottom;">
+              <div style="height:24px;"></div>
+              <div class="sig-name" style="font-weight:bold;text-decoration:underline;text-align:center;">${formData.studentName}</div>
+            </td></tr>
+          </table>
         </td>`
             : ""
         }
-      </tr>
-    `
-      )
+      </tr>`;
+      })
       .join("");
+
+    // Footer row inside the table
+    const footerRow = `
+      <tr>
+        <td colspan="5" style="text-align:left; font-size:0.98em; padding-top:10px;">
+          <b>ALL ITEMS ARE RECEIVED IN GOOD CONDITION</b><br>
+          <span style="font-size:0.97em;">(Exchange is allowed only within 3 days from the invoice date. Strictly no refund)</span>
+        </td>
+        <td style="text-align:right; font-size:1.05em; font-weight:bold; padding-top:10px;">
+          TOTAL AMOUNT: <span style="min-width:80px;display:inline-block;text-align:right;">${parseFloat(
+            formData.totalAmount
+          ).toFixed(2)}</span>
+        </td>
+      </tr>
+    `;
     return `
       <div class="receipt-header-flex">
         <div class="receipt-header-logo"><img src="../Images/STI-LOGO.png" alt="STI Logo" /></div>
@@ -331,19 +357,9 @@ function showSalesReceipt(formData) {
           </thead>
           <tbody>
             ${dataRows}
+            ${footerRow}
           </tbody>
         </table>
-        <div class="receipt-footer-flex">
-          <div class="receipt-footer-policy">
-            <b>ALL ITEMS ARE RECEIVED IN GOOD CONDITION</b><br>
-            <span style="font-size:0.97em;">(Exchange is allowed only within 3 days from the invoice date. Strictly no refund)</span>
-          </div>
-          <div class="receipt-total-row">
-            <b>TOTAL AMOUNT:</b> <span style="min-width:80px;display:inline-block;text-align:right;">${parseFloat(
-              formData.totalAmount
-            ).toFixed(2)}</span>
-          </div>
-        </div>
       </div>
     `;
   }
@@ -413,7 +429,7 @@ function showSalesReceipt(formData) {
         padding: 0;
         margin: 0 auto;
         background: #fff;
-        font-family: Arial, sans-serif;
+        font-family: Arial, sans-serif;a
         position: relative;
       }
       .receipt-half {
@@ -455,6 +471,11 @@ function showSalesReceipt(formData) {
         vertical-align: top;
         word-break: break-word;
       }
+      .receipt-main-table tbody > tr, .receipt-main-table tbody > tr > td {
+        margin: 0;
+        padding-top: 2px;
+        padding-bottom: 2px;
+      }
       .receipt-main-table th {
         background: #f2f2f2;
         text-align: center;
@@ -468,40 +489,32 @@ function showSalesReceipt(formData) {
         text-align: left;
         min-width: 180px;
         max-width: 220px;
+        padding: 0 !important;
       }
-      .sign-line {
-        display: inline-block;
-        border-bottom: 1px solid #222;
-        width: 120px;
-        height: 18px;
-        margin-bottom: 2px;
-      }
-      .sign-name {
-        font-size: 0.95em;
-        color: #222;
-      }
-      .receipt-footer-flex {
+      .signature-table {
         width: 100%;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-top: 0.5em;
+        border-collapse: separate;
+        border-spacing: 0;
       }
-      .receipt-footer-policy {
-        font-size: 0.98em;
-        border-top: none;
-        padding-top: 0px;
-        text-align: left;
-        margin-bottom: 0;
-        max-width: 60%;
-      }
-      .receipt-total-row {
-        font-size: 1.05em;
+      .signature-table .sig-label {
         font-weight: bold;
-        margin: 0 0 0 0;
-        text-align: right;
-        min-width: 180px;
+        font-size: 0.98em;
+        border: 1px solid #222;
+        border-bottom: none;
+        padding: 4px 6px 2px 6px;
+        background: #f8f8f8;
+      }
+      .signature-table .sig-box {
+        border: 1px solid #222;
+        border-top: none;
+        height: 28px;
+        padding: 2px 6px;
+        font-size: 0.97em;
+        background: #fff;
+      }
+      .signature-table .sig-name {
+        font-size: 1em;
+        margin-top: 2px;
       }
       @media print {
         @page {
@@ -545,6 +558,12 @@ function showSalesReceipt(formData) {
 
 function printSalesReceipt() {
   window.print();
+  // Automatically close the modal after printing
+  setTimeout(function () {
+    if (document.getElementById("salesReceiptModal")) {
+      document.getElementById("salesReceiptModal").style.display = "none";
+    }
+  }, 500);
 }
 
 function submitDeductQuantity(event) {
@@ -555,6 +574,7 @@ function submitDeductQuantity(event) {
   const studentName =
     studentNameSelect.options[studentNameSelect.selectedIndex].text;
   const studentIdNumber = document.getElementById("studentIdNumber").value;
+  const cashierName = document.getElementById("cashierName").value;
   const salesItems = document.querySelectorAll(".sales-item");
 
   if (
@@ -571,10 +591,12 @@ function submitDeductQuantity(event) {
   formData.append("transactionNumber", transactionNumber);
   formData.append("studentName", studentName);
   formData.append("studentIdNumber", studentIdNumber);
+  formData.append("cashierName", cashierName);
 
   // Arrays to store multiple items
   const itemIds = [];
   const itemNames = [];
+  const itemCategories = [];
   const sizes = [];
   const quantities = [];
   const prices = [];
@@ -587,6 +609,42 @@ function submitDeductQuantity(event) {
     const itemName = itemSelect
       ? itemSelect.options[itemSelect.selectedIndex].text
       : "";
+    let itemCategory = "";
+    if (window.jQuery && $(itemSelect).data("select2")) {
+      // Try to get from data-category first
+      itemCategory = $(itemSelect).find(":selected").data("category");
+      if (!itemCategory) {
+        // Fallback: parse from text
+        const text = $(itemSelect).find(":selected").text();
+        const dashIdx = text.lastIndexOf(" - ");
+        if (dashIdx !== -1) {
+          itemCategory = text.substring(dashIdx + 3).trim();
+        } else {
+          itemCategory = "";
+        }
+      }
+      console.log("Select2:", itemCategory, $(itemSelect).find(":selected")[0]);
+    } else {
+      itemCategory =
+        itemSelect.options[itemSelect.selectedIndex].getAttribute(
+          "data-category"
+        ) || "";
+      if (!itemCategory) {
+        // Fallback: parse from text
+        const text = itemSelect.options[itemSelect.selectedIndex].text;
+        const dashIdx = text.lastIndexOf(" - ");
+        if (dashIdx !== -1) {
+          itemCategory = text.substring(dashIdx + 3).trim();
+        } else {
+          itemCategory = "";
+        }
+      }
+      console.log(
+        "Native:",
+        itemCategory,
+        itemSelect.options[itemSelect.selectedIndex]
+      );
+    }
     const sizeSelect = item.querySelector('select[name="size[]"]');
     const quantityInput = item.querySelector(
       'input[name="quantityToDeduct[]"]'
@@ -617,6 +675,7 @@ function submitDeductQuantity(event) {
 
     itemIds.push(itemSelect.value);
     itemNames.push(itemName);
+    itemCategories.push(itemCategory);
     sizes.push(sizeSelect.value);
     quantities.push(quantityInput.value);
     prices.push(priceInput.value);
@@ -644,6 +703,8 @@ function submitDeductQuantity(event) {
     studentName,
     studentIdNumber,
     itemIds,
+    itemNames,
+    itemCategories,
     sizes,
     quantities,
     prices,
@@ -676,11 +737,13 @@ function submitDeductQuantity(event) {
           studentIdNumber,
           itemIds,
           itemNames,
+          itemCategories,
           sizes,
           quantities,
           prices,
           itemTotals,
           totalAmount: document.getElementById("totalAmount").value,
+          cashierName,
         });
       } else {
         alert("Error: " + (data.message || "Unknown error occurred"));

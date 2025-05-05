@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 // Build query string for filters
 $query_params = $_GET;
 unset($query_params['page']);
@@ -23,6 +22,12 @@ function page_link($page, $query_string) {
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- Inject the logged-in user's name for use in JS -->
+    <script>
+      window.PAMO_USER = {
+        name: "<?php echo addslashes($_SESSION['name'] ?? ''); ?>"
+      };
+    </script>
     <script src="../PAMO JS/inventory.js"></script>
     <script src="../PAMO JS/backend/addItem.js"></script>
     <script src="../PAMO JS/backend/editItem.js"></script>
@@ -505,6 +510,10 @@ function page_link($page, $query_string) {
                             <label for="studentIdNumber">ID Number:</label>
                             <input type="text" id="studentIdNumber" name="studentIdNumber" readonly required>
                         </div>
+                        <div class="input-group">
+                            <label for="cashierName">Cashier Name:</label>
+                            <input type="text" id="cashierName" name="cashierName" required>
+                        </div>
                     </div>
                     <div id="salesItems">
                         <div class="sales-item form-row">
@@ -520,7 +529,7 @@ function page_link($page, $query_string) {
                                     $sql = "SELECT item_code, item_name, category, price FROM inventory ORDER BY item_name";
                                     $result = mysqli_query($conn, $sql);
                                     while ($row = mysqli_fetch_assoc($result)) {
-                                        echo "<option value='" . $row['item_code'] . "' data-price='" . $row['price'] . "'>" . $row['item_name'] . " (" . $row['item_code'] . ") - " . $row['category'] . "</option>";
+                                        echo "<option value='" . $row['item_code'] . "' data-price='" . $row['price'] . "' data-category='" . htmlspecialchars($row['category'], ENT_QUOTES) . "'>" . $row['item_name'] . " (" . $row['item_code'] . ") - " . $row['category'] . "</option>";
                                     }
                                     mysqli_close($conn);
                                     ?>

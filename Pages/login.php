@@ -21,6 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['email'] = $user['email'];
             $_SESSION['role_category'] = $user['role_category'];
             $_SESSION['last_name'] = $user['last_name'];
+            // Set the full name for PAMO user display
+            $_SESSION['name'] = $user['first_name'] . ' ' . $user['last_name'];
 
             // Check if there's a redirect parameter
             if (isset($_GET['redirect'])) {
