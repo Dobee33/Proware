@@ -51,10 +51,6 @@ $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
                 <div class="header-actions">
                     <i class="material-icons">notifications</i>
                     <i class="material-icons">account_circle</i>
-                    <button onclick="logout()" class="logout-btn">
-                        <i class="material-icons">logout</i>
-                        <span>Logout</span>
-                    </button>
                 </div>
             </header>
 

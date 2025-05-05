@@ -90,6 +90,7 @@ session_start();
             </div>
         </main>
     </div>
+    <script src="../PAMO JS/content-edit.js"></script>
 </body>
 
 </html>

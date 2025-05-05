@@ -214,6 +214,8 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         updateNotificationCount();
     </script>
 
+    <script src="../PAMO JS/preorders.js"></script>
+
     <style>
         /* Add this to your existing styles */
         .items-list {

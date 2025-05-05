@@ -120,9 +120,8 @@ function updateStockStatus(row) {
 }
 
 function logout() {
-  // Show confirmation dialog before logging out
   if (confirm("Are you sure you want to log out?")) {
-    window.location.href = "../Pages/login.php";
+    window.location.href = "../Pages/logout.php";
   }
 }
 
