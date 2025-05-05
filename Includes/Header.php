@@ -633,33 +633,54 @@ if (isset($_SESSION['user_id'])) {
     flex: 1;
     padding-right: 4px;
 }
-.mailbox-message {
+.mailbox-message-card {
     background: #f4f8ff;
-    border-radius: 12px;
-    margin-bottom: 18px;
-    padding: 18px 22px;
-    box-shadow: 0 2px 8px rgba(0,114,188,0.06);
+    border-radius: 14px;
+    margin-bottom: 22px;
+    padding: 18px 22px 14px 18px;
+    box-shadow: 0 2px 12px rgba(0,114,188,0.07);
     border-left: 5px solid #0072bc;
     transition: box-shadow 0.2s;
+    position: relative;
 }
-.mailbox-message:last-child {
+.mailbox-message-card:last-child {
     margin-bottom: 0;
 }
-.mailbox-message b {
+.mailbox-reply-label {
     color: #0072bc;
-    font-size: 1.1em;
+    font-weight: 700;
+    font-size: 1.08em;
+    margin-bottom: 4px;
 }
-.mailbox-message .mailbox-date {
-    display: block;
+.mailbox-reply-text {
+    font-size: 1.08em;
+    color: #222;
+    margin-bottom: 10px;
+    margin-top: 2px;
+}
+.mailbox-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.98em;
     color: #888;
-    font-size: 0.95em;
-    margin: 6px 0 2px 0;
 }
-.mailbox-message .mailbox-question {
-    color: #444;
+.mailbox-date {
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.mailbox-date i, .mailbox-question i {
+    color: #0072bc;
     font-size: 1em;
-    margin-top: 8px;
+}
+.mailbox-question {
     font-style: italic;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 @media (max-width: 600px) {
     #mailboxModal .mailbox-content {
@@ -670,6 +691,9 @@ if (isset($_SESSION['user_id'])) {
     #closeMailboxModal {
         right: 12px;
         top: 10px;
+    }
+    .mailbox-message-card {
+        padding: 12px 4vw 10px 4vw;
     }
 }
 .mailbox-count {
@@ -704,12 +728,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else {
                         messages.forEach(function(msg) {
                             var div = document.createElement('div');
-                            div.className = 'mailbox-message';
+                            div.className = 'mailbox-message-card';
                             div.innerHTML =
-                                '<b>Admin Reply:</b><br>' +
-                                '<div>' + msg.reply + '</div>' +
-                                '<span class="mailbox-date">On: ' + msg.replied_at + '</span>' +
-                                '<div class="mailbox-question">Your question: ' + msg.question + '</div>';
+                                '<div class="mailbox-reply-label">Admin Reply:</div>' +
+                                '<div class="mailbox-reply-text">' + msg.reply + '</div>' +
+                                '<div class="mailbox-meta">' +
+                                    '<span class="mailbox-date"><i class="fas fa-calendar-alt"></i> ' + msg.replied_at + '</span>' +
+                                    '<span class="mailbox-question"><i class="fas fa-question-circle"></i> ' + msg.question + '</span>' +
+                                '</div>';
                             box.appendChild(div);
                         });
                     }
