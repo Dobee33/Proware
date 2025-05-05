@@ -7,6 +7,15 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once dirname(__FILE__) . '/init_cart.php';
 
 $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
+
+$mailboxCount = 0;
+if (isset($_SESSION['user_id'])) {
+    require_once dirname(__FILE__) . '/connection.php';
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM inquiries WHERE user_id = :uid AND reply IS NOT NULL AND student_read = 0");
+    $stmt->bindParam(':uid', $_SESSION['user_id'], PDO::PARAM_INT);
+    $stmt->execute();
+    $mailboxCount = $stmt->fetchColumn();
+}
 ?>
 
 <nav class="navbar" role="navigation" aria-label="Main navigation">
@@ -95,6 +104,17 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
                     </div>
                 </div>
             </div>
+
+            <?php if (isset($_SESSION['user_id']) && isset($_SESSION['role_category']) && $_SESSION['role_category'] === 'COLLEGE STUDENT') : ?>
+                <div class="icon mailbox-icon" id="mailboxIcon" style="position:relative;">
+                    <a href="javascript:void(0);" title="Mailbox">
+                        <i class="fas fa-envelope"></i>
+                        <?php if ($mailboxCount > 0): ?>
+                            <span class="mailbox-count"><?= $mailboxCount ?></span>
+                        <?php endif; ?>
+                    </a>
+                </div>
+            <?php endif; ?>
 
             <?php if (isset($_SESSION['user_id'])): ?>
                 <div class="icon">
@@ -555,6 +575,162 @@ $current_page = basename($_SERVER['PHP_SELF']); // Get the current page name
 
 <!-- Include cart functionality -->
 <script src="../Javascript/cart.js"></script>
+
+<!-- Mailbox Modal -->
+<div id="mailboxModal" style="display:none;">
+    <div class="mailbox-content">
+        <span id="closeMailboxModal">&times;</span>
+        <h2>Mailbox</h2>
+        <div id="mailboxMessages"></div>
+    </div>
+</div>
+<style>
+#mailboxModal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.35);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+#mailboxModal .mailbox-content {
+    background: #fff;
+    border-radius: 18px;
+    padding: 32px 32px 24px 32px;
+    min-width: 340px;
+    max-width: 600px;
+    width: 90vw;
+    max-height: 80vh;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+#mailboxModal h2 {
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0072bc;
+    letter-spacing: 1px;
+}
+#closeMailboxModal {
+    position: absolute;
+    top: 18px;
+    right: 28px;
+    font-size: 2rem;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+#closeMailboxModal:hover {
+    color: #d32f2f;
+}
+#mailboxMessages {
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 4px;
+}
+.mailbox-message {
+    background: #f4f8ff;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    padding: 18px 22px;
+    box-shadow: 0 2px 8px rgba(0,114,188,0.06);
+    border-left: 5px solid #0072bc;
+    transition: box-shadow 0.2s;
+}
+.mailbox-message:last-child {
+    margin-bottom: 0;
+}
+.mailbox-message b {
+    color: #0072bc;
+    font-size: 1.1em;
+}
+.mailbox-message .mailbox-date {
+    display: block;
+    color: #888;
+    font-size: 0.95em;
+    margin: 6px 0 2px 0;
+}
+.mailbox-message .mailbox-question {
+    color: #444;
+    font-size: 1em;
+    margin-top: 8px;
+    font-style: italic;
+}
+@media (max-width: 600px) {
+    #mailboxModal .mailbox-content {
+        padding: 18px 6vw 12px 6vw;
+        min-width: unset;
+        max-width: 98vw;
+    }
+    #closeMailboxModal {
+        right: 12px;
+        top: 10px;
+    }
+}
+.mailbox-count {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    background: #d32f2f;
+    color: #fff;
+    border-radius: 50%;
+    padding: 2px 7px;
+    font-size: 0.8em;
+    font-weight: bold;
+    z-index: 2;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var mailboxIcon = document.getElementById('mailboxIcon');
+    var mailboxModal = document.getElementById('mailboxModal');
+    var closeMailboxModal = document.getElementById('closeMailboxModal');
+    if (mailboxIcon) {
+        mailboxIcon.addEventListener('click', function() {
+            mailboxModal.style.display = 'flex';
+            fetch('../Includes/fetch_replies.php')
+                .then(res => res.json())
+                .then(data => {
+                    var box = document.getElementById('mailboxMessages');
+                    box.innerHTML = '';
+                    var messages = data.messages || [];
+                    if (messages.length === 0) {
+                        box.innerHTML = '<p style="color:#888;">No replies yet.</p>';
+                    } else {
+                        messages.forEach(function(msg) {
+                            var div = document.createElement('div');
+                            div.className = 'mailbox-message';
+                            div.innerHTML =
+                                '<b>Admin Reply:</b><br>' +
+                                '<div>' + msg.reply + '</div>' +
+                                '<span class="mailbox-date">On: ' + msg.replied_at + '</span>' +
+                                '<div class="mailbox-question">Your question: ' + msg.question + '</div>';
+                            box.appendChild(div);
+                        });
+                    }
+                    // Mark all as read after displaying
+                    if (data.unread_ids && data.unread_ids.length > 0) {
+                        fetch('../Includes/mark_mailbox_read.php', { method: 'POST' })
+                            .then(() => {
+                                var badge = document.querySelector('.mailbox-count');
+                                if (badge) badge.remove();
+                            });
+                    }
+                });
+        });
+    }
+    if (closeMailboxModal) {
+        closeMailboxModal.onclick = function() {
+            mailboxModal.style.display = 'none';
+        };
+    }
+});
+</script>
 
 <style>
     .navbar {

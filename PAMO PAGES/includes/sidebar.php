@@ -1,3 +1,29 @@
+<?php
+if (!isset($basePath)) $basePath = '';
+// Ensure session variables are set before nav rendering
+if (isset($_SESSION['user_id'])) {
+    include_once __DIR__ . '/../../Includes/connection.php';
+    $user_id = $_SESSION['user_id'];
+    $query = "SELECT first_name, last_name, role_category, program_or_position FROM account WHERE id = :user_id";
+    $stmt = $conn->prepare($query);
+    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->execute();
+    if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $_SESSION['role_category'] = $row['role_category'];
+        $_SESSION['program_or_position'] = $row['program_or_position'];
+    }
+}
+// Notification badge for new inquiries
+$newInquiries = 0;
+try {
+    include_once __DIR__ . '/../../Includes/connection.php';
+    $stmtNotif = $conn->prepare("SELECT COUNT(*) FROM inquiries WHERE status = 'new'");
+    $stmtNotif->execute();
+    $newInquiries = $stmtNotif->fetchColumn();
+} catch (Exception $e) {
+    $newInquiries = 0;
+}
+?>
 <nav class="sidebar">
     <div class="logo-area">
         <div class="logo">
@@ -7,49 +33,55 @@
     </div>
     <ul class="nav-links">
         <li <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'class="active"' : ''; ?>
-            onclick="window.location.href='dashboard.php'">
+            onclick="window.location.href='<?php echo $basePath; ?>dashboard.php'">
             <span class="active-bar"></span>
             <i class="material-icons">dashboard</i>Dashboard
         </li>
-
         <li <?php echo basename($_SERVER['PHP_SELF']) == 'inventory.php' ? 'class="active"' : ''; ?>
-            onclick="window.location.href='inventory.php'">
+            onclick="window.location.href='<?php echo $basePath; ?>inventory.php'">
             <span class="active-bar"></span>
             <i class="material-icons">inventory_2</i>Inventory
         </li>
         <li <?php echo basename($_SERVER['PHP_SELF']) == 'preorders.php' ? 'class="active"' : ''; ?>
-            onclick="window.location.href='preorders.php'">
+            onclick="window.location.href='<?php echo $basePath; ?>preorders.php'">
             <span class="active-bar"></span>
             <i class="material-icons">shopping_cart</i>Orders
         </li>
         <li <?php echo basename($_SERVER['PHP_SELF']) == 'reports.php' ? 'class="active"' : ''; ?>
-            onclick="window.location.href='reports.php'">
+            onclick="window.location.href='<?php echo $basePath; ?>reports.php'">
             <span class="active-bar"></span>
             <i class="material-icons">assessment</i>Reports
         </li>
         <li <?php echo basename($_SERVER['PHP_SELF']) == 'content-edit.php' ? 'class="active"' : ''; ?>
-            onclick="window.location.href='content-edit.php'">
+            onclick="window.location.href='<?php echo $basePath; ?>content-edit.php'">
             <span class="active-bar"></span>
             <i class="material-icons">inventory_2</i>Content Management
         </li>
+        <?php if (isset($_SESSION['program_or_position']) && $_SESSION['program_or_position'] === 'PAMO') : ?>
+        <li <?php echo basename($_SERVER['PHP_SELF']) == 'view_inquiries.php' ? 'class="active"' : ''; ?>
+            onclick="window.location.href='<?php echo $basePath; ?>view_inquiries.php'">
+            <span class="active-bar"></span>
+            <i class="material-icons">question_answer</i>Inquiries
+            <?php if ($newInquiries > 0): ?>
+                <span class="notif-badge"><?= $newInquiries ?></span>
+            <?php endif; ?>
+        </li>
+        <?php endif; ?>
     </ul>
     <div class="user-info">
         <img src="avatar.png" alt="User Avatar" onerror="this.onerror=null;this.src='../Images/default-avatar.png';">
         <div class="user-details">
             <h4>
                 <?php
-                include '../includes/connection.php';
+                // User info display only
                 if (isset($_SESSION['user_id'])) {
                     $user_id = $_SESSION['user_id'];
                     $query = "SELECT first_name, last_name, role_category, program_or_position FROM account WHERE id = :user_id";
                     $stmt = $conn->prepare($query);
                     $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
                     $stmt->execute();
-
                     if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                         echo $row['first_name'] . ' ' . $row['last_name'];
-                        $_SESSION['role_category'] = $row['role_category'];
-                        $_SESSION['program_or_position'] = $row['program_or_position'];
                     } else {
                         echo 'Guest User';
                     }
@@ -92,7 +124,36 @@
         height: 100vh;
         z-index: 100;
     }
-
+    .notif-badge {
+        background: #d32f2f;
+        color: #fff;
+        border-radius: 50%;
+        padding: 2px 8px;
+        font-size: 0.9em;
+        margin-left: 8px;
+        vertical-align: middle;
+        display: inline-block;
+        min-width: 24px;
+        text-align: center;
+        font-weight: bold;
+        position: relative;
+        top: -2px;
+    }
+    .nav-links li.active {
+        background: #2196f3 !important;
+        color: #fff !important;
+        border-radius: 12px;
+    }
+    .nav-links li.active i,
+    .nav-links li.active .notif-badge {
+        color: #fff !important;
+    }
+    .nav-links li.active .notif-badge {
+        background: #d32f2f !important;
+    }
+    .nav-links li .notif-badge {
+        margin-left: 8px;
+    }
     .logo-area {
         background: #fffbe7;
         border-bottom: 1.5px solid #f0e6b2;
@@ -144,15 +205,6 @@
 
     .nav-links li.active .active-bar {
         display: block;
-    }
-
-    .nav-links li.active {
-        background: #e3f2fd;
-        color: #0072bc;
-    }
-
-    .nav-links li.active i {
-        color: #0072bc;
     }
 
     .nav-links li:hover {

@@ -156,18 +156,36 @@
         // Form Submission
         document.getElementById('questionForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            // Show toast notification
-            const toast = document.getElementById('toast');
-            toast.classList.add('show');
-            
-            // Hide toast after 3 seconds
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-            
-            // Reset form
-            this.reset();
+            console.log('Form submitted!'); // Debug log
+            const form = this;
+            const formData = new FormData(form);
+
+            fetch('submit_question.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const toast = document.getElementById('toast');
+                if (data.success) {
+                    toast.querySelector('span').textContent = "Your question has been sent successfully!";
+                    form.reset();
+                } else {
+                    toast.querySelector('span').textContent = "There was an error sending your question.";
+                }
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            })
+            .catch(() => {
+                const toast = document.getElementById('toast');
+                toast.querySelector('span').textContent = "There was an error sending your question.";
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            });
         });
     </script>
 </body>
