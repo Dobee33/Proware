@@ -105,29 +105,26 @@ try {
         $actual_quantity = $beginning_quantity + $new_delivery;
 
         // Update inventory
-        $sql = "UPDATE inventory SET 
-                actual_quantity = ?,
-                new_delivery = ?,
-                beginning_quantity = ?,
+        $updateStockStmt = $conn->prepare(
+            "UPDATE inventory 
+            SET actual_quantity = ?,
                 status = CASE 
                     WHEN ? <= 0 THEN 'Out of Stock'
-                    WHEN ? <= 20 THEN 'Low Stock'
+                    WHEN ? <= 10 THEN 'Low Stock'
                     ELSE 'In Stock'
                 END
-                WHERE item_code = ?";
-                
-        $stmt = $conn->prepare($sql);
-        if (!$stmt) {
+            WHERE item_code = ? AND actual_quantity = ?"
+        );
+        if (!$updateStockStmt) {
             throw new Exception("Database error");
         }
 
         $stmt->bind_param("iiiiss", 
             $actual_quantity,
-            $new_delivery,
-            $beginning_quantity,
             $actual_quantity,
             $actual_quantity,
-            $item['itemId']
+            $item['itemId'],
+            $beginning_quantity
         );
         
         if (!$stmt->execute()) {

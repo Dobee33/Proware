@@ -77,35 +77,33 @@ try {
         $new_actual_quantity = $item['actual_quantity'] - $quantityToDeduct;
         
         // Update inventory with optimistic locking
-        $sql = "UPDATE inventory SET 
-                actual_quantity = ?,
-                sold_quantity = sold_quantity + ?,
+        $updateStockStmt = $conn->prepare(
+            "UPDATE inventory 
+            SET actual_quantity = ?,
                 status = CASE 
                     WHEN ? <= 0 THEN 'Out of Stock'
-                    WHEN ? <= 20 THEN 'Low Stock'
+                    WHEN ? <= 10 THEN 'Low Stock'
                     ELSE 'In Stock'
                 END
-                WHERE item_code = ? AND actual_quantity = ?";
-                
-        $stmt = $conn->prepare($sql);
-        if (!$stmt) {
+            WHERE item_code = ? AND actual_quantity = ?"
+        );
+        if (!$updateStockStmt) {
             throw new Exception("Prepare failed: " . $conn->error);
         }
 
-        $stmt->bind_param("iiiiss", 
+        $updateStockStmt->bind_param("iiiiss", 
             $new_actual_quantity,
-            $quantityToDeduct,
             $new_actual_quantity,
             $new_actual_quantity,
             $itemId,
             $item['actual_quantity']
         );
         
-        if (!$stmt->execute()) {
-            throw new Exception("Error updating item $itemId: " . $stmt->error);
+        if (!$updateStockStmt->execute()) {
+            throw new Exception("Error updating item $itemId: " . $updateStockStmt->error);
         }
 
-        if ($stmt->affected_rows === 0) {
+        if ($updateStockStmt->affected_rows === 0) {
             throw new Exception("Item $itemId was modified by another transaction. Please try again.");
         }
 

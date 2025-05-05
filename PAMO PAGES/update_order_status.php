@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         sold_quantity = sold_quantity + ?,
                         status = CASE 
                             WHEN ? <= 0 THEN 'Out of Stock'
-                            WHEN ? <= 20 THEN 'Low Stock'
+                            WHEN ? <= 10 THEN 'Low Stock'
                             ELSE 'In Stock'
                         END
                     WHERE item_code = ? AND actual_quantity = ?"

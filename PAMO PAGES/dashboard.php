@@ -13,7 +13,7 @@ $pending_orders = $pending_result->fetch(PDO::FETCH_ASSOC)['pending'] ?? 0;
 
 $low_stock_query = "SELECT COUNT(*) as low_stock 
                     FROM inventory 
-                    WHERE actual_quantity <= 20 
+                    WHERE actual_quantity <= 10 
                     AND actual_quantity > 0";
 $low_stock_result = $conn->query($low_stock_query);
 $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
