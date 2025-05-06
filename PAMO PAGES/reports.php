@@ -1,5 +1,10 @@
 <?php
 session_start();
+// Determine report type and page from GET parameters
+$reportType = isset($_GET['type']) ? $_GET['type'] : 'inventory';
+$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+$limit = 15;
+$offset = ($page - 1) * $limit;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,177 +24,71 @@ session_start();
         <?php include 'includes/sidebar.php'; ?>
 
         <main class="main-content">
-            <header>
+            <header class="reports-header">
+                <h2 class="reports-title">Reports</h2>
                 <div class="search-bar">
                     <i class="material-icons">search</i>
                     <input type="text" id="searchInput" placeholder="Search reports...">
                 </div>
-                <div class="header-actions">
-                    <div class="date-filters">
-                        <input type="date" id="startDate" placeholder="Start Date">
-                        <input type="date" id="endDate" placeholder="End Date">
-                        <button onclick="clearDates()" class="clear-date-btn">
-                            <i class="material-icons">clear</i>
-                            Clear
-                        </button>
-                        <button onclick="applyFilters()" class="apply-filters-btn">
-                            <i class="material-icons">filter_list</i>
-                            Apply Filters
-                        </button>
-                        <div class="quick-filters">
-                            <button onclick="applyDailyFilter()" class="daily-filter-btn">
-                                <i class="material-icons">today</i>
-                                Daily
-                            </button>
-                            <button onclick="applyMonthlyFilter()" class="monthly-filter-btn">
-                                <i class="material-icons">date_range</i>
-                                Monthly
-                            </button>
-                        </div>
-                    </div>
-                    <button onclick="exportToExcel()" class="export-btn">
-                        <i class="material-icons">table_view</i>
-                        Export to Excel
+                <div class="date-filters">
+                    <label for="startDate" class="date-label">From</label>
+                    <input type="date" id="startDate" placeholder="Start Date">
+                    <label for="endDate" class="date-label">To</label>
+                    <input type="date" id="endDate" placeholder="End Date">
+                    <button onclick="clearDates()" class="clear-date-btn" title="Clear Dates">
+                        <i class="material-icons">clear</i>
                     </button>
+                    <button id="applyFiltersBtn" type="button" class="apply-filters-btn" title="Apply Filters">
+                        <i class="material-icons">filter_list</i>
+                        Apply
+                    </button>
+                    <div class="quick-filters">
+                        <button onclick="applyDailyFilter()" class="daily-filter-btn" title="Daily">
+                            <i class="material-icons">today</i>
+                            Daily
+                        </button>
+                        <button onclick="applyMonthlyFilter()" class="monthly-filter-btn" title="Monthly">
+                            <i class="material-icons">date_range</i>
+                            Monthly
+                        </button>
+                    </div>
                 </div>
+                <button onclick="exportToExcel()" class="export-btn" title="Export to Excel">
+                    <i class="material-icons">table_view</i>
+                    Export
+                </button>
             </header>
 
             <div class="reports-content">
                 <div class="report-filters">
                     <h3>Report Filters</h3>
                     <select id="reportType" onchange="changeReportType()">
-                        <option value="inventory">Inventory Report</option>
-                        <option value="sales">Sales Report</option>
-                        <option value="audit">Audit Trail</option>
+                        <option value="inventory"<?php if($reportType=='inventory') echo ' selected'; ?>>Inventory Report</option>
+                        <option value="sales"<?php if($reportType=='sales') echo ' selected'; ?>>Sales Report</option>
+                        <option value="audit"<?php if($reportType=='audit') echo ' selected'; ?>>Audit Trail</option>
                     </select>
                 </div>
 
                 <!-- Inventory Report Table -->
-                <div id="inventoryReport" class="report-table">
-                    <h3>Inventory Report</h3>
-                    <div class="scroll-table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Item Code</th>
-                                <th>Item Name</th>
-                                <th>Category</th>
-                                <th>Beginning Quantity</th>
-                                <th>New Delivery</th>
-                                <th>Actual Quantity</th>
-                                <th>Damage</th>
-                                <th>Sold Quantity</th>
-                                <th>Status</th>
-                                <th>Date Delivered</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $conn = mysqli_connect("localhost", "root", "", "proware");
-                            $sql = "SELECT * FROM inventory ORDER BY created_at DESC";
-                            $result = mysqli_query($conn, $sql);
-
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                echo "<tr>";
-                                echo "<td>{$row['item_code']}</td>";
-                                echo "<td>{$row['item_name']}</td>";
-                                echo "<td>{$row['category']}</td>";
-                                echo "<td>{$row['beginning_quantity']}</td>";
-                                echo "<td>{$row['new_delivery']}</td>";
-                                echo "<td>{$row['actual_quantity']}</td>";
-                                echo "<td>{$row['damage']}</td>";
-                                echo "<td>{$row['sold_quantity']}</td>";
-                                echo "<td>{$row['status']}</td>";
-                                echo "<td>{$row['created_at']}</td>";
-                                echo "</tr>";
-                            }
-                            ?>
-                        </tbody>
-                    </table>
-                    </div>
+                <div id="inventoryReport" class="report-table" style="display: <?php echo $reportType == 'inventory' ? 'block' : 'none'; ?>;">
                 </div>
 
                 <!-- Sales Report Table -->
-                <div id="salesReport" class="report-table" style="display: none;">
-                    <h3>Sales Report</h3>
-                    <div class="total-amount-display" style="display: none;">
-                        <h4>Total Sales Amount: <span id="totalSalesAmount">₱0.00</span></h4>
-                    </div>
-                    <div class="scroll-table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Order Number</th>
-                                <th>Item Code</th>
-                                <th>Item Name</th>
-                                <th>Size</th>
-                                <th>Quantity</th>
-                                <th>Price Per Item</th>
-                                <th>Total Amount</th>
-                                <th>Sale Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $sql = "SELECT s.*, i.item_name 
-                                   FROM sales s 
-                                   LEFT JOIN inventory i ON s.item_code = i.item_code 
-                                   ORDER BY s.sale_date DESC";
-                            $result = mysqli_query($conn, $sql);
-
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                echo "<tr>";
-                                echo "<td>{$row['transaction_number']}</td>";
-                                echo "<td>{$row['item_code']}</td>";
-                                echo "<td>{$row['item_name']}</td>";
-                                echo "<td>{$row['size']}</td>";
-                                echo "<td>{$row['quantity']}</td>";
-                                echo "<td>₱" . number_format($row['price_per_item'], 2) . "</td>";
-                                echo "<td>₱" . number_format($row['total_amount'], 2) . "</td>";
-                                echo "<td>{$row['sale_date']}</td>";
-                                echo "</tr>";
-                            }
-                            ?>
-                        </tbody>
-                    </table>
-                    </div>
+                <div id="salesReport" class="report-table" style="display: <?php echo $reportType == 'sales' ? 'block' : 'none'; ?>;">
                 </div>
 
                 <!-- Audit Trail Table -->
-                <div id="auditReport" class="report-table" style="display: none;">
-                    <h3>Audit Trail</h3>
-                    <div class="scroll-table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date/Time</th>
-                                <th>Action Type</th>
-                                <th>Item Code</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $sql = "SELECT * FROM activities ORDER BY timestamp DESC";
-                            $result = mysqli_query($conn, $sql);
-
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                echo "<tr>";
-                                echo "<td>{$row['timestamp']}</td>";
-                                echo "<td>{$row['action_type']}</td>";
-                                echo "<td>{$row['item_code']}</td>";
-                                echo "<td>{$row['description']}</td>";
-                                echo "</tr>";
-                            }
-                            mysqli_close($conn);
-                            ?>
-                        </tbody>
-                    </table>
-                    </div>
+                <div id="auditReport" class="report-table" style="display: <?php echo $reportType == 'audit' ? 'block' : 'none'; ?>;">
                 </div>
             </div>
         </main>
     </div>
+    <script>
+    function changeReportType() {
+        const reportType = document.getElementById("reportType").value;
+        window.location.href = "?type=" + reportType + "&page=1";
+    }
+    </script>
 </body>
 
 </html>

@@ -16,11 +16,22 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Add search functionality
-  document.getElementById("searchInput").addEventListener("input", function () {
-    searchReports(this.value);
-  });
+  const searchInput = document.getElementById("searchInput");
+  if (searchInput) {
+    searchInput.addEventListener("input", function () {
+      const type = document.getElementById("reportType")?.value || "inventory";
+      ajaxLoadReport(type, 1);
+    });
+  }
 
-  loadTableData();
+  // Add event listener for Apply Filters button
+  const applyFiltersBtn = document.getElementById("applyFiltersBtn");
+  if (applyFiltersBtn) {
+    applyFiltersBtn.addEventListener("click", function () {
+      const type = document.getElementById("reportType")?.value || "inventory";
+      ajaxLoadReport(type, 1);
+    });
+  }
 });
 
 function loadTableData() {
@@ -43,192 +54,188 @@ function loadTableData() {
   });
 }
 
+// Utility to collect all current filter/search values
+function getCurrentReportFilters() {
+  return {
+    search: document.getElementById("searchInput")?.value || "",
+    startDate: document.getElementById("startDate")?.value || "",
+    endDate: document.getElementById("endDate")?.value || "",
+    type: document.getElementById("reportType")?.value || "inventory",
+  };
+}
+
+// AJAX-based pagination for reports (now always sends all filters)
+function ajaxLoadReport(type, page = 1, extraParams = {}) {
+  const reportDiv = document.getElementById(type + "Report");
+  if (!reportDiv) return;
+  showLoading();
+  // Always collect all filters
+  const filters = getCurrentReportFilters();
+  const params = { ...filters, ...extraParams, type, page };
+  const query = new URLSearchParams(params).toString();
+  fetch("../PAMO PAGES/includes/fetch_reports.php?" + query)
+    .then((res) => res.json())
+    .then((data) => {
+      // Insert table HTML
+      if (reportDiv) reportDiv.innerHTML = data.table;
+      // Remove any existing pagination after this reportDiv
+      let next = reportDiv ? reportDiv.nextElementSibling : null;
+      if (next && next.classList.contains("pagination")) {
+        next.remove();
+      }
+      // Insert pagination after the reportDiv (outside the table)
+      if (data.pagination && reportDiv) {
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = data.pagination;
+        reportDiv.parentNode.insertBefore(
+          tempDiv.firstElementChild,
+          reportDiv.nextSibling
+        );
+      }
+      hideLoading();
+      if (type === "sales") setTimeout(updateTotalSalesAmount, 100);
+    })
+    .catch((err) => {
+      hideLoading();
+      showNotification("Error loading report: " + err.message);
+    });
+}
+
+// Search input triggers paginated search (reset to page 1)
+const searchInput = document.getElementById("searchInput");
+if (searchInput) {
+  searchInput.addEventListener("input", function () {
+    const type = document.getElementById("reportType")?.value || "inventory";
+    ajaxLoadReport(type, 1);
+  });
+}
+
+// Date filter changes (manual input)
+const startDate = document.getElementById("startDate");
+if (startDate) {
+  startDate.addEventListener("change", function () {
+    const type = document.getElementById("reportType")?.value || "inventory";
+    ajaxLoadReport(type, 1);
+  });
+}
+const endDate = document.getElementById("endDate");
+if (endDate) {
+  endDate.addEventListener("change", function () {
+    const type = document.getElementById("reportType")?.value || "inventory";
+    ajaxLoadReport(type, 1);
+  });
+}
+
+// Daily filter
 function applyDailyFilter() {
   const dailyButton = document.querySelector(".daily-filter-btn");
   const monthlyButton = document.querySelector(".monthly-filter-btn");
-
-  // If daily button is already active, deselect it
-  if (dailyButton.classList.contains("active")) {
+  if (dailyButton && dailyButton.classList.contains("active")) {
     dailyButton.classList.remove("active");
     clearDates();
     return;
   }
-
   const today = new Date();
   const formattedDate = today.toISOString().split("T")[0];
-
-  document.getElementById("startDate").value = formattedDate;
-  document.getElementById("endDate").value = formattedDate;
-
-  // Update active state of filter buttons
-  dailyButton.classList.add("active");
-  monthlyButton.classList.remove("active");
-
-  // Apply filters and update total
-  const reportType = document.getElementById("reportType").value;
-  if (reportType === "sales") {
-    applyFilters(true);
-  } else {
-    applyFilters();
-  }
+  const startDate = document.getElementById("startDate");
+  const endDate = document.getElementById("endDate");
+  if (startDate) startDate.value = formattedDate;
+  if (endDate) endDate.value = formattedDate;
+  if (dailyButton) dailyButton.classList.add("active");
+  if (monthlyButton) monthlyButton.classList.remove("active");
+  const type = document.getElementById("reportType")?.value || "inventory";
+  ajaxLoadReport(type, 1);
 }
 
+// Monthly filter
 function applyMonthlyFilter() {
   const dailyButton = document.querySelector(".daily-filter-btn");
   const monthlyButton = document.querySelector(".monthly-filter-btn");
-
-  // If monthly button is already active, deselect it
-  if (monthlyButton.classList.contains("active")) {
+  if (monthlyButton && monthlyButton.classList.contains("active")) {
     monthlyButton.classList.remove("active");
     clearDates();
     return;
   }
-
   const today = new Date();
   const currentYear = today.getFullYear();
-  const currentMonth = today.getMonth(); // 0-11 for Jan-Dec
-
-  // Set to first day of current month
+  const currentMonth = today.getMonth();
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
-  // Set to last day of current month
   const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
-
-  // Format dates as YYYY-MM-DD
   const formatDate = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
-
-  document.getElementById("startDate").value = formatDate(firstDayOfMonth);
-  document.getElementById("endDate").value = formatDate(lastDayOfMonth);
-
-  // Update active state of filter buttons
-  monthlyButton.classList.add("active");
-  dailyButton.classList.remove("active");
-
-  // Apply filters and update total
-  const reportType = document.getElementById("reportType").value;
-  if (reportType === "sales") {
-    applyFilters(true);
-  } else {
-    applyFilters();
-  }
+  const startDate = document.getElementById("startDate");
+  const endDate = document.getElementById("endDate");
+  if (startDate) startDate.value = formatDate(firstDayOfMonth);
+  if (endDate) endDate.value = formatDate(lastDayOfMonth);
+  if (monthlyButton) monthlyButton.classList.add("active");
+  if (dailyButton) dailyButton.classList.remove("active");
+  const type = document.getElementById("reportType")?.value || "inventory";
+  ajaxLoadReport(type, 1);
 }
 
+// Clear date filters and reset pagination
 function clearDates() {
   const startDate = document.getElementById("startDate");
   const endDate = document.getElementById("endDate");
+  if (startDate) startDate.value = "";
+  if (endDate) {
+    endDate.value = "";
+    endDate.disabled = true;
+  }
+  const dailyBtn = document.querySelector(".daily-filter-btn");
+  const monthlyBtn = document.querySelector(".monthly-filter-btn");
+  if (dailyBtn) dailyBtn.classList.remove("active");
+  if (monthlyBtn) monthlyBtn.classList.remove("active");
+  const totalDisplay = document.querySelector(".total-amount-display");
+  if (totalDisplay) totalDisplay.style.display = "none";
+  const totalSalesAmount = document.getElementById("totalSalesAmount");
+  if (totalSalesAmount) totalSalesAmount.textContent = "₱0.00";
+  const type = document.getElementById("reportType")?.value || "inventory";
+  ajaxLoadReport(type, 1);
+}
 
-  startDate.value = "";
-  endDate.value = "";
-  endDate.disabled = true;
-
-  // Remove active state from filter buttons
-  document.querySelector(".daily-filter-btn").classList.remove("active");
-  document.querySelector(".monthly-filter-btn").classList.remove("active");
-
-  // Hide total amount display
+// Report type change
+function changeReportType() {
+  const reportType = document.getElementById("reportType").value;
+  document.getElementById("inventoryReport").style.display = "none";
+  document.getElementById("salesReport").style.display = "none";
+  document.getElementById("auditReport").style.display = "none";
+  document.getElementById(reportType + "Report").style.display = "block";
   const totalDisplay = document.querySelector(".total-amount-display");
   if (totalDisplay) {
     totalDisplay.style.display = "none";
   }
-
-  // Reset total amount display
-  document.getElementById("totalSalesAmount").textContent = "₱0.00";
-
-  // Refresh the current report view
-  const reportType = document.getElementById("reportType").value;
-  const formData = new FormData();
-  formData.append("reportType", reportType);
-  formData.append("clearFilters", "true");
-
-  showLoading();
-
-  fetch("../PAMO PAGES/includes/filter_reports.php", {
-    method: "POST",
-    body: formData,
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.text();
-    })
-    .then((data) => {
-      const reportDiv = document.getElementById(reportType + "Report");
-      if (reportDiv) {
-        reportDiv.innerHTML = data;
-        // Ensure total amount display is hidden after clearing
-        const newTotalDisplay = reportDiv.querySelector(
-          ".total-amount-display"
-        );
-        if (newTotalDisplay) {
-          newTotalDisplay.style.display = "none";
-        }
-      }
-      hideLoading();
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      hideLoading();
-      showNotification("Error clearing filters: " + error.message);
-    });
+  ajaxLoadReport(reportType, 1);
 }
 
-function applyFilters(shouldUpdateTotal = false) {
-  const startDate = document.getElementById("startDate").value;
-  const endDate = document.getElementById("endDate").value;
-  const reportType = document.getElementById("reportType").value;
-
-  if (!startDate || !endDate) {
-    alert("Please select both start and end dates");
-    return;
+// Pagination click handler (always sends current filters)
+document.addEventListener("click", function (e) {
+  if (e.target.closest(".pagination a")) {
+    const link = e.target.closest(".pagination a");
+    if (
+      link.getAttribute("href") &&
+      link.getAttribute("href").indexOf("page=") !== -1
+    ) {
+      e.preventDefault();
+      const url = new URL(link.href, window.location.origin);
+      const type =
+        url.searchParams.get("type") ||
+        document.getElementById("reportType").value;
+      const page = url.searchParams.get("page") || 1;
+      ajaxLoadReport(type, page);
+    }
   }
+});
 
-  showLoading();
-
-  // Create form data
-  const formData = new FormData();
-  formData.append("reportType", reportType);
-  formData.append("startDate", startDate);
-  formData.append("endDate", endDate);
-
-  // Send AJAX request to fetch filtered data
-  fetch("../PAMO PAGES/includes/filter_reports.php", {
-    method: "POST",
-    body: formData,
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.text();
-    })
-    .then((data) => {
-      // Update the table content with the filtered data
-      const reportDiv = document.getElementById(reportType + "Report");
-      if (reportDiv) {
-        reportDiv.innerHTML = data;
-
-        // Update total amount for sales report
-        if (reportType === "sales" || shouldUpdateTotal) {
-          setTimeout(updateTotalSalesAmount, 100); // Add slight delay to ensure DOM is updated
-        }
-
-        hideLoading();
-      } else {
-        console.error("Report div not found:", reportType + "Report");
-        hideLoading();
-      }
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      hideLoading();
-      showNotification("Error applying filters: " + error.message);
-    });
-}
+// On initial load, load the current report via AJAX
+window.addEventListener("DOMContentLoaded", function () {
+  const reportType = document.getElementById("reportType").value;
+  ajaxLoadReport(reportType, 1);
+});
 
 function updateTotalSalesAmount() {
   const salesTable = document.querySelector("#salesReport table");
@@ -268,50 +275,6 @@ function updateTotalSalesAmount() {
         });
     }
   }
-}
-
-function searchReports(query) {
-  query = query.toLowerCase();
-  const reportType = document.getElementById("reportType").value;
-  const table = document.querySelector(`#${reportType}Report table`);
-  const rows = table.getElementsByTagName("tr");
-
-  for (let i = 1; i < rows.length; i++) {
-    // Start from 1 to skip header row
-    const row = rows[i];
-    const cells = row.getElementsByTagName("td");
-    let found = false;
-
-    for (let cell of cells) {
-      if (cell.textContent.toLowerCase().includes(query)) {
-        found = true;
-        break;
-      }
-    }
-
-    row.style.display = found ? "" : "none";
-  }
-}
-
-function changeReportType() {
-  const reportType = document.getElementById("reportType").value;
-
-  // Hide all reports
-  document.getElementById("inventoryReport").style.display = "none";
-  document.getElementById("salesReport").style.display = "none";
-  document.getElementById("auditReport").style.display = "none";
-
-  // Show selected report
-  document.getElementById(reportType + "Report").style.display = "block";
-
-  // Hide total amount display when changing report type
-  const totalDisplay = document.querySelector(".total-amount-display");
-  if (totalDisplay) {
-    totalDisplay.style.display = "none";
-  }
-
-  // Clear dates and filters
-  clearDates();
 }
 
 function exportToExcel() {
