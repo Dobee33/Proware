@@ -174,3 +174,186 @@
   background-color: #007bff;
   color: white;
 }
+
+.analytics-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: nowrap;
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.analytics-card {
+  flex: 1 1 0;
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px 16px 16px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  min-height: 340px;
+}
+
+.analytics-card canvas {
+  width: 100% !important;
+  max-width: 260px !important;
+  height: 250px !important;
+  margin: 0 auto;
+  display: block;
+}
+
+.analytics-filters-card {
+  background: none;
+  box-shadow: none;
+  padding: 0;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 12px;
+}
+
+.analytics-filters label {
+  font-weight: 500;
+  color: #222;
+}
+
+.analytics-filters select {
+  border-radius: 6px;
+  border: 1px solid #bbb;
+  padding: 6px 12px;
+  font-size: 1rem;
+  margin-left: 6px;
+  background: #fff;
+}
+
+@media (max-width: 900px) {
+  .analytics-section {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  .analytics-card {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 0;
+  }
+}
+
+body {
+  background: #e3f0fc;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #1a237e;
+  margin-bottom: 15px;
+  text-shadow: 1px 1px 2px #b3c6e7;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.analytics-card h4 {
+  margin-bottom: 18px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #222;
+  text-align: center;
+}
+
+.sales-filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.sales-filters label {
+  font-weight: 500;
+  color: #222;
+}
+
+.sales-filters select {
+  border-radius: 6px;
+  border: 1px solid #bbb;
+  padding: 6px 12px;
+  font-size: 1rem;
+  margin-left: 6px;
+  background: #fff;
+}
+
+.analytics-card.inventory-analytics {
+  width: 480px;
+  height: 400px;
+  min-width: 480px;
+  min-height: 400px;
+  max-width: 480px;
+  max-height: 400px;
+  justify-content: center;
+  align-self: flex-start;
+  margin-left: auto;
+}
+
+.analytics-card.sales-analytics {
+  flex: 1 1 0;
+  min-width: 400px;
+  max-width: calc(100% - 496px); /* 480px card + 16px gap */
+  height: 400px;
+  min-height: 400px;
+  justify-content: flex-start;
+  overflow: hidden;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.inventory-analytics canvas {
+  width: 260px !important;
+  height: 260px !important;
+  max-width: 260px !important;
+  max-height: 260px !important;
+  margin: 0 auto;
+  display: block;
+}
+
+.sales-analytics canvas {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto;
+  display: block;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1100px) {
+  .analytics-section {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  .analytics-card.sales-analytics,
+  .analytics-card.inventory-analytics {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+  .inventory-analytics canvas {
+    width: 100% !important;
+    height: 220px !important;
+    max-width: 100% !important;
+    max-height: 220px !important;
+  }
+  .sales-analytics canvas {
+    width: 100% !important;
+    height: 220px !important;
+    max-width: 100% !important;
+    max-height: 220px !important;
+  }
+}

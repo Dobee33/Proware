@@ -22,7 +22,7 @@ $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../PAMO CSS/styles.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="../PAMO CSS/review_inquiries.css">
+    <link rel="stylesheet" href="../PAMO CSS/view_inquiries.css">
     
 </head>
 <body>
@@ -75,7 +75,7 @@ $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </form>
         </div>
     </div>
-    <script src="../PAMO JS/review_inquiries.js"></script>
+    <script src="../PAMO JS/view_inquiries.js"></script>
 </body>
 </html>
 <?php $conn = null; ?> 

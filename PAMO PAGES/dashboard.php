@@ -35,6 +35,7 @@ $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="../PAMO CSS/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../PAMO JS/dashboard.js"></script>
 </head>
 
@@ -82,6 +83,36 @@ $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
                     </div>
                 </div>
 
+                <div class="analytics-section">
+                    <div class="analytics-card sales-analytics">
+                        <div class="section-title">Sales Analytics</div>
+                        <div class="sales-filters">
+                            <label>
+                                Category:
+                                <select id="salesCategoryFilter"><option value="">All</option></select>
+                            </label>
+                            <label>
+                                Course:
+                                <select id="salesCourseFilter"><option value="">All</option></select>
+                            </label>
+                            <label>
+                                Period:
+                                <select id="salesPeriodFilter">
+                                    <option value="daily">Daily</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                            </label>
+                        </div>
+                        <h4>Sales Performance</h4>
+                        <canvas id="salesLineChart" width="850" height="320"></canvas>
+                    </div>
+                    <div class="analytics-card inventory-analytics">
+                        <div class="section-title">Inventory Analytics</div>
+                        <h4>Inventory Stock Levels</h4>
+                        <canvas id="stockPieChart"></canvas>
+                    </div>
+                </div>
                 <div class="recent-activities">
                     <div class="activities-header">
                         <h3>Recent Activities</h3>

@@ -1,9 +1,9 @@
 Array
 (
-    [existingItem] => UITB001
-    [newItemCode] => UITB001-007
+    [existingItem] => UITP001
+    [newItemCode] => UITP001-007
     [newSize] => 3XL
-    [newQuantity] => 4
+    [newQuantity] => 28
     [newDamage] => 0
     [deliveryOrderNumber] => 
 )
