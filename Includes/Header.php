@@ -699,14 +699,20 @@ if (isset($_SESSION['user_id'])) {
 .mailbox-count {
     position: absolute;
     top: -5px;
-    right: -8px;
-    background: #d32f2f;
-    color: #fff;
-    border-radius: 50%;
-    padding: 2px 7px;
-    font-size: 0.8em;
-    font-weight: bold;
-    z-index: 2;
+    right: -12px;
+    background-color: #ff4444;
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 2px;
+    border-radius: 8px;
+    min-width: 15px;
+    height: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 </style>
 <script>
