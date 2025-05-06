@@ -1,9 +1,9 @@
 Array
 (
-    [existingItem] => UBM001
-    [newItemCode] => UBM001-007
+    [existingItem] => USHS001
+    [newItemCode] => USHS001-007
     [newSize] => 3XL
-    [newQuantity] => 14
+    [newQuantity] => 1
     [newDamage] => 0
     [deliveryOrderNumber] => 
 )

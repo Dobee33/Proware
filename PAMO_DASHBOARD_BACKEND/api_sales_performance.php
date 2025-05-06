@@ -17,13 +17,17 @@ if ($period === 'monthly') {
     $groupBy = "DATE(s.sale_date)";
 }
 
-$query = "SELECT $dateSelect as date, SUM(s.quantity) as total_sales
-          FROM sales s
-          LEFT JOIN inventory i ON s.item_code = i.item_code";
-
-if ($category === 'Tertiary-Uniform' && !empty($course)) {
-    $query .= " LEFT JOIN course_item ci ON i.id = ci.inventory_id
-                LEFT JOIN course c ON ci.course_id = c.id";
+// Always select category and course (if available)
+if ($category === 'Tertiary-Uniform') {
+    $query = "SELECT $dateSelect as date, SUM(s.quantity) as total_sales, i.category, c.course_name as course
+              FROM sales s
+              LEFT JOIN inventory i ON s.item_code = i.item_code
+              LEFT JOIN course_item ci ON i.id = ci.inventory_id
+              LEFT JOIN course c ON ci.course_id = c.id";
+} else {
+    $query = "SELECT $dateSelect as date, SUM(s.quantity) as total_sales, i.category, NULL as course
+              FROM sales s
+              LEFT JOIN inventory i ON s.item_code = i.item_code";
 }
 
 $query .= " WHERE 1";
@@ -39,7 +43,7 @@ if ($category === 'Tertiary-Uniform' && !empty($course)) {
     $params[':category'] = $category;
 }
 
-$query .= " GROUP BY $groupBy ORDER BY date ASC";
+$query .= " GROUP BY $groupBy, i.category, course ORDER BY date ASC";
 
 $stmt = $conn->prepare($query);
 $stmt->execute($params);

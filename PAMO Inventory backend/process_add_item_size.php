@@ -70,6 +70,55 @@ mysqli_stmt_bind_param($stmt, "ssssiid",
 );
 
 if (mysqli_stmt_execute($stmt)) {
+    // Get the new inventory ID
+    $new_inventory_id = mysqli_insert_id($conn);
+
+    // Find the parent inventory ID (the first item with the same prefix)
+    $parent_sql = "SELECT id FROM inventory WHERE item_code LIKE ? ORDER BY id ASC LIMIT 1";
+    $parent_stmt = mysqli_prepare($conn, $parent_sql);
+    mysqli_stmt_bind_param($parent_stmt, "s", $prefix);
+    mysqli_stmt_execute($parent_stmt);
+    $parent_result = mysqli_stmt_get_result($parent_stmt);
+    $parent_row = mysqli_fetch_assoc($parent_result);
+    $parent_inventory_id = $parent_row ? $parent_row['id'] : null;
+    mysqli_stmt_close($parent_stmt);
+
+    // If parent found, copy all course links
+    if ($parent_inventory_id) {
+        $course_sql = "SELECT course_id FROM course_item WHERE inventory_id = ?";
+        $course_stmt = mysqli_prepare($conn, $course_sql);
+        mysqli_stmt_bind_param($course_stmt, "i", $parent_inventory_id);
+        mysqli_stmt_execute($course_stmt);
+        $course_result = mysqli_stmt_get_result($course_stmt);
+        $insert_course_sql = "INSERT INTO course_item (course_id, inventory_id) VALUES (?, ?)";
+        $insert_course_stmt = mysqli_prepare($conn, $insert_course_sql);
+        while ($course_row = mysqli_fetch_assoc($course_result)) {
+            $course_id = $course_row['course_id'];
+            mysqli_stmt_bind_param($insert_course_stmt, "ii", $course_id, $new_inventory_id);
+            mysqli_stmt_execute($insert_course_stmt);
+        }
+        mysqli_stmt_close($course_stmt);
+        mysqli_stmt_close($insert_course_stmt);
+
+        // If category is STI-Shirts, copy shirt_type links
+        if ($originalItem['category'] === 'STI-Shirts') {
+            $shirt_type_sql = "SELECT shirt_type_id FROM shirt_type_item WHERE inventory_id = ?";
+            $shirt_type_stmt = mysqli_prepare($conn, $shirt_type_sql);
+            mysqli_stmt_bind_param($shirt_type_stmt, "i", $parent_inventory_id);
+            mysqli_stmt_execute($shirt_type_stmt);
+            $shirt_type_result = mysqli_stmt_get_result($shirt_type_stmt);
+            $insert_shirt_type_sql = "INSERT INTO shirt_type_item (inventory_id, shirt_type_id) VALUES (?, ?)";
+            $insert_shirt_type_stmt = mysqli_prepare($conn, $insert_shirt_type_sql);
+            while ($shirt_type_row = mysqli_fetch_assoc($shirt_type_result)) {
+                $shirt_type_id = $shirt_type_row['shirt_type_id'];
+                mysqli_stmt_bind_param($insert_shirt_type_stmt, "ii", $new_inventory_id, $shirt_type_id);
+                mysqli_stmt_execute($insert_shirt_type_stmt);
+            }
+            mysqli_stmt_close($shirt_type_stmt);
+            mysqli_stmt_close($insert_shirt_type_stmt);
+        }
+    }
+
     // Log the activity
     $activity_description = "New size added for {$originalItem['item_name']} ({$newItemCode}) - Size: {$newSize}, Initial stock: {$newQuantity}, Damage: {$newDamage}";
     $log_activity_query = "INSERT INTO activities (action_type, description, item_code, user_id, timestamp) VALUES ('Add Item Size', ?, ?, ?, NOW())";

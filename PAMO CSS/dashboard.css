@@ -357,3 +357,19 @@ body {
     max-height: 220px !important;
   }
 }
+
+/* Chart.js custom tooltip styling (for future HTML tooltips or reference) */
+.chartjs-tooltip {
+  background: #fff !important;
+  color: #222 !important;
+  border: 1.5px solid #4caf50 !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.08);
+  font-weight: bold;
+  font-size: 15px;
+  padding: 12px 18px;
+  pointer-events: none;
+  z-index: 1000;
+  min-width: 120px;
+  text-align: left;
+}

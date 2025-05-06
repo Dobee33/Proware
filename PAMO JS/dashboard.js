@@ -128,6 +128,10 @@ function renderSalesLineChart(data) {
   const labels = data.map((d) => d.date);
   const sales = data.map((d) => d.total_sales);
 
+  // Get current filter values
+  const category = document.getElementById("salesCategoryFilter").value;
+  const course = document.getElementById("salesCourseFilter").value;
+
   if (salesLineChart) salesLineChart.destroy();
   salesLineChart = new Chart(ctx, {
     type: "line",
@@ -139,12 +143,49 @@ function renderSalesLineChart(data) {
           data: sales,
           borderColor: "#4caf50",
           fill: false,
+          pointBackgroundColor: "#2196f3",
+          pointRadius: 5,
+          pointHoverRadius: 7,
         },
       ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      plugins: {
+        tooltip: {
+          backgroundColor: "#fff",
+          borderColor: "#4caf50",
+          borderWidth: 1,
+          titleColor: "#222",
+          bodyColor: "#222",
+          padding: 12,
+          displayColors: false,
+          bodyFont: { weight: "bold" },
+          callbacks: {
+            label: function (context) {
+              const idx = context.dataIndex;
+              const point = data[idx];
+              let label = `Sold: ${point.total_sales}`;
+              if (!category) {
+                if (point.category) label += ` | Category: ${point.category}`;
+              } else if (category === "Tertiary-Uniform") {
+                if (point.course) label += ` | Course: ${point.course}`;
+              }
+              return label;
+            },
+          },
+        },
+      },
+      hover: {
+        mode: "nearest",
+        intersect: true,
+      },
+      elements: {
+        point: {
+          pointStyle: "circle",
+        },
+      },
     },
   });
 }
