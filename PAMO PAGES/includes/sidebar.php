@@ -23,6 +23,16 @@ try {
 } catch (Exception $e) {
     $newInquiries = 0;
 }
+// Notification badge for pending pre-orders
+$pendingOrdersCount = 0;
+try {
+    include_once __DIR__ . '/../../Includes/connection.php';
+    $stmtPendingOrders = $conn->prepare("SELECT COUNT(*) FROM pre_orders WHERE status = 'pending'");
+    $stmtPendingOrders->execute();
+    $pendingOrdersCount = $stmtPendingOrders->fetchColumn();
+} catch (Exception $e) {
+    $pendingOrdersCount = 0;
+}
 ?>
 <nav class="sidebar">
     <div class="logo-area">
@@ -46,6 +56,9 @@ try {
             onclick="window.location.href='<?php echo $basePath; ?>preorders.php'">
             <span class="active-bar"></span>
             <i class="material-icons">shopping_cart</i>Orders
+            <?php if (isset($pendingOrdersCount) && $pendingOrdersCount > 0): ?>
+                <span class="notif-badge"><?php echo $pendingOrdersCount; ?></span>
+            <?php endif; ?>
         </li>
         <li <?php echo basename($_SERVER['PHP_SELF']) == 'reports.php' ? 'class="active"' : ''; ?>
             onclick="window.location.href='<?php echo $basePath; ?>reports.php'">

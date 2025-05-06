@@ -61,10 +61,6 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <option value="completed" <?php echo $status === 'completed' ? 'selected' : ''; ?>>Completed</option>
                         </select>
                     </div>
-                    <div class="notification-icon">
-                        <i class="material-icons">notifications</i>
-                        <span class="notification-badge" id="notificationCount">0</span>
-                    </div>
                 </div>
             </header>
 
@@ -203,15 +199,6 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         function filterByStatus(status) {
             window.location.href = `preorders.php?status=${status}`;
         }
-
-        // Update notification count
-        function updateNotificationCount() {
-            const pendingOrders = document.querySelectorAll('.order-card[data-status="pending"]').length;
-            document.getElementById('notificationCount').textContent = pendingOrders;
-        }
-
-        // Initial notification count update
-        updateNotificationCount();
     </script>
 
     <script src="../PAMO JS/preorders.js"></script>

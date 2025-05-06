@@ -44,17 +44,6 @@ $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
         <?php include 'includes/sidebar.php'; ?>
 
         <main class="main-content">
-            <header>
-                <div class="search-bar">
-                    <i class="material-icons">search</i>
-                    <input type="text" placeholder="Search...">
-                </div>
-                <div class="header-actions">
-                    <i class="material-icons">notifications</i>
-                    <i class="material-icons">account_circle</i>
-                </div>
-            </header>
-
             <div class="dashboard">
                 <div class="stats-cards">
                     <div class="card" onclick="window.location.href='inventory.php'">
