@@ -82,7 +82,7 @@ function renderStockPieChart(data) {
     return;
   }
   const ctx = canvas.getContext("2d");
-  const labels = data.map((d) => `${d.category} (${d.course})`);
+  const labels = data.map((d) => d.category);
   const quantities = data.map((d) => d.quantity);
 
   if (stockPieChart) stockPieChart.destroy();
@@ -102,6 +102,18 @@ function renderStockPieChart(data) {
           ],
         },
       ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          display: true,
+          position: "bottom", // <-- This moves the legend under the chart
+          labels: {
+            boxWidth: 20,
+            padding: 16,
+          },
+        },
+      },
     },
   });
 }
