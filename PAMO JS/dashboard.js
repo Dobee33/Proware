@@ -119,14 +119,24 @@ function renderStockPieChart(data) {
 }
 
 function renderSalesLineChart(data) {
+  // Filter out invalid data points
+  const filteredData = data.filter(
+    (d) => d.total_sales !== null && d.total_sales !== undefined && d.date
+  );
+  const labels = filteredData.map((d) => d.date);
+  const sales = filteredData.map((d) => Number(d.total_sales));
+
+  // Debug logging
+  console.log("Labels:", labels);
+  console.log("Sales:", sales);
+  console.log("Raw data:", data);
+
   const canvas = document.getElementById("salesLineChart");
   if (!canvas) {
     console.error("salesLineChart canvas not found");
     return;
   }
   const ctx = canvas.getContext("2d");
-  const labels = data.map((d) => d.date);
-  const sales = data.map((d) => d.total_sales);
 
   // Get current filter values
   const category = document.getElementById("salesCategoryFilter").value;
@@ -139,20 +149,28 @@ function renderSalesLineChart(data) {
       labels,
       datasets: [
         {
-          label: "Sales",
+          // label: "Sales", // Remove the label so legend and text are not shown
           data: sales,
           borderColor: "#4caf50",
           fill: false,
           pointBackgroundColor: "#2196f3",
           pointRadius: 5,
           pointHoverRadius: 7,
+          pointHitRadius: 15, // Increase clickable area
         },
       ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      interaction: {
+        mode: "nearest",
+        intersect: true,
+      },
       plugins: {
+        legend: {
+          display: false, // Remove the rectangle legend
+        },
         tooltip: {
           backgroundColor: "#fff",
           borderColor: "#4caf50",
@@ -162,10 +180,12 @@ function renderSalesLineChart(data) {
           padding: 12,
           displayColors: false,
           bodyFont: { weight: "bold" },
+          position: "nearest", // Ensures tooltip is close to the point
+          yAlign: "top", // Always show tooltip above the dot
           callbacks: {
             label: function (context) {
               const idx = context.dataIndex;
-              const point = data[idx];
+              const point = filteredData[idx];
               let label = `Sold: ${point.total_sales}`;
               if (!category) {
                 if (point.category) label += ` | Category: ${point.category}`;
@@ -177,13 +197,12 @@ function renderSalesLineChart(data) {
           },
         },
       },
-      hover: {
-        mode: "nearest",
-        intersect: true,
-      },
       elements: {
         point: {
           pointStyle: "circle",
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointHitRadius: 15,
         },
       },
     },

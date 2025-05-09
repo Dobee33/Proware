@@ -1,9 +1,9 @@
 Array
 (
-    [existingItem] => USHS001
-    [newItemCode] => USHS001-007
+    [existingItem] => URTWS001
+    [newItemCode] => URTWS001-007
     [newSize] => 3XL
-    [newQuantity] => 1
+    [newQuantity] => 56
     [newDamage] => 0
     [deliveryOrderNumber] => 
 )

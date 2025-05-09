@@ -74,8 +74,7 @@ $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
 
                 <div class="analytics-section">
                     <div class="analytics-card sales-analytics">
-                        <div class="section-title">Sales Analytics</div>
-                        <div class="sales-filters">
+                        <div class="sales-filters" style="position: absolute; top: 18px; left: 18px; z-index: 2; width: auto; background: none; box-shadow: none; padding: 0; margin-bottom: 0;">
                             <label>
                                 Category:
                                 <select id="salesCategoryFilter"><option value="">All</option></select>
@@ -93,8 +92,9 @@ $low_stock_items = $low_stock_result->fetch(PDO::FETCH_ASSOC)['low_stock'] ?? 0;
                                 </select>
                             </label>
                         </div>
+                        <div class="section-title" style="margin-top: 48px;">Sales Analytics</div>
                         <h4>Sales Performance</h4>
-                        <canvas id="salesLineChart" width="850" height="320"></canvas>
+                        <canvas id="salesLineChart" height="320"></canvas>
                     </div>
                     <div class="analytics-card inventory-analytics">
                         <div class="section-title">Inventory Analytics</div>

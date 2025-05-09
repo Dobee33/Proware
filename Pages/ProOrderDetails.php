@@ -9,8 +9,23 @@ $course = $_POST['course'] ?? '';
 $email = $_POST['email'] ?? '';
 $phone = $_POST['phone'] ?? '';
 $cart_items = json_decode($_POST['cart_items'] ?? '[]', true);
+if (!is_array($cart_items)) {
+    $cart_items = [];
+}
 $included_items = json_decode($_POST['included_items'] ?? '[]', true);
+if (!is_array($included_items)) {
+    $included_items = [];
+}
 $total_amount = $_POST['total_amount'] ?? 0;
+
+// Debugging logs
+error_log('Cart Items: ' . print_r($cart_items, true));
+error_log('Included Items: ' . print_r($included_items, true));
+
+if (empty($cart_items) || empty($included_items)) {
+    error_log('Cart or included items are empty!');
+    // Optionally, you can show a user-friendly error or redirect here
+}
 
 // Filter cart items to only include selected items
 $selected_items = array_filter($cart_items, function($item) use ($included_items) {
@@ -20,33 +35,26 @@ $selected_items = array_filter($cart_items, function($item) use ($included_items
 // Reindex the array
 $selected_items = array_values($selected_items);
 
-// Generate order number based on the first item's code
+// Generate order number in the format SI-<mmdd>-<sequential>
 $order_number = '';
 if (!empty($selected_items)) {
-    $first_item = $selected_items[0];
-    error_log("First item: " . print_r($first_item, true)); // Debug log
+    $prefix = 'SI';
+    $date_part = date('md');
+    $today = date('Y-m-d');
     
-    try {
-        // Get the item code directly from inventory using the item name
-        $stmt = $conn->prepare("SELECT item_code FROM inventory WHERE item_name = ?");
-        $stmt->execute([$first_item['item_name']]);
-        $inventory_item = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        error_log("Inventory item found: " . print_r($inventory_item, true)); // Debug log
-        
-        if ($inventory_item) {
-            $order_number = $inventory_item['item_code'] . '-' . date('YmdHis');
-            error_log("Generated order number: " . $order_number); // Debug log
-        } else {
-            error_log("No inventory item found for name: " . $first_item['item_name']); // Debug log
-            // Fallback to using the item code from cart if inventory lookup fails
-            $order_number = $first_item['item_code'] . '-' . date('YmdHis');
-        }
-    } catch (PDOException $e) {
-        error_log("Error getting inventory item: " . $e->getMessage());
-        // Fallback to using the item code from cart if query fails
-        $order_number = $first_item['item_code'] . '-' . date('YmdHis');
+    // Query for the latest order number for today
+    $stmt = $conn->prepare("SELECT order_number FROM pre_orders WHERE order_number LIKE ? ORDER BY id DESC LIMIT 1");
+    $like_pattern = $prefix . '-' . $date_part . '-%';
+    $stmt->execute([$like_pattern]);
+    $last_order = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($last_order && preg_match('/(\\d{6})$/', $last_order['order_number'], $matches)) {
+        $last_seq = (int)$matches[1];
+        $new_seq = $last_seq + 1;
+    } else {
+        $new_seq = 1;
     }
+    $order_number = sprintf('%s-%s-%06d', $prefix, $date_part, $new_seq);
 }
 
 // Save order to database
@@ -77,10 +85,18 @@ try {
     ]);
 
     // Delete only the included items from cart
-    $placeholders = str_repeat('?,', count($included_items) - 1) . '?';
-    $stmt = $conn->prepare("DELETE FROM cart WHERE user_id = ? AND id IN ($placeholders)");
-    $params = array_merge([$_SESSION['user_id']], $included_items);
-    $stmt->execute($params);
+    if (!empty($included_items)) {
+        $chunk_size = 500; // Safe chunk size for most MySQL setups
+        $user_id = $_SESSION['user_id'];
+        foreach (array_chunk($included_items, $chunk_size) as $chunk) {
+            $placeholders = implode(',', array_fill(0, count($chunk), '?'));
+            $stmt = $conn->prepare("DELETE FROM cart WHERE user_id = ? AND id IN ($placeholders)");
+            $params = array_merge([$user_id], $chunk);
+            $stmt->execute($params);
+        }
+    } else {
+        error_log('No included items to delete from cart.');
+    }
 
     // Commit transaction
     $conn->commit();
