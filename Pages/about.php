@@ -21,38 +21,6 @@
             box-sizing: border-box;
         }
 
-        /* Reset and enforce header icon styles */
-        .navbar .icons .icon {
-            position: relative;
-        }
-
-        /* Specific styles for cart and notification counts */
-        .navbar .icons .icon .cart-count,
-        .navbar .icons .icon .notification-count {
-            position: absolute;
-            top: -5px;
-            right: -12px;
-            background-color: #ff4444;
-            color: white;
-            font-size: 0.65rem;
-            font-weight: 500;
-            padding: 2px;
-            border-radius: 8px;
-            min-width: 15px;
-            height: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-        }
-
-        /* Remove any other styles that might interfere */
-        .about-wrapper .cart-count,
-        .about-wrapper .notification-count {
-            all: unset;
-        }
     </style>
 </head>
 <body>
