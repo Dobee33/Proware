@@ -34,17 +34,15 @@ if (!$prefix) {
     echo json_encode(['success' => false, 'message' => 'No prefix provided']);
     exit;
 }
-$sql = "SELECT item_code, sizes FROM inventory WHERE item_code LIKE CONCAT(?, '-%')";
+$sql = "SELECT sizes FROM inventory WHERE item_code LIKE ?";
 $stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "s", $prefix);
+$like = $prefix . '%';
+mysqli_stmt_bind_param($stmt, "s", $like);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $sizes = [];
 while ($row = mysqli_fetch_assoc($result)) {
-    $sizes[] = [
-        'size' => $row['sizes'],
-        'item_code' => $row['item_code']
-    ];
+    $sizes[] = $row['sizes'];
 }
 echo json_encode(['success' => true, 'sizes' => $sizes]);
 mysqli_close($conn);

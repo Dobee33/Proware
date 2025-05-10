@@ -1,10 +1,20 @@
 // Add Item Size Modal Backend Functions
 
-function showAddItemSizeModal() {
-  document.getElementById("addItemSizeModal").style.display = "block";
-}
+const allSizes = [
+  "XS",
+  "S",
+  "M",
+  "L",
+  "XL",
+  "XXL",
+  "3XL",
+  "4XL",
+  "5XL",
+  "6XL",
+  "7XL",
+  "One Size",
+];
 
-// Size to suffix mapping
 const sizeSuffixMap = {
   "One Size": "001",
   XS: "001",
@@ -20,54 +30,49 @@ const sizeSuffixMap = {
   "7XL": "011",
 };
 
-function updateItemCodePrefix() {
-  const select = document.getElementById("existingItem");
-  const selectedOption = select.options[select.selectedIndex];
-  const prefix = selectedOption.value;
-  const sizeSelect = document.getElementById("newSize");
-  const size = sizeSelect.value;
-  const itemCodeField = document.getElementById("newItemCode");
-  let suffix = sizeSuffixMap[size] || "";
-  if (prefix && suffix) {
-    itemCodeField.value = prefix + "-" + suffix;
-  } else if (prefix) {
-    itemCodeField.value = prefix + "-";
-  } else {
-    itemCodeField.value = "";
+let inventoryUsedSizes = [];
+
+function showAddItemSizeModal() {
+  document.getElementById("addItemSizeModal").style.display = "block";
+  // Reset the form
+  document.getElementById("addItemSizeForm").reset();
+  // Reset Select2 for Select Item
+  if (window.jQuery && $("#existingItem").length) {
+    $("#existingItem").val(null).trigger("change");
   }
+  // Reset to single entry
+  const entriesContainer = document.getElementById("itemSizeEntries");
+  entriesContainer.innerHTML = "";
+  addItemSizeEntry(); // Add initial entry
 }
 
-const allSizes = [
-  "One Size",
-  "XS",
-  "S",
-  "M",
-  "L",
-  "XL",
-  "XXL",
-  "3XL",
-  "4XL",
-  "5XL",
-  "6XL",
-  "7XL",
-];
+function getSelectedSizes() {
+  // Get all selected sizes in the current entries
+  return Array.from(document.querySelectorAll("select[name='newSize[]']"))
+    .map((sel) => sel.value)
+    .filter(Boolean);
+}
 
-function updateSizeDropdown(existingSizes) {
-  const sizeSelect = document.getElementById("newSize");
-  sizeSelect.innerHTML = '<option value="">Select Size</option>';
-  // Normalize for both string and object
-  const normalizedExisting = existingSizes.map((s) =>
-    typeof s === "string"
-      ? s.trim().toLowerCase()
-      : (s.size || "").trim().toLowerCase()
-  );
-  allSizes.forEach((size) => {
-    if (!normalizedExisting.includes(size.toLowerCase())) {
-      const option = document.createElement("option");
-      option.value = size;
-      option.textContent = size;
-      sizeSelect.appendChild(option);
-    }
+function updateSizeDropdowns(usedSizes = null) {
+  // If usedSizes is not provided, get from current selection
+  if (!usedSizes) usedSizes = getSelectedSizes();
+  // Exclude both inventoryUsedSizes and usedSizes
+  const excludeSizes = [
+    ...new Set([...(inventoryUsedSizes || []), ...usedSizes]),
+  ];
+  document.querySelectorAll("select[name='newSize[]']").forEach((select) => {
+    const currentValue = select.value;
+    select.innerHTML = '<option value="">Select Size</option>';
+    allSizes.forEach((size) => {
+      // Allow the current value, but not any other already-selected or inventory size
+      if (!excludeSizes.includes(size) || size === currentValue) {
+        const option = document.createElement("option");
+        option.value = size;
+        option.textContent = size;
+        if (size === currentValue) option.selected = true;
+        select.appendChild(option);
+      }
+    });
   });
 }
 
@@ -75,7 +80,8 @@ function fetchAndUpdateSizesForItem() {
   const select = document.getElementById("existingItem");
   const prefix = select.value;
   if (!prefix) {
-    updateSizeDropdown([]); // Show all sizes if no item selected
+    inventoryUsedSizes = [];
+    updateSizeDropdowns([]); // Show all sizes if no item selected
     updateItemCodePrefix();
     return;
   }
@@ -87,7 +93,8 @@ function fetchAndUpdateSizesForItem() {
     .then((response) => response.json())
     .then((data) => {
       if (data.success) {
-        updateSizeDropdown(data.sizes);
+        inventoryUsedSizes = data.sizes;
+        updateSizeDropdowns();
         updateItemCodePrefix(); // Reset item code as well
       } else {
         alert("Error fetching sizes: " + data.message);
@@ -98,8 +105,8 @@ function fetchAndUpdateSizesForItem() {
     });
 }
 
+// Bind to item select change
 document.addEventListener("DOMContentLoaded", function () {
-  // Use jQuery event binding for Select2 compatibility
   if (window.jQuery && $("#existingItem").length) {
     $("#existingItem").on("change", fetchAndUpdateSizesForItem);
   } else {
@@ -108,60 +115,147 @@ document.addEventListener("DOMContentLoaded", function () {
       existingItem.addEventListener("change", fetchAndUpdateSizesForItem);
     }
   }
-  // When size changes, update code
-  const newSize = document.getElementById("newSize");
-  if (newSize) {
-    newSize.addEventListener("change", updateItemCodePrefix);
+});
+
+function addItemSizeEntry() {
+  const entriesContainer = document.getElementById("itemSizeEntries");
+  const entryDiv = document.createElement("div");
+  entryDiv.className = "item-size-entry";
+  entryDiv.innerHTML = `
+    <div class="item-close" onclick="removeItemSizeEntry(this)">&times;</div>
+    <div class="item-content">
+      <div class="input-group">
+        <label for="newSize">Size:</label>
+        <select name="newSize[]" required></select>
+      </div>
+      <div class="input-group">
+        <label for="newItemCode">Item Code:</label>
+        <input type="text" name="newItemCode[]" required readonly>
+      </div>
+      <div class="input-group">
+        <label for="newQuantity">Initial Stock:</label>
+        <input type="number" name="newQuantity[]" min="0" required>
+      </div>
+      <div class="input-group">
+        <label for="newDamage">Damaged Items:</label>
+        <input type="number" name="newDamage[]" min="0" value="0">
+      </div>
+    </div>
+  `;
+  entriesContainer.appendChild(entryDiv);
+
+  // Show close button only if there's more than one entry
+  const closeButtons = document.querySelectorAll(".item-close");
+  closeButtons.forEach((button) => {
+    button.style.display =
+      entriesContainer.children.length > 1 ? "block" : "none";
+  });
+
+  // After adding, update all dropdowns to reflect available sizes
+  updateSizeDropdowns();
+}
+
+function removeItemSizeEntry(button) {
+  const entry = button.parentElement;
+  const entriesContainer = document.getElementById("itemSizeEntries");
+  entry.remove();
+
+  // Show/hide close buttons based on remaining entries
+  const closeButtons = document.querySelectorAll(".item-close");
+  closeButtons.forEach((btn) => {
+    btn.style.display = entriesContainer.children.length > 1 ? "block" : "none";
+  });
+}
+
+function updateItemCodePrefix() {
+  const existingItem = document.getElementById("existingItem");
+  const selectedOption = existingItem.options[existingItem.selectedIndex];
+  const prefix = selectedOption.value;
+
+  // Update all item code inputs
+  const itemCodeInputs = document.getElementsByName("newItemCode[]");
+  itemCodeInputs.forEach((input) => {
+    const sizeSelect = input
+      .closest(".item-size-entry")
+      .querySelector("select[name='newSize[]']");
+    if (sizeSelect.value) {
+      const suffix = sizeSuffixMap[sizeSelect.value] || "";
+      input.value = suffix ? `${prefix}-${suffix}` : `${prefix}-`;
+    }
+  });
+}
+
+// When a size is changed, update all dropdowns to prevent duplicates
+// and update item codes
+
+document.addEventListener("change", function (e) {
+  if (e.target.name === "newSize[]") {
+    updateSizeDropdowns();
+    // Update item code for this entry
+    const entry = e.target.closest(".item-size-entry");
+    const itemCodeInput = entry.querySelector("input[name='newItemCode[]']");
+    const existingItem = document.getElementById("existingItem");
+    const prefix = existingItem.value;
+    if (prefix && e.target.value) {
+      const suffix = sizeSuffixMap[e.target.value] || "";
+      itemCodeInput.value = suffix ? `${prefix}-${suffix}` : `${prefix}-`;
+    }
   }
 });
 
 function submitNewItemSize(event) {
   event.preventDefault();
 
-  const size = document.getElementById("newSize").value;
-  let itemCode = document.getElementById("newItemCode").value;
-  itemCode = itemCode.trim();
-  console.log("Item code value:", JSON.stringify(itemCode));
+  const form = document.getElementById("addItemSizeForm");
+  const formData = new FormData(form);
 
-  if (!size) {
-    alert("Please select a size.");
-    return;
-  }
-  if (!itemCode || itemCode.endsWith("-")) {
-    alert("Please enter a complete item code (with unique suffix).");
+  // Validate at least one size entry
+  const entries = document.querySelectorAll(".item-size-entry");
+  if (entries.length === 0) {
+    alert("Please add at least one size entry");
     return;
   }
 
-  const formData = new FormData();
-  formData.append(
-    "existingItem",
-    document.getElementById("existingItem").value
-  );
-  formData.append("newItemCode", itemCode);
-  formData.append("newSize", size);
-  formData.append("newQuantity", document.getElementById("newQuantity").value);
-  formData.append("newDamage", document.getElementById("newDamage").value);
-  formData.append(
-    "deliveryOrderNumber",
-    document.getElementById("deliveryOrderNumber").value
-  );
+  // Validate all entries
+  let isValid = true;
+  entries.forEach((entry) => {
+    const size = entry.querySelector("select[name='newSize[]']").value;
+    const quantity = entry.querySelector("input[name='newQuantity[]']").value;
+    if (!size || !quantity) {
+      isValid = false;
+    }
+  });
 
-  fetch("../PAMO Inventory backend/process_add_item_size.php", {
-    method: "POST",
-    body: formData,
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        alert("New size added successfully!");
-        closeModal("addItemSizeModal");
-        location.reload();
+  if (!isValid) {
+    alert("Please fill in all required fields for each size entry");
+    return;
+  }
+
+  // Send the form data
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "../PAMO Inventory backend/process_add_item_size.php", true);
+  xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        try {
+          const response = JSON.parse(xhr.responseText);
+          if (response.success) {
+            alert("New sizes added successfully!");
+            location.reload();
+          } else {
+            alert("Error: " + response.message);
+          }
+        } catch (e) {
+          console.error("Parse error:", e);
+          alert("Error processing response: " + xhr.responseText);
+        }
       } else {
-        alert("Error: " + data.message);
+        alert("Error: " + xhr.statusText);
       }
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      alert("An error occurred while processing your request");
-    });
+    }
+  };
+
+  xhr.send(formData);
 }

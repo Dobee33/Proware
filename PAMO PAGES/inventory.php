@@ -582,72 +582,85 @@ function page_link($page, $query_string) {
             </div>
             <div class="modal-body">
                 <form id="addItemSizeForm" onsubmit="submitNewItemSize(event)">
-                    <div class="input-group">
-                        <label for="deliveryOrderNumber">Delivery Order #:</label>
-                        <input type="text" id="deliveryOrderNumber" name="deliveryOrderNumber" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="existingItem">Select Item:</label>
-                        <select id="existingItem" name="existingItem" required onchange="updateItemCodePrefix()">
-                            <option value="">Select Item</option>
-                            <?php
-                            $conn = mysqli_connect("localhost", "root", "", "proware");
-                            if (!$conn) {
-                                die("Connection failed: " . mysqli_connect_error());
-                            }
+                    <div class="order-section">
+                        <div class="input-group">
+                            <label for="deliveryOrderNumber">Delivery Order #:</label>
+                            <input type="text" id="deliveryOrderNumber" name="deliveryOrderNumber" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="existingItem">Select Item:</label>
+                            <select id="existingItem" name="existingItem" required onchange="updateItemCodePrefix()">
+                                <option value="">Select Item</option>
+                                <?php
+                                $conn = mysqli_connect("localhost", "root", "", "proware");
+                                if (!$conn) {
+                                    die("Connection failed: " . mysqli_connect_error());
+                                }
 
-                            // Get unique items based on their prefix (before the dash)
-                            $sql = "SELECT DISTINCT 
-                                    SUBSTRING_INDEX(item_code, '-', 1) as prefix,
-                                    item_name,
-                                    category
-                                    FROM inventory 
-                                    ORDER BY item_name";
-                            $result = mysqli_query($conn, $sql);
+                                // Get unique items based on their prefix (before the dash)
+                                $sql = "SELECT DISTINCT 
+                                        SUBSTRING_INDEX(item_code, '-', 1) as prefix,
+                                        item_name,
+                                        category
+                                        FROM inventory 
+                                        ORDER BY item_name";
+                                $result = mysqli_query($conn, $sql);
 
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                echo "<option value='" . $row['prefix'] . "' data-name='" . $row['item_name'] . "' data-category='" . $row['category'] . "'>" . 
-                                     $row['item_name'] . " (" . $row['prefix'] . ")</option>";
-                            }
-                            mysqli_close($conn);
-                            ?>
-                        </select>
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    echo "<option value='" . $row['prefix'] . "' data-name='" . $row['item_name'] . "' data-category='" . $row['category'] . "'>" . 
+                                         $row['item_name'] . " (" . $row['prefix'] . ")</option>";
+                                }
+                                mysqli_close($conn);
+                                ?>
+                            </select>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label for="newSize">Size:</label>
-                        <select id="newSize" name="newSize" required>
-                            <option value="">Select Size</option>
-                            <option value="XS">XS</option>
-                            <option value="S">S</option>
-                            <option value="M">M</option>
-                            <option value="L">L</option>
-                            <option value="XL">XL</option>
-                            <option value="XXL">XXL</option>
-                            <option value="3XL">3XL</option>
-                            <option value="4XL">4XL</option>
-                            <option value="5XL">5XL</option>
-                            <option value="6XL">6XL</option>
-                            <option value="7XL">7XL</option>
-                            <option value="One Size">One Size</option>
-                        </select>
+
+                    <div id="itemSizeEntries">
+                        <div class="item-size-entry">
+                            <div class="item-close">&times;</div>
+                            <div class="item-content">
+                                <div class="input-group">
+                                    <label for="newSize">Size:</label>
+                                    <select name="newSize[]" required>
+                                        <option value="">Select Size</option>
+                                        <option value="XS">XS</option>
+                                        <option value="S">S</option>
+                                        <option value="M">M</option>
+                                        <option value="L">L</option>
+                                        <option value="XL">XL</option>
+                                        <option value="XXL">XXL</option>
+                                        <option value="3XL">3XL</option>
+                                        <option value="4XL">4XL</option>
+                                        <option value="5XL">5XL</option>
+                                        <option value="6XL">6XL</option>
+                                        <option value="7XL">7XL</option>
+                                        <option value="One Size">One Size</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label for="newItemCode">Item Code:</label>
+                                    <input type="text" name="newItemCode[]" required readonly>
+                                </div>
+                                <div class="input-group">
+                                    <label for="newQuantity">Initial Stock:</label>
+                                    <input type="number" name="newQuantity[]" min="0" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="newDamage">Damaged Items:</label>
+                                    <input type="number" name="newDamage[]" min="0" value="0">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label for="newItemCode">Item Code:</label>
-                        <input type="text" id="newItemCode" name="newItemCode" required readonly>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label for="newQuantity">Initial Stock:</label>
-                        <input type="number" id="newQuantity" name="newQuantity" min="0" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="newDamage">Damaged Items:</label>
-                        <input type="number" id="newDamage" name="newDamage" min="0" value="0">
-                    </div>
+
+                    <button type="button" class="add-item-btn" onclick="addItemSizeEntry()">
+                        <i class="material-icons">add_circle</i> Add Another Size
+                    </button>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" form="addItemSizeForm" class="save-btn">Add Size</button>
+                <button type="submit" form="addItemSizeForm" class="save-btn">Add Sizes</button>
                 <button onclick="closeModal('addItemSizeModal')" class="cancel-btn">Cancel</button>
             </div>
         </div>
@@ -859,6 +872,29 @@ function page_link($page, $query_string) {
     background: #f8f9fa;
     cursor: not-allowed;
     pointer-events: none;
+}
+
+.item-size-entry {
+    position: relative;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+.item-size-entry .item-close {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #dc3545;
+    font-weight: bold;
+    display: none;
+    z-index: 2;
+}
+.item-size-entry:not(:first-child) .item-close {
+    display: block;
 }
     </style>
 </body>
