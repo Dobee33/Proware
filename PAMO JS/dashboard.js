@@ -37,6 +37,17 @@ function redirectToLowStock() {
 
 let stockPieChart, salesLineChart;
 
+// Unique color mapping for each inventory category (custom user colors)
+const CATEGORY_COLORS = {
+  "Tertiary-Uniform": "#0d1a4a", // Dark Blue
+  "SHS-Uniform": "#4fc3f7", // Light Blue
+  "STI-Accessories": "#ff9800", // Orange
+  "STI-Shirts": "#43a047", // Green
+  "STI-Jacket": "#e53935", // Red
+  "SHS-PE": "#ffd600", // Yellow
+  "Tertiary-PE": "#8e24aa", // Purple
+};
+
 async function fetchStockData(category = "", course = "") {
   const params = new URLSearchParams({ category, course });
   try {
@@ -84,6 +95,9 @@ function renderStockPieChart(data) {
   const ctx = canvas.getContext("2d");
   const labels = data.map((d) => d.category);
   const quantities = data.map((d) => d.quantity);
+  const backgroundColors = labels.map(
+    (label) => CATEGORY_COLORS[label] || "#cccccc"
+  );
 
   if (stockPieChart) stockPieChart.destroy();
   stockPieChart = new Chart(ctx, {
@@ -93,29 +107,39 @@ function renderStockPieChart(data) {
       datasets: [
         {
           data: quantities,
-          backgroundColor: [
-            "#4caf50",
-            "#ff9800",
-            "#2196f3",
-            "#e91e63",
-            "#9c27b0",
-          ],
+          backgroundColor: backgroundColors,
         },
       ],
     },
     options: {
       plugins: {
         legend: {
-          display: true,
-          position: "bottom", // <-- This moves the legend under the chart
-          labels: {
-            boxWidth: 20,
-            padding: 16,
-          },
+          display: false, // Disable built-in legend
         },
       },
     },
   });
+
+  // --- Custom HTML Legend ---
+  let legendContainer = document.getElementById("stockPieChartLegend");
+  if (!legendContainer) {
+    legendContainer = document.createElement("div");
+    legendContainer.id = "stockPieChartLegend";
+    canvas.parentNode.appendChild(legendContainer);
+  }
+  // Build legend HTML (two rows)
+  const itemsPerRow = Math.ceil(labels.length / 2);
+  let legendHTML = '<div class="custom-pie-legend-row">';
+  labels.forEach((label, idx) => {
+    if (idx > 0 && idx % itemsPerRow === 0) {
+      legendHTML += '</div><div class="custom-pie-legend-row">';
+    }
+    legendHTML += `<span class="custom-pie-legend-item"><span class="legend-color-box" style="background:${
+      CATEGORY_COLORS[label] || "#cccccc"
+    }"></span>${label}</span>`;
+  });
+  legendHTML += "</div>";
+  legendContainer.innerHTML = legendHTML;
 }
 
 function renderSalesLineChart(data) {

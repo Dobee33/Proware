@@ -1,33 +1,29 @@
 Array
 (
     [deliveryOrderNumber] => 123123
-    [existingItem] => UHRMB001
+    [existingItem] => PVJ023
     [newSize] => Array
         (
-            [0] => XL
-            [1] => XXL
-            [2] => 3XL
+            [0] => 3XL
+            [1] => M
         )
 
     [newItemCode] => Array
         (
-            [0] => UHRMB001-005
-            [1] => UHRMB001-006
-            [2] => UHRMB001-007
+            [0] => PVJ023-007
+            [1] => PVJ023-003
         )
 
     [newQuantity] => Array
         (
-            [0] => 36
-            [1] => 11
-            [2] => 15
+            [0] => 100
+            [1] => 55
         )
 
     [newDamage] => Array
         (
             [0] => 0
             [1] => 0
-            [2] => 0
         )
 
 )
