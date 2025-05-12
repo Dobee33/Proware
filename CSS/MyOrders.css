@@ -286,6 +286,11 @@ body {
   color: #721c24;
 }
 
+.status-badge.voided {
+  background: #e9ecef;
+  color: #495057;
+}
+
 .order-details {
   background: #fafafa;
   border-radius: 12px;
