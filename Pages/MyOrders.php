@@ -25,6 +25,16 @@ if ($status_filter !== 'all') {
     $stmt->execute([$_SESSION['user_id']]);
 }
 $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order_id'])) {
+    $cancel_order_id = $_POST['cancel_order_id'];
+    // Only allow cancel if the order is still pending and belongs to this user
+    $stmt = $conn->prepare("UPDATE pre_orders SET status = 'cancelled' WHERE id = ? AND user_id = ? AND status = 'pending'");
+    $stmt->execute([$cancel_order_id, $_SESSION['user_id']]);
+    // Optionally, add a notification or message here
+    header("Location: MyOrders.php?status=" . urlencode($status_filter)); // Refresh page
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -58,6 +68,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <option value="rejected" <?php echo $status_filter === 'rejected' ? 'selected' : ''; ?>>Rejected</option>
                         <option value="completed" <?php echo $status_filter === 'completed' ? 'selected' : ''; ?>>Completed</option>
                         <option value="voided" <?php echo $status_filter === 'voided' ? 'selected' : ''; ?>>Voided</option>
+                        <option value="cancelled" <?php echo $status_filter === 'cancelled' ? 'selected' : ''; ?>>Cancelled</option>
                     </select>
                 </div>
             </div>
@@ -87,6 +98,12 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <span class="status-badge <?php echo $order['status']; ?>">
                                     <?php echo ucfirst($order['status']); ?>
                                 </span>
+                                <?php if ($order['status'] === 'pending'): ?>
+                                    <form method="post" onsubmit="return confirm('Are you sure you want to cancel this order?');" style="display:inline;">
+                                        <input type="hidden" name="cancel_order_id" value="<?php echo $order['id']; ?>">
+                                        <button type="submit" class="cancel-btn">Cancel Order</button>
+                                    </form>
+                                <?php endif; ?>
                             </div>
 
                             <div class="order-details">
@@ -141,5 +158,26 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
             window.location.href = `MyOrders.php${status !== 'all' ? '?status=' + status : ''}`;
         }
     </script>
+
+    <style>
+        .status-badge.cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .cancel-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.4rem 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-left: 1rem;
+            transition: background 0.2s;
+        }
+        .cancel-btn:hover {
+            background: #c82333;
+        }
+    </style>
 </body>
 </html> 

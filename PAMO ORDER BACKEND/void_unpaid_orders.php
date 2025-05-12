@@ -2,7 +2,6 @@
 require_once '../Includes/connection.php';
 require_once '../Includes/notifications.php';
 
-// Get all approved orders that haven't been paid within 5 minutes
 $query = "
     SELECT po.*, a.first_name, a.last_name, a.email
     FROM pre_orders po

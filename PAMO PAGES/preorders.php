@@ -60,6 +60,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <option value="rejected" <?php echo $status === 'rejected' ? 'selected' : ''; ?>>Rejected</option>
                             <option value="completed" <?php echo $status === 'completed' ? 'selected' : ''; ?>>Completed</option>
                             <option value="voided" <?php echo $status === 'voided' ? 'selected' : ''; ?>>Voided</option>
+                            <option value="cancelled" <?php echo $status === 'cancelled' ? 'selected' : ''; ?>>Cancelled</option>
                         </select>
                     </div>
                 </div>

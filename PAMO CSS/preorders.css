@@ -634,6 +634,11 @@
   color: #495057;
 }
 
+.status-badge.cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .orders-grid {
