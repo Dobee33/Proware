@@ -76,7 +76,7 @@ if ($type === 'inventory') {
     $total_row = mysqli_fetch_assoc($total_result);
     $total_items = $total_row['total'];
     $total_pages = ceil($total_items / $limit);
-    $sql = "SELECT * FROM inventory $where_clause ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
+    $sql = "SELECT *, IFNULL(date_delivered, created_at) AS display_date FROM inventory $where_clause ORDER BY display_date DESC LIMIT $limit OFFSET $offset";
     $result = mysqli_query($conn, $sql);
     $tableHtml .= '<h3>Inventory Report</h3>';
     $tableHtml .= '<table><thead><tr>';
@@ -95,7 +95,7 @@ if ($type === 'inventory') {
         $tableHtml .= '<td>' . $row['damage'] . '</td>';
         $tableHtml .= '<td>' . $row['sold_quantity'] . '</td>';
         $tableHtml .= '<td>' . $row['status'] . '</td>';
-        $tableHtml .= '<td>' . $row['created_at'] . '</td>';
+        $tableHtml .= '<td>' . $row['display_date'] . '</td>';
         $tableHtml .= '</tr>';
     }
     if ($rowCount === 0) {

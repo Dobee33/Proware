@@ -108,6 +108,9 @@ try {
         $updateStockStmt = $conn->prepare(
             "UPDATE inventory 
             SET actual_quantity = ?,
+                new_delivery = ?,
+                beginning_quantity = ?,
+                date_delivered = NOW(),
                 status = CASE 
                     WHEN ? <= 0 THEN 'Out of Stock'
                     WHEN ? <= 10 THEN 'Low Stock'
@@ -119,12 +122,14 @@ try {
             throw new Exception("Database error");
         }
 
-        $updateStockStmt->bind_param("iiisi", 
-            $actual_quantity,
-            $actual_quantity,
-            $actual_quantity,
-            $item['itemId'],
-            $beginning_quantity
+        $updateStockStmt->bind_param("iiiiisi", 
+            $actual_quantity,         // actual_quantity
+            $new_delivery,            // new_delivery
+            $beginning_quantity,      // beginning_quantity
+            $actual_quantity,         // for status logic
+            $actual_quantity,         // for status logic
+            $item['itemId'],          // item_code
+            $beginning_quantity       // previous actual_quantity
         );
         
         if (!$updateStockStmt->execute()) {
