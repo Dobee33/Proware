@@ -276,7 +276,8 @@ body {
   color: #856404;
 }
 
-.status-badge.approved {
+.status-badge.approved,
+.status-badge.completed {
   background-color: #d4edda;
   color: #155724;
 }

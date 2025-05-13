@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('Asia/Manila');
 require_once '../Includes/connection.php';
 require_once '../Includes/notifications.php';
 

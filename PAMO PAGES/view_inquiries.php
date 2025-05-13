@@ -18,7 +18,7 @@ $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html>
 <head>
     <title>Student Inquiries</title>
-    <link rel="stylesheet" href="../CSS/global.css">
+    
     <link rel="stylesheet" href="../PAMO CSS/styles.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

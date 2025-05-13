@@ -82,7 +82,30 @@ try {
         <?php endif; ?>
     </ul>
     <div class="user-info">
-        <img src="avatar.png" alt="User Avatar" onerror="this.onerror=null;this.src='../Images/default-avatar.png';">
+        <?php
+        // Get initials for SVG avatar
+        $initials = 'GU';
+        if (isset($_SESSION['user_id'])) {
+            $user_id = $_SESSION['user_id'];
+            $query = "SELECT first_name, last_name FROM account WHERE id = :user_id";
+            $stmt = $conn->prepare($query);
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt->execute();
+            if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $firstInitial = strtoupper(substr($row['first_name'], 0, 1));
+                $lastInitial = strtoupper(substr($row['last_name'], 0, 1));
+                $initials = $firstInitial . $lastInitial;
+            }
+        }
+        ?>
+        <div class="user-avatar-svg" style="width: 40px; height: 40px; border-radius: 50%; background: var(--secondary-color); display: flex; align-items: center; justify-content: center;">
+            <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="20" cy="20" r="20" fill="#3498db" />
+                <text x="50%" y="55%" text-anchor="middle" fill="#fff" font-size="18" font-family="'Segoe UI', Arial, sans-serif" font-weight="bold" dy=".1em">
+                    <?php echo htmlspecialchars($initials); ?>
+                </text>
+            </svg>
+        </div>
         <div class="user-details">
             <h4>
                 <?php
@@ -115,7 +138,7 @@ try {
         </div>
     </div>
     <div style="margin-top: auto; padding-bottom: 30px; width: 100%; display: flex; justify-content: center;">
-        <button onclick="logout()" class="logout-btn improved-logout" style="width: 90%; display: flex; align-items: center; gap: 12px; justify-content: center;">
+        <button onclick="logout()" class="logout-btn improved-logout">
             <i class="material-icons">logout</i>
             <span>Logout</span>
         </button>
@@ -125,7 +148,7 @@ try {
 <style>
     .sidebar {
         width: 250px;
-        background-color: #FEFBC7;
+        background-color: #cfcecf;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         margin-right: 0px;
         font-size: 20px;
@@ -153,13 +176,13 @@ try {
         top: -2px;
     }
     .nav-links li.active {
-        background: #2196f3 !important;
-        color: #fff !important;
+        background: #534f54 !important;
+        color: yellow !important;
         border-radius: 12px;
     }
     .nav-links li.active i,
     .nav-links li.active .notif-badge {
-        color: #fff !important;
+        color: yellow !important;
     }
     .nav-links li.active .notif-badge {
         background: #d32f2f !important;
@@ -168,8 +191,7 @@ try {
         margin-left: 8px;
     }
     .logo-area {
-        background: #fffbe7;
-        border-bottom: 1.5px solid #f0e6b2;
+        background: #cfcecf;
         padding: 18px 0 10px 0;
         margin-bottom: 8px;
     }
@@ -193,7 +215,7 @@ try {
         font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
         font-weight: 800;
         font-size: 2.1rem;
-        color: #0072bc;
+        color: yellow;
         letter-spacing: 2px;
         margin: 0;
         text-shadow: 0 1px 0 #fff, 0 2px 8px rgba(0,0,0,0.04);
@@ -212,7 +234,7 @@ try {
         top: 0;
         height: 100%;
         width: 6px;
-        background: #0072bc;
+        background: #534f54;
         border-radius: 6px 0 0 6px;
     }
 
@@ -250,13 +272,5 @@ try {
         font-size: 24px;
         color: #fff;
         margin-right: 2px;
-    }
-
-    .user-info img {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        object-fit: cover;
-        background: #eee;
     }
 </style>
