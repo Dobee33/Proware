@@ -129,6 +129,11 @@ if ($type === 'inventory') {
     $total_pages = ceil($total_items / $limit);
     $sql = "SELECT s.*, i.item_name FROM sales s LEFT JOIN inventory i ON s.item_code = i.item_code $where_clause ORDER BY s.sale_date DESC LIMIT $limit OFFSET $offset";
     $result = mysqli_query($conn, $sql);
+    // Calculate grand total for all filtered data
+    $grand_total_sql = "SELECT SUM(s.total_amount) as grand_total FROM sales s LEFT JOIN inventory i ON s.item_code = i.item_code $where_clause";
+    $grand_total_result = mysqli_query($conn, $grand_total_sql);
+    $grand_total_row = mysqli_fetch_assoc($grand_total_result);
+    $grand_total = $grand_total_row['grand_total'] ? $grand_total_row['grand_total'] : 0;
     $tableHtml .= '<h3>Sales Report</h3>';
     if ($startDate || $endDate || $search) {
         $tableHtml .= '<div class="total-amount-display" style="display: none;"><h4>Total Sales Amount: <span id="totalSalesAmount">₱0.00</span></h4></div>';
@@ -209,5 +214,6 @@ if ($type === 'inventory') {
 mysqli_close($conn);
 echo json_encode([
     'table' => $tableHtml,
-    'pagination' => $paginationHtml
+    'pagination' => $paginationHtml,
+    'grand_total' => isset($grand_total) ? $grand_total : 0
 ]); 

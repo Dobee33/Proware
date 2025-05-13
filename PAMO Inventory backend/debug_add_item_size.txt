@@ -1,7 +1,7 @@
 Array
 (
-    [deliveryOrderNumber] => 123123
-    [existingItem] => PTWSHBF002
+    [deliveryOrderNumber] => 000000
+    [existingItem] => PTWMBW001
     [newSize] => Array
         (
             [0] => M
@@ -13,20 +13,20 @@ Array
 
     [newItemCode] => Array
         (
-            [0] => PTWSHBF002-003
-            [1] => PTWSHBF002-004
-            [2] => PTWSHBF002-005
-            [3] => PTWSHBF002-006
-            [4] => PTWSHBF002-007
+            [0] => PTWMBW001-003
+            [1] => PTWMBW001-004
+            [2] => PTWMBW001-005
+            [3] => PTWMBW001-006
+            [4] => PTWMBW001-007
         )
 
     [newQuantity] => Array
         (
-            [0] => 64
-            [1] => 23
-            [2] => 23
-            [3] => 37
-            [4] => 3
+            [0] => 65
+            [1] => 14
+            [2] => 34
+            [3] => 44
+            [4] => 61
         )
 
     [newDamage] => Array

@@ -93,7 +93,22 @@ function ajaxLoadReport(type, page = 1, extraParams = {}) {
         );
       }
       hideLoading();
-      if (type === "sales") setTimeout(updateTotalSalesAmount, 100);
+      if (type === "sales") {
+        // Show the total-amount display and set the value from backend
+        const totalDisplay = document.querySelector(".total-amount-display");
+        if (totalDisplay) {
+          totalDisplay.style.display = "block";
+          const totalAmountSpan = document.getElementById("totalSalesAmount");
+          if (totalAmountSpan) {
+            totalAmountSpan.textContent =
+              "₱" +
+              Number(data.grand_total || 0).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              });
+          }
+        }
+      }
     })
     .catch((err) => {
       hideLoading();
@@ -136,7 +151,7 @@ function applyDailyFilter() {
     return;
   }
   const today = new Date();
-  const formattedDate = today.toISOString().split("T")[0];
+  const formattedDate = today.toLocaleDateString("en-CA"); // 'YYYY-MM-DD'
   const startDate = document.getElementById("startDate");
   const endDate = document.getElementById("endDate");
   if (startDate) startDate.value = formattedDate;
@@ -236,46 +251,6 @@ window.addEventListener("DOMContentLoaded", function () {
   const reportType = document.getElementById("reportType").value;
   ajaxLoadReport(reportType, 1);
 });
-
-function updateTotalSalesAmount() {
-  const salesTable = document.querySelector("#salesReport table");
-  if (!salesTable) return;
-
-  const rows = salesTable.getElementsByTagName("tr");
-  let total = 0;
-
-  // Start from 1 to skip header row
-  for (let i = 1; i < rows.length; i++) {
-    const row = rows[i];
-    if (row.style.display !== "none") {
-      const amountCell = row.cells[6]; // Index of Total Amount column
-      if (amountCell) {
-        // Remove ₱ symbol and commas, then parse
-        const amount = parseFloat(
-          amountCell.textContent.replace("₱", "").replace(/,/g, "")
-        );
-        if (!isNaN(amount)) {
-          total += amount;
-        }
-      }
-    }
-  }
-
-  // Update the total amount display
-  const totalDisplay = document.querySelector(".total-amount-display");
-  if (totalDisplay) {
-    totalDisplay.style.display = "block"; // Show the total amount display
-    const totalAmountSpan = document.getElementById("totalSalesAmount");
-    if (totalAmountSpan) {
-      totalAmountSpan.textContent =
-        "₱" +
-        total.toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        });
-    }
-  }
-}
 
 function exportToExcel() {
   const reportType = document.getElementById("reportType").value;
