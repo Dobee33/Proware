@@ -91,7 +91,7 @@ try {
             throw new Exception("Prepare failed: " . $conn->error);
         }
 
-        $updateStockStmt->bind_param("iiiiss", 
+        $updateStockStmt->bind_param("iiisi", 
             $new_actual_quantity,
             $new_actual_quantity,
             $new_actual_quantity,
