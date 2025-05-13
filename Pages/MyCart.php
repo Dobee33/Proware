@@ -168,6 +168,48 @@ $cart_total = 0;
                             </tbody>
                         </table>
                     </div>
+                    <!-- MOBILE CART CARDS START -->
+                    <div class="cart-items-mobile">
+                        <?php foreach ($final_cart_items as $item):
+                            $subtotal = $item['price'] * $item['quantity'];
+                        ?>
+                        <div class="cart-item-card">
+                            <div class="card-img-section">
+                                <img src="../<?php echo htmlspecialchars($item['image_path']); ?>" alt="<?php echo htmlspecialchars($item['item_name']); ?>">
+                            </div>
+                            <div class="card-details-section">
+                                <div class="card-title-row">
+                                    <div class="card-item-name"><?php echo htmlspecialchars($item['item_name']); ?></div>
+                                    <button onclick="removeFromCart(<?php echo $item['id']; ?>)" class="remove-btn" title="Remove item">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="card-meta-row">
+                                    <span class="card-item-size">
+                                        <?php echo !empty($item['size']) ? htmlspecialchars($item['size']) : '-'; ?>
+                                    </span>
+                                </div>
+                                <div class="card-price-row">
+                                    <span class="card-item-price">₱<?php echo number_format($item['price'], 2); ?></span>
+                                </div>
+                                <div class="card-qty-row">
+                                    <div class="quantity-control">
+                                        <button type="button" class="qty-btn minus">-</button>
+                                        <input type="number" value="<?php echo $item['quantity']; ?>" 
+                                               min="1" max="<?php echo $item['actual_quantity']; ?>" 
+                                               class="qty-input" 
+                                               data-item-id="<?php echo $item['id']; ?>"
+                                               data-item-code="<?php echo $item['item_code']; ?>"
+                                               data-max-stock="<?php echo $item['actual_quantity']; ?>">
+                                        <button type="button" class="qty-btn plus">+</button>
+                                    </div>
+                                    <span class="card-item-subtotal">Subtotal: ₱<?php echo number_format($subtotal, 2); ?></span>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <!-- MOBILE CART CARDS END -->
                     <div class="cart-summary">
                         <h2>Order Summary</h2>
                         <div class="summary-details">
@@ -683,6 +725,117 @@ $cart_total = 0;
         .qty-input::-webkit-outer-spin-button {
             -webkit-appearance: none;
             margin: 0;
+        }
+
+        /* Hide mobile card layout by default */
+        .cart-items-mobile {
+            display: none;
+        }
+        /* Show table, hide cards on desktop */
+        @media (min-width: 769px) {
+            .cart-items-mobile {
+                display: none !important;
+            }
+            .cart-items-container {
+                display: block;
+            }
+        }
+        /* Show cards, hide table on mobile */
+        @media (max-width: 768px) {
+            .cart-items-container {
+                display: none !important;
+            }
+            .cart-items-mobile {
+                display: block;
+            }
+            .cart-items-mobile {
+                margin: 0 0.5rem 1rem;
+            }
+            .cart-item-card {
+                display: flex;
+                gap: 1rem;
+                background: #fff;
+                border-radius: 10px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                margin-bottom: 1.2rem;
+                padding: 1rem;
+                align-items: flex-start;
+            }
+            .card-img-section {
+                flex: 0 0 80px;
+                width: 80px;
+                height: 80px;
+                border-radius: 8px;
+                overflow: hidden;
+                background: #f7f7f7;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .card-img-section img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            .card-details-section {
+                flex: 1 1 auto;
+                display: flex;
+                flex-direction: column;
+                gap: 0.3rem;
+            }
+            .card-title-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            .card-item-name {
+                font-size: 1rem;
+                font-weight: 600;
+                color: var(--primary-color);
+                margin-bottom: 0.1rem;
+                word-break: break-word;
+            }
+            .remove-btn {
+                font-size: 1.1rem;
+                color: #dc3545;
+                background: none;
+                border: none;
+                cursor: pointer;
+                opacity: 0.7;
+                padding: 0.2rem 0.4rem;
+            }
+            .remove-btn:hover {
+                color: #c82333;
+                opacity: 1;
+            }
+            .card-meta-row {
+                font-size: 0.92rem;
+                color: #888;
+            }
+            .card-item-size {
+                background: #e6f2ff;
+                color: #0066cc;
+                border-radius: 4px;
+                padding: 2px 8px;
+                font-size: 0.9rem;
+            }
+            .card-price-row {
+                font-size: 1.05rem;
+                color: #444;
+                font-weight: 600;
+            }
+            .card-qty-row {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                margin-top: 0.2rem;
+            }
+            .card-item-subtotal {
+                font-size: 0.98rem;
+                color: var(--primary-color);
+                font-weight: 500;
+            }
         }
     </style>
 

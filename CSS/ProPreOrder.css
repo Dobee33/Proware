@@ -409,3 +409,103 @@ h1 {
   -webkit-overflow-scrolling: touch;
   margin-bottom: 1rem;
 }
+
+/* --- MOBILE CART CARDS LAYOUT --- */
+.cart-items-mobile {
+  display: none;
+}
+@media (max-width: 768px) {
+  .table-responsive {
+    display: none !important;
+  }
+  .cart-items-mobile {
+    display: block;
+    margin: 0 0.5rem 1rem;
+  }
+  .cart-item-card {
+    display: flex;
+    gap: 1rem;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    margin-bottom: 1.2rem;
+    padding: 1rem;
+    align-items: flex-start;
+  }
+  .card-img-section {
+    flex: 0 0 80px;
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f7f7f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card-img-section img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .card-details-section {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .card-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .card-item-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 0.1rem;
+    word-break: break-word;
+  }
+  .card-meta-row {
+    font-size: 0.92rem;
+    color: #888;
+  }
+  .card-item-size {
+    background: #e6f2ff;
+    color: #0066cc;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.9rem;
+  }
+  .card-price-row {
+    font-size: 1.05rem;
+    color: #444;
+    font-weight: 600;
+  }
+  .card-qty-row {
+    font-size: 0.98rem;
+    color: #333;
+    font-weight: 500;
+    margin-top: 0.2rem;
+  }
+  .card-include-row {
+    margin-top: 0.5rem;
+  }
+  .include-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: #0077be;
+    font-weight: 500;
+  }
+  .include-checkbox-mobile {
+    width: 20px;
+    height: 20px;
+    accent-color: #ffd700;
+    border: 2px solid #0077be;
+    border-radius: 3px;
+    margin: 0;
+  }
+}

@@ -154,6 +154,44 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- MOBILE CART CARDS START -->
+                <div class="cart-items-mobile">
+                    <?php if (!empty($final_cart_items)): ?>
+                        <?php foreach ($final_cart_items as $item): 
+                            $item_total = $item['price'] * $item['quantity'];
+                            $clean_name = rtrim($item['item_name'], " SMLX234567");
+                        ?>
+                        <div class="cart-item-card" data-item-id="<?php echo $item['id']; ?>" data-item-code="<?php echo $item['item_code']; ?>">
+                            <div class="card-img-section">
+                                <img src="../<?php echo htmlspecialchars($item['image_path']); ?>" alt="<?php echo htmlspecialchars($clean_name); ?>">
+                            </div>
+                            <div class="card-details-section">
+                                <div class="card-title-row">
+                                    <div class="card-item-name"><?php echo htmlspecialchars($clean_name); ?></div>
+                                </div>
+                                <div class="card-meta-row">
+                                    <span class="card-item-size"><?php echo htmlspecialchars($item['size'] ?? 'N/A'); ?></span>
+                                </div>
+                                <div class="card-price-row">
+                                    <span class="card-item-price">₱<?php echo number_format($item['price'], 2); ?></span>
+                                </div>
+                                <div class="card-qty-row">
+                                    <span class="card-item-quantity">Qty: <?php echo $item['quantity']; ?></span>
+                                </div>
+                                <div class="card-include-row">
+                                    <label class="include-label">
+                                        <input type="checkbox" class="include-checkbox-mobile" data-item-id="<?php echo $item['id']; ?>" checked>
+                                        Include
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="empty-cart">Your cart is empty</div>
+                    <?php endif; ?>
+                </div>
+                <!-- MOBILE CART CARDS END -->
             </div>
 
             <div class="summary-section">
