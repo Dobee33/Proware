@@ -1,29 +1,41 @@
 Array
 (
     [deliveryOrderNumber] => 123123
-    [existingItem] => PVJ023
+    [existingItem] => PTWSHBF002
     [newSize] => Array
         (
-            [0] => 3XL
-            [1] => M
+            [0] => M
+            [1] => L
+            [2] => XL
+            [3] => XXL
+            [4] => 3XL
         )
 
     [newItemCode] => Array
         (
-            [0] => PVJ023-007
-            [1] => PVJ023-003
+            [0] => PTWSHBF002-003
+            [1] => PTWSHBF002-004
+            [2] => PTWSHBF002-005
+            [3] => PTWSHBF002-006
+            [4] => PTWSHBF002-007
         )
 
     [newQuantity] => Array
         (
-            [0] => 100
-            [1] => 55
+            [0] => 64
+            [1] => 23
+            [2] => 23
+            [3] => 37
+            [4] => 3
         )
 
     [newDamage] => Array
         (
             [0] => 0
             [1] => 0
+            [2] => 0
+            [3] => 0
+            [4] => 0
         )
 
 )

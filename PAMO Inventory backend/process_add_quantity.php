@@ -119,7 +119,7 @@ try {
             throw new Exception("Database error");
         }
 
-        $stmt->bind_param("iiiiss", 
+        $updateStockStmt->bind_param("iiisi", 
             $actual_quantity,
             $actual_quantity,
             $actual_quantity,
@@ -127,9 +127,10 @@ try {
             $beginning_quantity
         );
         
-        if (!$stmt->execute()) {
+        if (!$updateStockStmt->execute()) {
             throw new Exception("Failed to update inventory");
         }
+        $updateStockStmt->close();
 
         // Log the activity
         $activity_description = "New delivery added - Order #: $orderNumber, Item: {$item['itemId']}, Quantity: {$item['quantity']}, Previous stock: $beginning_quantity, New total: $actual_quantity";
@@ -140,11 +141,15 @@ try {
         }
 
         $user_id = $_SESSION['user_id'] ?? null;
+        if ($user_id === null) {
+            throw new Exception("User not logged in");
+        }
         $stmt->bind_param("ssi", $activity_description, $item['itemId'], $user_id);
         
         if (!$stmt->execute()) {
             throw new Exception("Failed to log activity");
         }
+        $stmt->close();
     }
 
     // If we got here, everything succeeded
