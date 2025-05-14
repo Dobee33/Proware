@@ -254,42 +254,21 @@ window.addEventListener("DOMContentLoaded", function () {
 
 function exportToExcel() {
   const reportType = document.getElementById("reportType").value;
-  const table = document.querySelector(`#${reportType}Report table`);
-
-  // Create a workbook
-  let csv = [];
-  const rows = table.getElementsByTagName("tr");
-
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i];
-    const cells = row.getElementsByTagName(i === 0 ? "th" : "td");
-    let rowData = [];
-
-    if (row.style.display !== "none") {
-      // Only export visible rows
-      for (let cell of cells) {
-        rowData.push(cell.textContent);
-      }
-      csv.push(rowData.join(","));
-    }
+  // Collect current filters
+  const filters = getCurrentReportFilters();
+  const params = new URLSearchParams(filters).toString();
+  let exportUrl = "";
+  if (reportType === "sales") {
+    exportUrl = "../PAMO PAGES/includes/export_sales_report.php?" + params;
+  } else if (reportType === "inventory") {
+    exportUrl = "../PAMO PAGES/includes/export_inventory_report.php?" + params;
+  } else if (reportType === "audit") {
+    exportUrl = "../PAMO PAGES/includes/export_audit_report.php?" + params;
+  } else {
+    alert("Excel export is not available for this report type.");
+    return;
   }
-
-  // Create and download the CSV file
-  const csvContent = csv.join("\n");
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-  const url = URL.createObjectURL(blob);
-
-  link.setAttribute("href", url);
-  link.setAttribute(
-    "download",
-    `${reportType}_report_${new Date().toISOString().split("T")[0]}.csv`
-  );
-  link.style.visibility = "hidden";
-
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  window.open(exportUrl, "_blank");
 }
 
 function changePage(direction) {

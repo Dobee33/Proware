@@ -591,3 +591,25 @@ tr:hover {
     justify-content: flex-start;
   }
 }
+
+/* Responsive Table Container for Reports */
+@media (max-width: 900px) {
+  .report-table,
+  .scroll-table-container {
+    overflow-x: auto !important;
+    width: 100%;
+    display: block;
+  }
+  .report-table table,
+  .scroll-table-container table {
+    min-width: 700px;
+    width: 100%;
+    display: block;
+  }
+  .report-table th,
+  .report-table td {
+    padding: 8px 6px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+}
