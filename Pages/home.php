@@ -19,6 +19,7 @@
 <body>
     <?php
     include("../Includes/Header.php");
+    include("../Includes/connection.php");
     ?>
     
     <!-- Hero Section -->
@@ -57,85 +58,27 @@
         </div>
     </section>
 
-    <section class="tagline">
-        <div class="tag">
-            <h1>Be future-ready. Be STI.</h1>
-            <p>Explore our wide range of products and check stock availability right from your device.</p>
-        </div>
-
-        <div class="sti-frames">
-                <div id="letter-s" class="frame"></div>
-                <div id="letter-s1" class="frame"></div>
-                <div id="letter-s2" class="frame"></div>
-                <div id="letter-s3" class="frame"></div>
-            </div>
-
-    </section>
-
-
-    <section class="Display">
-        <div class="container">
-            <div class="section-header">
-                <h2>Welcome to STI</h2>
-                <p>Discover our latest collection</p>
-            </div>
-
-            <div class="display-content">
-                <div class="display-item" data-aos="fade-up" data-aos-delay="0">
-                    <img src="../Images/STI-TM.jpg" alt="STI TM Uniform">
-                </div>
-                <div class="display-item" data-aos="fade-up" data-aos-delay="100">
-                    <img src="../Images/STI-ICT.jpg" alt="STI ICT Uniform">
-                </div>
-                <div class="display-item" data-aos="fade-up" data-aos-delay="200">
-                    <img src="../Images/STI-HM.jpg" alt="STI HM Uniform">
-                </div>
-                <div class="display-item" data-aos="fade-up" data-aos-delay="300">
-                    <img src="../Images/STI-CM.jpg" alt="STI CM Uniform">
-                </div>
-                <div class="display-item" data-aos="fade-up" data-aos-delay="400">
-                    <img src="../Images/STI-BA.jpg" alt="STI BA Uniform">
-                </div>
-                <div class="display-item" data-aos="fade-up" data-aos-delay="500">
-                    <img src="../Images/STI GRIT.png" alt="STI GRIT">
-                </div>
-            </div>
-        </div>
-    </section>
+    
 
     <section class="New-Arrivals">
         <div class="section-header">
             <h2>Item Categories</h2>
             <p class="section-subtitle">Check out our latest products</p>
         </div>
-        
         <div class="new-arrivals-container">
-            <!-- New Arrival 1 -->
-            <div class="new-arrival-card" data-aos="fade-up">
-                <div class="new-arrival-image">
-                    <img src="../Images/new1.png" alt="STI GRIT Collection" draggable="false" />
-                    <div class="new-arrival-overlay">
-                    </div>
-                </div>
-            </div>
-            
-            <!-- New Arrival 2 -->
-            <div class="new-arrival-card" data-aos="fade-up" data-aos-delay="100">
-                <div class="new-arrival-image">
-                    <img src="../Images/new3.png" alt="ICT Program Uniform" draggable="false" />
-                    <div class="new-arrival-overlay">
-                    </div>
-                </div>
-            </div>
-            
-            <!-- New Arrival 3 -->
-            <div class="new-arrival-card" data-aos="fade-up" data-aos-delay="200">
-                <div class="new-arrival-image">
-                    <img src="../Images/new2.png" alt="Hospitality Management Uniform" draggable="false" />
-                    <div class="new-arrival-overlay">
-                    </div>
-                </div>
-            </div>
+            <?php
+            // Fetch only 4 categories for the new layout
+            $sql = "SELECT image_path, title FROM homepage_content WHERE section='new_arrival' LIMIT 4";
+            $result = $conn->query($sql);
+            while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $title = htmlspecialchars($row['title']);
+                echo '<div class="new-arrival-card" data-aos="fade-up">';
+                echo '  <div class="new-arrival-image">';
+                echo '    <img src="../' . htmlspecialchars($row['image_path']) . '" alt="' . $title . '" draggable="false" />';
+                echo '  </div>';
+                echo '</div>';
+            }
+            ?>
         </div>
         <div class="new-arrivals-order-btn-container">
             <?php if (isset($_SESSION['user_id'])): ?>
@@ -146,88 +89,102 @@
         </div>
     </section>
 
-    <!-- Best Sellers Section -->
+    <!-- Display Section -->
+    <section class="Display">
+        <div class="container">
+            <div class="section-header">
+                <h2>Welcome to STI</h2>
+                <p>Discover our latest collection</p>
+            </div>
+            <div class="display-content display-grid-custom">
+                <?php
+                $sql = "SELECT image_path, title FROM homepage_content WHERE section='display' LIMIT 3";
+                $result = $conn->query($sql);
+                $display_items = [];
+                while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $display_items[] = $row;
+                }
+                // First image: left column, spans two rows
+                if (isset($display_items[0])) {
+                    $img1 = '../' . htmlspecialchars($display_items[0]['image_path']);
+                    $title1 = htmlspecialchars($display_items[0]['title']);
+                    echo '<div class="display-bg-card display-grid-large" style="background-image: url(' . "'$img1'" . ');" data-aos="fade-up">';
+                    echo '  <div class="display-bg-overlay">';
+                    echo '    <div class="display-bg-info">';
+                    echo '      <h3>' . $title1 . '</h3>';
+                    echo '    </div>';
+                    echo '  </div>';
+                    echo '</div>';
+                }
+                // Second image: top right
+                if (isset($display_items[1])) {
+                    $img2 = '../' . htmlspecialchars($display_items[1]['image_path']);
+                    $title2 = htmlspecialchars($display_items[1]['title']);
+                    echo '<div class="display-bg-card display-grid-small" style="background-image: url(' . "'$img2'" . ');" data-aos="fade-up">';
+                    echo '  <div class="display-bg-overlay">';
+                    echo '    <div class="display-bg-info">';
+                    echo '      <h3>' . $title2 . '</h3>';
+                    echo '    </div>';
+                    echo '  </div>';
+                    echo '</div>';
+                }
+                // Third image: bottom right
+                if (isset($display_items[2])) {
+                    $img3 = '../' . htmlspecialchars($display_items[2]['image_path']);
+                    $title3 = htmlspecialchars($display_items[2]['title']);
+                    echo '<div class="display-bg-card display-grid-small" style="background-image: url(' . "'$img3'" . ');" data-aos="fade-up">';
+                    echo '  <div class="display-bg-overlay">';
+                    echo '    <div class="display-bg-info">';
+                    echo '      <h3>' . $title3 . '</h3>';
+                    echo '    </div>';
+                    echo '  </div>';
+                    echo '</div>';
+                }
+                ?>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="tagline">
+        <div class="tag">
+            <h1>Be future-ready. Be STI.</h1>
+            <p>Explore our wide range of products and check stock availability right from your device.</p>
+        </div>
+        <div class="sti-frames">
+            <div id="letter-s" class="frame"></div>
+            <div id="letter-s1" class="frame"></div>
+            <div id="letter-s2" class="frame"></div>
+            <div id="letter-s3" class="frame"></div>
+        </div>
+    </section>
+
+    <!-- Pre-Order Request Section (Grid 4x2) -->
     <section class="Best-Sellers">
         <div class="section-header">
             <h2>Items Available to Request for Pre-Order</h2>
             <p class="section-subtitle">These are items you can request in advance. If enough students request an item, PAMO will consider stocking it!</p>
         </div>
-        <div class="best-sellers-grid">
-            <div class="best-sellers-track">
-                <!-- Original Cards -->
-                <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="0">
-                    <div class="product-image">
-                        <img src="../Images/STI-TM.jpg" alt="STI TM Uniform" draggable="false" />
-                        <div class="product-overlay">
-                            <button class="add-to-cart-btn">Pre Order</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="100">
-                    <div class="product-image">
-                        <img src="../Images/STI-ICT.jpg" alt="STI ICT Uniform" draggable="false" />
-                        <div class="product-overlay">
-                            <button class="add-to-cart-btn">Pre Order</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="200">
-                    <div class="product-image">
-                        <img src="../Images/STI-HM.jpg" alt="STI HM Uniform" draggable="false" />
-                        <div class="product-overlay">
-                            <button class="add-to-cart-btn">Pre Order</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="300">
-                    <div class="product-image">
-                        <img src="../Images/STI-CM.jpg" alt="STI CM Uniform" draggable="false" />
-                        <div class="product-overlay">
-                            <button class="add-to-cart-btn">Pre Order</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Cloned Cards for Seamless Loop -->
-                <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="400">
-                    <div class="product-image">
-                        <img src="../Images/STI-TM.jpg" alt="STI TM Uniform" draggable="false" />
-                        <div class="product-overlay">
-                            <button class="add-to-cart-btn">Pre Order</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="500">
-                    <div class="product-image">
-                        <img src="../Images/STI-ICT.jpg" alt="STI ICT Uniform" draggable="false" />
-                        <div class="product-overlay">
-                            <button class="add-to-cart-btn">Pre Order</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="600">
-                    <div class="product-image">
-                        <img src="../Images/STI-HM.jpg" alt="STI HM Uniform" draggable="false" />
-                        <div class="product-overlay">
-                            <button class="add-to-cart-btn">Pre Order</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="best-seller-card" data-aos="zoom-in" data-aos-delay="700">
-                    <div class="product-image">
-                        <img src="../Images/STI-CM.jpg" alt="STI CM Uniform" draggable="false" />
-                        <div class="product-overlay">
-                            <button class="add-to-cart-btn">Pre Order</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="best-sellers-grid-4x2">
+            <?php
+            $sql = "SELECT * FROM homepage_content WHERE section='pre_order' ORDER BY created_at DESC LIMIT 8";
+            $result = $conn->query($sql);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $img = '../' . htmlspecialchars($row['image_path']);
+                $category = isset($row['category']) ? htmlspecialchars($row['category']) : '';
+                $title = htmlspecialchars($row['title']);
+                $price = number_format($row['price'], 2);
+                echo '<div class="best-seller-card">';
+                if ($category) echo '<div class="product-category" style="font-size:0.8rem;color:#888;text-transform:uppercase;margin-bottom:4px;">' . $category . '</div>';
+                echo '  <div class="product-image">';
+                echo '    <img src="' . $img . '" alt="' . $title . '" draggable="false" />';
+                echo '  </div>';
+                echo '  <div class="product-title" style="font-weight:bold;font-size:1.1rem;margin:5px 0;">' . $title . '</div>';
+                echo '  <div class="product-price" style="color:#0072bc;font-size:1.1rem;margin-bottom:8px;">₱' . $price . '</div>';
+                echo '  <button class="add-to-cart-btn">Pre Order</button>';
+                echo '</div>';
+            }
+            ?>
         </div>
     </section>
 

@@ -1,42 +1,36 @@
-// Sample data structure
-const contentData = {
-  hero: {
-    images: [
-      { id: 1, url: "hero1.jpg", title: "Hero Image 1" },
-      { id: 2, url: "hero2.jpg", title: "Hero Image 2" },
-    ],
-  },
-  categories: {
-    uniform: {
-      images: [
-        { id: 1, url: "uniform1.jpg", title: "Uniform 1" },
-        { id: 2, url: "uniform2.jpg", title: "Uniform 2" },
-      ],
-    },
-    accessories: {
-      images: [
-        { id: 1, url: "accessory1.jpg", title: "Accessory 1" },
-        { id: 2, url: "accessory2.jpg", title: "Accessory 2" },
-      ],
-    },
-    shirt: {
-      images: [
-        { id: 1, url: "shirt1.jpg", title: "Shirt 1" },
-        { id: 2, url: "shirt2.jpg", title: "Shirt 2" },
-      ],
-    },
-  },
-  featured: {
-    products: [
-      { id: 1, url: "product1.jpg", title: "Featured Product 1" },
-      { id: 2, url: "product2.jpg", title: "Featured Product 2" },
-    ],
-  },
-};
-
-// Initialize the page
 document.addEventListener("DOMContentLoaded", function () {
   loadAllSections();
+  // Attach delete and edit handlers
+  document.querySelectorAll(".image-grid").forEach(function (grid) {
+    grid.addEventListener("click", function (e) {
+      // Delete
+      if (e.target.closest('.overlay-btn[title="Delete"]')) {
+        const btn = e.target.closest(".overlay-btn");
+        const imageId = btn.getAttribute("data-id");
+        if (confirm("Are you sure you want to delete this image?")) {
+          fetch("../PAMO BACKEND CONTENT EDIT/delete-content-image.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "id=" + encodeURIComponent(imageId),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.success) {
+                location.reload();
+              } else {
+                alert(data.error || "Failed to delete image.");
+              }
+            });
+        }
+      }
+      // Edit
+      if (e.target.closest('.overlay-btn[title="Edit"]')) {
+        const btn = e.target.closest(".overlay-btn");
+        const imageId = btn.getAttribute("data-id");
+        openEditModal(imageId);
+      }
+    });
+  });
 });
 
 function loadAllSections() {
@@ -392,3 +386,49 @@ function logout() {
     window.location.href = "../Pages/logout.php";
   }
 }
+
+// Modal logic
+function openEditModal(imageId) {
+  // Fetch current data for the image
+  fetch(`../PAMO BACKEND CONTENT EDIT/get-content-image.php?id=${imageId}`)
+    .then((res) => res.json())
+    .then((data) => {
+      if (!data.success) {
+        alert(data.error || "Failed to fetch image data.");
+        return;
+      }
+      // Populate modal fields
+      document.getElementById("editImageId").value = imageId;
+      document.getElementById("editImageTitle").value = data.title;
+      document.getElementById("editImagePreview").src = "../" + data.image_path;
+      document.getElementById("editImageModal").style.display = "block";
+    });
+}
+
+function closeEditModal() {
+  document.getElementById("editImageModal").style.display = "none";
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  document
+    .getElementById("editImageForm")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      fetch("../PAMO BACKEND CONTENT EDIT/edit-content-image.php", {
+        method: "POST",
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            location.reload();
+          } else {
+            alert(data.error || "Failed to update image.");
+          }
+        });
+    });
+  document
+    .getElementById("closeEditModalBtn")
+    .addEventListener("click", closeEditModal);
+});
