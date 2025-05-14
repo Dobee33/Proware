@@ -923,3 +923,16 @@ body,
   background-color: #fff;
   box-shadow: 0 2px 12px rgba(0, 123, 255, 0.08);
 }
+
+.pagination-ellipsis {
+  display: inline-block;
+  min-width: 24px;
+  text-align: center;
+  color: #aaa;
+  font-size: 1.2em;
+  pointer-events: none;
+  user-select: none;
+  background: none;
+  border: none;
+  margin: 0 2px;
+}

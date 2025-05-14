@@ -78,21 +78,43 @@ ob_start();
 if ($total_items > 0 && $total_pages > 1) {
     echo '<div class="pagination">';
     if ($page > 1) {
-        echo '<a href="?page=' . ($page-1) . '" class="ajax-page-link">&laquo; Prev</a>';
+        echo '<a href="?page=' . ($page-1) . '" class="ajax-page-link">&laquo;</a>';
     }
-    $window = 2;
-    $start = max(1, $page - $window);
-    $end = min($total_pages, $page + $window);
-    if ($total_pages <= 5) {
-        $start = 1;
-        $end = $total_pages;
+    // Always show first page
+    if ($page == 1) {
+        echo '<a href="?page=1" class="ajax-page-link active">1</a>';
+    } else {
+        echo '<a href="?page=1" class="ajax-page-link">1</a>';
     }
+    // Show ellipsis if needed before the window
+    if ($page > 4) {
+        echo '<span class="pagination-ellipsis">...</span>';
+    }
+    // Determine window of pages to show around current page
+    $window = 1; // Number of pages before/after current
+    $start = max(2, $page - $window);
+    $end = min($total_pages - 1, $page + $window);
     for ($i = $start; $i <= $end; $i++) {
-        $active = ($i == $page) ? ' active' : '';
-        echo '<a href="?page=' . $i . '" class="ajax-page-link' . $active . '">' . $i . '</a>';
+        if ($i == $page) {
+            echo '<a href="?page=' . $i . '" class="ajax-page-link active">' . $i . '</a>';
+        } else {
+            echo '<a href="?page=' . $i . '" class="ajax-page-link">' . $i . '</a>';
+        }
+    }
+    // Show ellipsis if needed after the window
+    if ($page < $total_pages - 3) {
+        echo '<span class="pagination-ellipsis">...</span>';
+    }
+    // Always show last page (if more than 1 page)
+    if ($total_pages > 1) {
+        if ($page == $total_pages) {
+            echo '<a href="?page=' . $total_pages . '" class="ajax-page-link active">' . $total_pages . '</a>';
+        } else {
+            echo '<a href="?page=' . $total_pages . '" class="ajax-page-link">' . $total_pages . '</a>';
+        }
     }
     if ($page < $total_pages) {
-        echo '<a href="?page=' . ($page+1) . '" class="ajax-page-link">Next &raquo;</a>';
+        echo '<a href="?page=' . ($page+1) . '" class="ajax-page-link">&raquo;</a>';
     }
     echo '</div>';
 }

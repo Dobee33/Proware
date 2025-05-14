@@ -221,23 +221,45 @@ function page_link($page, $query_string) {
                 <?php if ($total_pages > 1): ?>
                 <div class="pagination">
                     <?php if ($page > 1): ?>
-                        <a href="<?php echo page_link($page-1, $query_string); ?>" class="ajax-page-link">&laquo; Prev</a>
+                        <a href="<?php echo page_link($page-1, $query_string); ?>" class="ajax-page-link">&laquo;</a>
                     <?php endif; ?>
                     <?php
-                    // Show a window of up to 5 pages around the current page
-                    $window = 2; // how many pages before/after current
-                    $start = max(1, $page - $window);
-                    $end = min($total_pages, $page + $window);
-                    if ($total_pages <= 5) {
-                        $start = 1;
-                        $end = $total_pages;
+                    // Always show first page
+                    if ($page == 1) {
+                        echo '<a href="' . page_link(1, $query_string) . '" class="ajax-page-link active">1</a>';
+                    } else {
+                        echo '<a href="' . page_link(1, $query_string) . '" class="ajax-page-link">1</a>';
                     }
-                    for ($i = $start; $i <= $end; $i++):
+                    // Show ellipsis if needed before the window
+                    if ($page > 4) {
+                        echo '<span class="pagination-ellipsis">...</span>';
+                    }
+                    // Determine window of pages to show around current page
+                    $window = 1; // Number of pages before/after current
+                    $start = max(2, $page - $window);
+                    $end = min($total_pages - 1, $page + $window);
+                    for ($i = $start; $i <= $end; $i++) {
+                        if ($i == $page) {
+                            echo '<a href="' . page_link($i, $query_string) . '" class="ajax-page-link active">' . $i . '</a>';
+                        } else {
+                            echo '<a href="' . page_link($i, $query_string) . '" class="ajax-page-link">' . $i . '</a>';
+                        }
+                    }
+                    // Show ellipsis if needed after the window
+                    if ($page < $total_pages - 3) {
+                        echo '<span class="pagination-ellipsis">...</span>';
+                    }
+                    // Always show last page (if more than 1 page)
+                    if ($total_pages > 1) {
+                        if ($page == $total_pages) {
+                            echo '<a href="' . page_link($total_pages, $query_string) . '" class="ajax-page-link active">' . $total_pages . '</a>';
+                        } else {
+                            echo '<a href="' . page_link($total_pages, $query_string) . '" class="ajax-page-link">' . $total_pages . '</a>';
+                        }
+                    }
                     ?>
-                        <a href="<?php echo page_link($i, $query_string); ?>" class="ajax-page-link<?php if ($i == $page) echo ' active'; ?>"><?php echo $i; ?></a>
-                    <?php endfor; ?>
                     <?php if ($page < $total_pages): ?>
-                        <a href="<?php echo page_link($page+1, $query_string); ?>" class="ajax-page-link">Next &raquo;</a>
+                        <a href="<?php echo page_link($page+1, $query_string); ?>" class="ajax-page-link">&raquo;</a>
                     <?php endif; ?>
                 </div>
                 <?php endif; ?>
