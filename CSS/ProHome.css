@@ -1526,6 +1526,7 @@
   min-width: 300px;
   max-width: 300px;
   flex: 0 0 300px;
+  height: 300px;
   background: #fff;
   border-radius: 18px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
@@ -1537,9 +1538,9 @@
 
 .display-carousel-card img {
   width: 100%;
-  height: 220px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 18px 18px 0 0;
+  border-radius: 18px;
 }
 
 .display-carousel-title {
@@ -1554,18 +1555,20 @@
   .display-carousel-card {
     min-width: 220px;
     max-width: 220px;
+    height: 180px;
   }
   .display-carousel-card img {
-    height: 150px;
+    height: 100%;
   }
 }
 @media (max-width: 600px) {
   .display-carousel-card {
     min-width: 90vw;
     max-width: 90vw;
+    height: 120px;
   }
   .display-carousel-card img {
-    height: 120px;
+    height: 100%;
   }
   .display-carousel-wrapper {
     padding: 10px 0;
