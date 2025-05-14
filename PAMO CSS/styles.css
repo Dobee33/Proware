@@ -71,7 +71,7 @@ body {
 }
 
 header {
-  background: white;
+  background: #cfcecf;
   padding: 15px 25px;
   border-radius: 12px;
   box-shadow: var(--shadow);

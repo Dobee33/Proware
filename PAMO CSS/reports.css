@@ -512,7 +512,7 @@ tr:hover {
 
 /* --- Enhanced Reports Header --- */
 .reports-header {
-  background: #f8f9fa;
+  background: #cfcecf;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   padding: 18px 18px 10px 18px;
@@ -543,7 +543,7 @@ tr:hover {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #fff;
+  background: #cfcecf;
   padding: 8px 14px;
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);

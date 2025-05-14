@@ -47,9 +47,12 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <main class="main-content">
             <header>
-                <div class="search-bar">
-                    <i class="material-icons">search</i>
-                    <input type="text" id="searchInput" placeholder="Search pre-orders...">
+                <div class="header-title-search" style="display: flex; align-items: center; gap: 24px;">
+                    <h1 class="page-title" style="color: #007bff; font-size: 2rem; font-weight: bold; margin: 0 18px 0 0;">Orders</h1>
+                    <div class="search-bar">
+                        <i class="material-icons">search</i>
+                        <input type="text" id="searchInput" placeholder="Search orders...">
+                    </div>
                 </div>
                 <div class="header-actions">
                     <div class="filter-dropdown">
