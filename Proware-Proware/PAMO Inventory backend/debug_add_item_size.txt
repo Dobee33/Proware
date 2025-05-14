@@ -1,0 +1,41 @@
+Array
+(
+    [deliveryOrderNumber] => 000000
+    [existingItem] => PTWMBW001
+    [newSize] => Array
+        (
+            [0] => M
+            [1] => L
+            [2] => XL
+            [3] => XXL
+            [4] => 3XL
+        )
+
+    [newItemCode] => Array
+        (
+            [0] => PTWMBW001-003
+            [1] => PTWMBW001-004
+            [2] => PTWMBW001-005
+            [3] => PTWMBW001-006
+            [4] => PTWMBW001-007
+        )
+
+    [newQuantity] => Array
+        (
+            [0] => 65
+            [1] => 14
+            [2] => 34
+            [3] => 44
+            [4] => 61
+        )
+
+    [newDamage] => Array
+        (
+            [0] => 0
+            [1] => 0
+            [2] => 0
+            [3] => 0
+            [4] => 0
+        )
+
+)

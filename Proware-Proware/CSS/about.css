@@ -1,0 +1,337 @@
+/* Default - Mobile First */
+.about-wrapper {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.about-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+/* Hero Section */
+.hero-section {
+  position: relative;
+  width: 100%;
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+    url("../Images/be-future-ready-2024-thumb.jpg");
+  background-size: cover;
+  background-position: center;
+  padding: 60px 0;
+  text-align: center;
+  margin-top: 50px;
+  margin-bottom: 30px;
+  color: var(--secondary-color);
+}
+
+/* Remove any cart-count and notification-count styles from about.css to prevent conflicts */
+.about-wrapper .cart-count,
+.about-wrapper .notification-count {
+  display: none;
+}
+
+.hero-content {
+  padding: 0 15px;
+  max-width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.hero-content h1 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hero-content .subtitle {
+  font-size: 1.1rem;
+  color: white;
+  margin: 0 auto;
+  line-height: 1.4;
+  max-width: 100%;
+}
+
+/* Content Sections */
+.content-section {
+  background: white;
+  padding: 25px 15px;
+  margin-bottom: 30px;
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  color: var(--primary-color);
+}
+
+.section-header i {
+  font-size: 1.5rem;
+}
+
+.section-header h2 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.section-content {
+  color: var(--text-color);
+  line-height: 1.5;
+  font-size: 1rem;
+}
+
+/* Benefits Section */
+.benefits-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.benefit-card {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  transition: transform 0.3s ease;
+  border: 1px solid rgba(0, 114, 188, 0.1);
+}
+
+.benefit-card i {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 15px;
+}
+
+.benefit-card h3 {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+/* Mission Section */
+.mission-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.mission-card {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid rgba(0, 114, 188, 0.1);
+}
+
+.mission-card h3 {
+  color: var(--primary-color);
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+}
+
+/* Guide Section */
+.guide-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.guide-card {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 114, 188, 0.1);
+}
+
+.guide-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  color: var(--primary-color);
+}
+
+.guide-header i {
+  font-size: 1.5rem;
+}
+
+.guide-header h3 {
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.guide-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.guide-card li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 15px;
+  color: var(--text-color);
+  line-height: 1.4;
+  font-size: 0.95rem;
+}
+
+.guide-card li i {
+  color: var(--primary-color);
+  margin-top: 3px;
+}
+
+/* Small - ≥576px */
+@media (min-width: 576px) {
+  .about-container {
+    padding: 0 20px;
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  .hero-content h1 {
+    font-size: 3rem;
+  }
+
+  .hero-content .subtitle {
+    font-size: 1.2rem;
+    max-width: 500px;
+  }
+
+  .content-section {
+    padding: 30px 20px;
+  }
+
+  .section-header h2 {
+    font-size: 1.7rem;
+  }
+
+  .benefit-card,
+  .mission-card,
+  .guide-card {
+    padding: 25px;
+  }
+}
+
+/* Medium - ≥768px */
+@media (min-width: 768px) {
+  .about-container {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .hero-section {
+    padding: 80px 0;
+  }
+
+  .hero-content h1 {
+    font-size: 4rem;
+  }
+
+  .hero-content .subtitle {
+    font-size: 1.3rem;
+  }
+
+  .benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mission-grid,
+  .guide-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .section-header i {
+    font-size: 1.8rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.9rem;
+  }
+}
+
+/* Large - ≥992px */
+@media (min-width: 992px) {
+  .about-container {
+    max-width: 960px;
+  }
+
+  .hero-section {
+    padding: 100px 0;
+    background-attachment: fixed;
+  }
+
+  .hero-content h1 {
+    font-size: 5rem;
+  }
+
+  .hero-content .subtitle {
+    font-size: 1.4rem;
+  }
+
+  .content-section {
+    padding: 40px;
+  }
+
+  .benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+
+  .benefit-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .section-content {
+    font-size: 1.1rem;
+  }
+}
+
+/* Extra Large - ≥1200px */
+@media (min-width: 1200px) {
+  .about-container {
+    max-width: 1140px;
+  }
+
+  .hero-content h1 {
+    font-size: 6rem;
+  }
+
+  .hero-content .subtitle {
+    font-size: 1.5rem;
+    max-width: 600px;
+  }
+
+  .benefits-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .section-header i {
+    font-size: 2rem;
+  }
+
+  .section-header h2 {
+    font-size: 2rem;
+  }
+
+  .benefit-card i {
+    font-size: 2.5rem;
+  }
+
+  .benefit-card h3 {
+    font-size: 1.3rem;
+  }
+}
