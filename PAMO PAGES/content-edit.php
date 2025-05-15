@@ -163,13 +163,14 @@ if (isset($_GET['error'])) {
                         $sql = "SELECT * FROM homepage_content WHERE section='pre_order' ORDER BY created_at DESC";
                         $result = $conn->query($sql);
                         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                            $category = isset($row['category']) ? htmlspecialchars($row['category']) : '';
                             echo '<div class="image-card">';
                             echo '<img src="../' . htmlspecialchars($row['image_path']) . '" alt="' . htmlspecialchars($row['title']) . '">';
                             echo '<div class="image-overlay">';
                             echo '<button class="overlay-btn" title="Edit" data-id="' . $row['id'] . '"><i class="material-icons">edit</i></button>';
                             echo '<button class="overlay-btn" title="Delete" data-id="' . $row['id'] . '"><i class="material-icons">delete</i></button>';
                             echo '</div>';
-                            echo '<span class="image-title-tooltip">' . htmlspecialchars($row['title']) . '<br><b>' . htmlspecialchars($row['category']) . '</b><br>₱' . number_format($row['price'], 2) . '</span>';
+                            echo '<span class="image-title-tooltip">' . htmlspecialchars($row['title']) . '<br><b>' . $category . '</b><br>₱' . number_format($row['price'], 2) . '</span>';
                             echo '</div>';
                         }
                         ?>

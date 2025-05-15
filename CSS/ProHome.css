@@ -374,7 +374,7 @@
 /* ===== Tagline Section ===== */
 .tagline {
   background-color: var(--primary-color);
-  padding: 40px 0;
+  padding: 1px 0;
   text-align: center;
 }
 
@@ -483,7 +483,7 @@
 /* Small - ≥576px */
 @media (min-width: 576px) {
   .tagline {
-    padding: 50px 0;
+    padding: 1px 0;
   }
 
   .tag h1 {
@@ -503,7 +503,7 @@
 /* Medium - ≥768px */
 @media (min-width: 768px) {
   .tagline {
-    padding: 60px 0;
+    padding: 1px 0;
   }
 
   .tag h1 {
@@ -838,6 +838,22 @@
 .new-arrival-btn:hover {
   background: transparent;
   color: var(--secondary-color);
+}
+
+.new-arrival-title {
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #fff !important;
+  background: rgba(0, 0, 0, 0.5);
+  margin-top: 12px;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+  text-transform: capitalize;
+  padding: 6px 0;
+  border-radius: 6px;
+  position: relative;
+  z-index: 10;
 }
 
 /* Small - ≥576px */

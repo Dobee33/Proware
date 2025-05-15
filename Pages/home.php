@@ -73,6 +73,7 @@
                 echo '  <div class="new-arrival-image">';
                 echo '    <img src="../' . htmlspecialchars($row['image_path']) . '" alt="' . $title . '" draggable="false" />';
                 echo '  </div>';
+                echo '  <div class="new-arrival-title">' . $title . '</div>';
                 echo '</div>';
             }
             ?>
@@ -111,6 +112,13 @@
                     }
                     ?>
                 </div>
+            </div>
+            <div class="display-order-btn-container" style="text-align:center; margin-top: 20px;">
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <a href="ProItemList.php"><button class="shop-now-button" style="color: yellow; background: #0072BC;">Order Now</button></a>
+                <?php else: ?>
+                    <a href="login.php?redirect=ProItemList.php"><button class="shop-now-button" style="color: yellow; background: #0072BC;">Order Now</button></a>
+                <?php endif; ?>
             </div>
         </div>
     </section>
