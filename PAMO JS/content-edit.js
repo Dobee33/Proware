@@ -31,6 +31,18 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
+  // Accordion logic for section boxes
+  document.querySelectorAll(".section-header").forEach(function (header) {
+    header.addEventListener("click", function () {
+      const box = header.closest(".section-box");
+      // Close all other boxes
+      document.querySelectorAll(".section-box").forEach(function (b) {
+        if (b !== box) b.classList.remove("active");
+      });
+      // Toggle current box
+      box.classList.toggle("active");
+    });
+  });
 });
 
 function loadAllSections() {
