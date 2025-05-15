@@ -143,7 +143,7 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     </div>
                                 <?php elseif ($order['status'] === 'approved'): ?>
                                     <div class="order-actions">
-                                        <button class="complete-btn" onclick="updateOrderStatus(<?php echo $order['id']; ?>, 'completed')">
+                                        <button class="complete-btn" data-order-id="<?php echo $order['id']; ?>">
                                             <i class="fas fa-check-double"></i> Mark as Completed (After Payment)
                                         </button>
                                     </div>
@@ -161,34 +161,24 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </main>
     </div>
 
-    <script>
-        // Update order status
-        function updateOrderStatus(orderId, status) {
-            console.log('Updating order:', orderId, 'to status:', status);
-            
-            fetch('update_order_status.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `order_id=${orderId}&status=${status}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Server response:', data);
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Error updating order status: ' + data.message);
-                    console.error('Error details:', data.debug);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error updating order status. Check console for details.');
-            });
-        }
+    <!-- Preorder Receipt Modal (hidden by default) -->
+    <div id="preorderReceiptModal" class="modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Sales Receipt</h2>
+                <span class="close" onclick="closePreorderReceiptModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="preorderReceiptBody">
+                <!-- Receipt content will be injected here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="printPreorderReceipt()" class="save-btn">Print</button>
+                <button type="button" onclick="closePreorderReceiptModal()" class="cancel-btn">Close</button>
+            </div>
+        </div>
+    </div>
 
+    <script>
         // Search functionality
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
@@ -204,6 +194,9 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
         function filterByStatus(status) {
             window.location.href = `preorders.php?status=${status}`;
         }
+
+        // Expose PHP $orders as a JS object for use in modal logic
+        window.PREORDERS = <?php echo json_encode($orders); ?>;
     </script>
 
     <script src="../PAMO JS/preorders.js"></script>

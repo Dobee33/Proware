@@ -685,3 +685,323 @@
 .search-bar {
   margin: 0;
 }
+
+/* Modal Base Styles */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  overflow: auto;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Make modal display flex when shown */
+.modal[style*="display: block"] {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Receipt Styles for Preorder Modal (match inventory) */
+.receipt-a4 {
+  width: 210mm;
+  height: 297mm;
+  padding: 0;
+  margin: 0 auto;
+  background: #fff;
+  font-family: Arial, sans-serif;
+  position: relative;
+}
+.receipt-half {
+  height: 148.5mm;
+  box-sizing: border-box;
+  padding: 10px 10px 6px 10px;
+  border-bottom: 2.5px dashed #333;
+  page-break-inside: avoid;
+  background: #fff;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.receipt-divider {
+  height: 2px;
+  background: transparent;
+}
+.receipt-header-flex {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2px;
+  margin-top: 2px;
+  min-height: 60px;
+}
+.receipt-header-logo img {
+  height: 60px;
+  width: auto;
+  display: block;
+}
+.receipt-header-logo {
+  flex: 0 0 80px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.receipt-header-center {
+  flex: 1 1 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+.sti-lucena {
+  font-size: 1.35em;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin-bottom: 0px;
+}
+.sales-issuance-slip {
+  font-size: 1.1em;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  margin-top: 0px;
+}
+.receipt-header-copy {
+  flex: 0 0 100px;
+  text-align: right;
+  font-size: 1em;
+  font-weight: bold;
+  margin-top: 2px;
+  margin-right: 2px;
+}
+.receipt-header-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8px;
+  font-size: 1em;
+}
+.receipt-header-table td {
+  padding: 2px 6px 2px 0;
+  vertical-align: bottom;
+  border-bottom: 1px solid #222;
+}
+.receipt-header-table tr:last-child td {
+  border-bottom: none;
+}
+.receipt-main-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1em;
+  margin-bottom: 0px;
+  table-layout: fixed;
+}
+.receipt-main-table th,
+.receipt-main-table td {
+  border: 1px solid #222;
+  padding: 6px 8px;
+  vertical-align: top;
+  word-break: break-word;
+}
+.receipt-main-table th {
+  background: #f2f2f2;
+  text-align: center;
+}
+.receipt-main-table td {
+  background: #fff;
+}
+.signature-col {
+  background: #fff;
+  vertical-align: top;
+  text-align: left;
+  min-width: 180px;
+  max-width: 220px;
+  padding: 0 !important;
+}
+.signature-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.signature-table .sig-label {
+  font-weight: bold;
+  font-size: 0.98em;
+  border: 1px solid #222;
+  border-bottom: none;
+  padding: 4px 6px 2px 6px;
+  background: #f8f8f8;
+}
+.signature-table .sig-box {
+  border: 1px solid #222;
+  border-top: none;
+  height: 28px;
+  padding: 2px 6px;
+  font-size: 0.97em;
+  background: #fff;
+}
+.signature-table .sig-name {
+  font-size: 1em;
+  margin-top: 2px;
+}
+.receipt-footer-cell {
+  text-align: left;
+  font-size: 0.98em;
+  padding-top: 10px;
+}
+.receipt-footer-total {
+  text-align: right;
+  font-size: 1.05em;
+  font-weight: bold;
+  padding-top: 10px;
+}
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  html,
+  body {
+    width: 210mm;
+    height: 297mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    overflow: visible !important;
+  }
+  .modal,
+  .modal-card,
+  .modal-body {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+  .receipt-a4 {
+    width: 200mm !important;
+    height: 287mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+  body * {
+    visibility: hidden !important;
+  }
+  #preorderReceiptModal,
+  #preorderReceiptModal * {
+    visibility: visible !important;
+  }
+  #preorderReceiptModal {
+    position: fixed !important;
+    left: 0;
+    top: 0;
+    width: 210mm;
+    height: 297mm;
+    background: #fff !important;
+    z-index: 9999;
+    overflow: visible !important;
+    box-shadow: none !important;
+  }
+  .receipt-half {
+    height: 148.5mm !important;
+    overflow: hidden !important;
+  }
+  .receipt-divider {
+    display: none;
+  }
+  .modal-header,
+  .modal-footer,
+  .save-btn,
+  .cancel-btn,
+  .close {
+    display: none !important;
+  }
+}
+
+/* Modal Card Styles (match inventory) */
+.modal-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+  max-width: 900px;
+  width: 95vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px 12px 24px;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+}
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.4em;
+  font-weight: bold;
+}
+.modal-header .close {
+  font-size: 1.7em;
+  font-weight: bold;
+  color: #888;
+  cursor: pointer;
+  margin-left: 18px;
+  transition: color 0.2s;
+}
+.modal-header .close:hover {
+  color: #d32f2f;
+}
+.modal-body {
+  padding: 18px 24px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  background: #fff;
+}
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  border-top: 1px solid #eee;
+  background: #fafbfc;
+}
+.save-btn {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 22px;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.save-btn:hover {
+  background: #0056b3;
+}
+.cancel-btn {
+  background: #e0e0e0;
+  color: #333;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 22px;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.cancel-btn:hover {
+  background: #bdbdbd;
+}
