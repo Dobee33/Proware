@@ -26,6 +26,27 @@ if ($status) {
 
 $stmt->execute();
 $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// --- Add category to each item in each order ---
+foreach ($orders as &$order) {
+    $order_items = json_decode($order['items'], true);
+    if ($order_items && is_array($order_items)) {
+        foreach ($order_items as &$item) {
+            // Fetch category from inventory table using item_code
+            $item_code = $item['item_code'] ?? '';
+            if ($item_code) {
+                $cat_stmt = $conn->prepare("SELECT category FROM inventory WHERE item_code = ? LIMIT 1");
+                $cat_stmt->execute([$item_code]);
+                $cat_row = $cat_stmt->fetch(PDO::FETCH_ASSOC);
+                $item['category'] = $cat_row ? $cat_row['category'] : '';
+            } else {
+                $item['category'] = '';
+            }
+        }
+        $order['items'] = json_encode($order_items);
+    }
+}
+unset($order);
 ?>
 
 <!DOCTYPE html>
@@ -197,6 +218,8 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Expose PHP $orders as a JS object for use in modal logic
         window.PREORDERS = <?php echo json_encode($orders); ?>;
+        // Expose PAMO user name for receipt
+        window.PAMO_USER = { name: "<?php echo addslashes($_SESSION['name'] ?? ''); ?>" };
     </script>
 
     <script src="../PAMO JS/preorders.js"></script>

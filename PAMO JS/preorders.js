@@ -318,6 +318,10 @@ function printPreorderReceipt() {
       modal.style.display = "none";
       document.getElementById("preorderReceiptBody").innerHTML = "";
     }
+    // Reload the page to update the order status and UI
+    setTimeout(function () {
+      location.reload();
+    }, 300);
   }, 500);
 }
 
