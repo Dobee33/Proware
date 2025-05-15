@@ -520,7 +520,6 @@ tr:hover {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 18px;
   flex-wrap: nowrap;
 }
 
@@ -534,7 +533,7 @@ tr:hover {
 }
 
 .search-bar {
-  min-width: 240px;
+  min-width: 180px;
   width: 300px;
   margin-right: 12px;
 }
@@ -557,7 +556,6 @@ tr:hover {
 @media (max-width: 1200px) {
   .reports-header {
     flex-wrap: wrap;
-    gap: 10px;
     padding: 12px 4px 8px 4px;
   }
   .search-bar {
@@ -577,7 +575,6 @@ tr:hover {
   .reports-header {
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
   }
   .reports-title {
     margin: 0 0 6px 0;
@@ -594,22 +591,82 @@ tr:hover {
 
 /* Responsive Table Container for Reports */
 @media (max-width: 900px) {
-  .report-table,
-  .scroll-table-container {
-    overflow-x: auto !important;
-    width: 100%;
-    display: block;
+  .reports-header {
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 4px 8px 4px;
   }
-  .report-table table,
-  .scroll-table-container table {
-    min-width: 700px;
+  .search-bar,
+  .date-filters,
+  .export-btn {
+    width: 100%;
+    min-width: 0;
+    margin-right: 0;
+  }
+  .date-filters {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding: 8px 4px;
+    margin-right: 0;
+  }
+  .report-filters {
+    padding: 10px;
+    font-size: 0.95em;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* --- Responsive Table Wrapper for Reports --- */
+.report-table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.report-table-responsive .report-table {
+  min-width: 700px;
+  width: 100%;
+  display: block;
+  overflow-x: auto;
+}
+
+@media (max-width: 700px) {
+  .report-table-responsive .report-table,
+  .report-table-responsive .report-table table {
+    min-width: 600px;
     width: 100%;
     display: block;
+    overflow-x: auto;
   }
   .report-table th,
   .report-table td {
     padding: 8px 6px;
     font-size: 13px;
     white-space: nowrap;
+  }
+}
+
+body,
+.container,
+.main-content {
+  min-width: 0 !important;
+  width: 100% !important;
+  overflow-x: hidden;
+}
+
+@media (max-width: 500px) {
+  .report-table th,
+  .report-table td {
+    padding: 6px 3px;
+    font-size: 12px;
+  }
+  .reports-title {
+    font-size: 1.1em;
+  }
+  .report-filters select {
+    width: 100%;
+    font-size: 13px;
   }
 }

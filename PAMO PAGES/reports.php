@@ -70,15 +70,18 @@ $offset = ($page - 1) * $limit;
                 </div>
 
                 <!-- Inventory Report Table -->
-                <div id="inventoryReport" class="report-table" style="display: <?php echo $reportType == 'inventory' ? 'block' : 'none'; ?>;">
+                <div class="report-table-responsive">
+                    <div id="inventoryReport" class="report-table" style="display: <?php echo $reportType == 'inventory' ? 'block' : 'none'; ?>;"></div>
                 </div>
 
                 <!-- Sales Report Table -->
-                <div id="salesReport" class="report-table" style="display: <?php echo $reportType == 'sales' ? 'block' : 'none'; ?>;">
+                <div class="report-table-responsive">
+                    <div id="salesReport" class="report-table" style="display: <?php echo $reportType == 'sales' ? 'block' : 'none'; ?>;"></div>
                 </div>
 
                 <!-- Audit Trail Table -->
-                <div id="auditReport" class="report-table" style="display: <?php echo $reportType == 'audit' ? 'block' : 'none'; ?>;">
+                <div class="report-table-responsive">
+                    <div id="auditReport" class="report-table" style="display: <?php echo $reportType == 'audit' ? 'block' : 'none'; ?>;"></div>
                 </div>
             </div>
         </main>
