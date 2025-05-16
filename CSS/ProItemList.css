@@ -486,10 +486,14 @@ body {
   -moz-appearance: textfield;
 }
 
-.quantity input::-webkit-outer-spin-button,
-.quantity input::-webkit-inner-spin-button {
+/* Remove spinner (arrow up/down) from input[type=number] for all browsers */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 
 .add-to-cart {
