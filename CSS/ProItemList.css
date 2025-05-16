@@ -791,10 +791,14 @@ body {
 .price-display {
   color: #007bff;
   font-weight: bold;
+  font-size: 1.3rem;
 }
 
 .stock-display {
   color: #28a745;
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: 1px;
 }
 
 .stock-display.low-stock {
