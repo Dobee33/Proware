@@ -510,7 +510,7 @@ function page_link($page, $query_string) {
                     <div class="order-section form-row">
                         <div class="input-group">
                             <label for="transactionNumber">Transaction Number:</label>
-                            <input type="text" id="transactionNumber" name="transactionNumber" required>
+                            <input type="text" id="transactionNumber" name="transactionNumber" readonly required>
                         </div>
                         <div class="input-group">
                             <label for="roleCategory">Role:</label>
