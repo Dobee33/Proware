@@ -233,96 +233,10 @@ const contentItems = [
 ];
 
 // Initialize content grid
-document.addEventListener("DOMContentLoaded", function () {
-  loadContentGrid();
-  initializeDropZone();
-});
-
-function loadContentGrid() {
-  const grid = document.querySelector(".content-grid");
-  grid.innerHTML = "";
-
-  contentItems.forEach((item) => {
-    const card = createContentCard(item);
-    grid.appendChild(card);
-  });
-}
-
-function createContentCard(item) {
-  const div = document.createElement("div");
-  div.className = "content-card";
-
-  div.innerHTML = `
-        <div class="content-image">
-            <img src="${item.image}" alt="${item.title}">
-            <div class="content-overlay">
-                <button class="overlay-btn" onclick="editContent(${item.id})">
-                    <i class="material-icons">edit</i>
-                </button>
-                <button class="overlay-btn" onclick="deleteContent(${item.id})">
-                    <i class="material-icons">delete</i>
-                </button>
-            </div>
-        </div>
-        <div class="content-info">
-            <div class="content-type">${item.type}</div>
-            <h3 class="content-title">${item.title}</h3>
-            <div class="content-dates">
-                <span>From: ${formatDate(item.startDate)}</span>
-                <span>To: ${formatDate(item.endDate)}</span>
-            </div>
-        </div>
-    `;
-  return div;
-}
-
-function initializeDropZone() {
-  const dropZone = document.getElementById("dropZone");
-  const fileInput = document.getElementById("fileInput");
-
-  // Handle drag and drop
-  dropZone.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    dropZone.classList.add("dragover");
-  });
-
-  dropZone.addEventListener("dragleave", () => {
-    dropZone.classList.remove("dragover");
-  });
-
-  dropZone.addEventListener("drop", (e) => {
-    e.preventDefault();
-    dropZone.classList.remove("dragover");
-    handleFiles(e.dataTransfer.files);
-  });
-
-  fileInput.addEventListener("change", (e) => {
-    handleFiles(e.target.files);
-  });
-}
-
-function handleFiles(files) {
-  const previewArea = document.getElementById("previewArea");
-  previewArea.innerHTML = "";
-
-  Array.from(files).forEach((file) => {
-    if (file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const preview = document.createElement("div");
-        preview.className = "preview-item";
-        preview.innerHTML = `
-                    <img src="${e.target.result}" alt="Preview">
-                    <button class="remove-btn" onclick="this.parentElement.remove()">
-                        <i class="material-icons">close</i>
-                    </button>
-                `;
-        previewArea.appendChild(preview);
-      };
-      reader.readAsDataURL(file);
-    }
-  });
-}
+// document.addEventListener("DOMContentLoaded", function () {
+//   loadContentGrid();
+//   initializeDropZone();
+// });
 
 function openUploadModal() {
   document.getElementById("uploadModal").style.display = "block";
@@ -414,33 +328,26 @@ function openEditModal(imageId) {
       document.getElementById("editImageTitle").value = data.title;
       document.getElementById("editImagePreview").src = "../" + data.image_path;
       document.getElementById("editImageModal").style.display = "block";
+      // Attach submit handler here to ensure it is always attached
+      document.getElementById("editImageForm").onsubmit = function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch("../PAMO BACKEND CONTENT EDIT/edit-content-image.php", {
+          method: "POST",
+          body: formData,
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success) {
+              location.reload();
+            } else {
+              alert(data.error || "Failed to update image.");
+            }
+          });
+      };
     });
 }
 
 function closeEditModal() {
   document.getElementById("editImageModal").style.display = "none";
 }
-
-document.addEventListener("DOMContentLoaded", function () {
-  document
-    .getElementById("editImageForm")
-    .addEventListener("submit", function (e) {
-      e.preventDefault();
-      const formData = new FormData(this);
-      fetch("../PAMO BACKEND CONTENT EDIT/edit-content-image.php", {
-        method: "POST",
-        body: formData,
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            location.reload();
-          } else {
-            alert(data.error || "Failed to update image.");
-          }
-        });
-    });
-  document
-    .getElementById("closeEditModalBtn")
-    .addEventListener("click", closeEditModal);
-});

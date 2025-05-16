@@ -54,10 +54,48 @@ if (isset($_GET['error'])) {
             </header>
             <?php echo $feedback; ?>
             <div class="content-container">
+
+            <div class="section-box">
+                    <div class="section-header">
+                        <h2>Item Categories</h2>
+                        <i class="material-icons">category</i>
+                    </div>
+                    <div class="section-content active">
+                        <form class="upload-form" action="../PAMO BACKEND CONTENT EDIT/upload-content-image.php" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="section" value="new_arrival">
+                            <label>Image Title:
+                                <input type="text" name="title" required class="input-text">
+                            </label>
+                            <label class="file-label">
+                                <i class="material-icons">upload_file</i>
+                                <span id="arrivalFileName">Choose image...</span>
+                                <input type="file" name="image" accept="image/*" required class="custom-file-input" onchange="document.getElementById('arrivalFileName').textContent = this.files[0]?.name || 'Choose image...';">
+                            </label>
+                            <button type="submit" class="upload-btn">Upload to New Arrivals</button>
+                        </form>
+                        <h3>Current New Arrivals Images</h3>
+                        <div class="image-grid">
+                        <?php
+                        $sql = "SELECT * FROM homepage_content WHERE section='new_arrival' ORDER BY created_at DESC";
+                        $result = $conn->query($sql);
+                        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                            echo '<div class="image-card">';
+                            echo '<img src="../' . htmlspecialchars($row['image_path']) . '" alt="' . htmlspecialchars($row['title']) . '">';
+                            echo '<div class="image-overlay">';
+                            echo '<button class="overlay-btn" title="Edit" data-id="' . $row['id'] . '"><i class="material-icons">edit</i></button>';
+                            echo '<button class="overlay-btn" title="Delete" data-id="' . $row['id'] . '"><i class="material-icons">delete</i></button>';
+                            echo '</div>';
+                            echo '<span class="image-title-tooltip">' . htmlspecialchars($row['title']) . '</span>';
+                            echo '</div>';
+                        }
+                        ?>
+                        </div>
+                    </div>
+                </div>
                 <!-- Display Section Upload Form -->
                 <div class="section-box">
                     <div class="section-header">
-                        <h2>Display Section Images</h2>
+                        <h2>Carousel</h2>
                         <i class="material-icons">image</i>
                     </div>
                     <div class="section-content active">
@@ -93,49 +131,12 @@ if (isset($_GET['error'])) {
                     </div>
                 </div>
 
-                <!-- New Arrivals Section Upload Form -->
-                <div class="section-box">
-                    <div class="section-header">
-                        <h2>New Arrivals Images</h2>
-                        <i class="material-icons">category</i>
-                    </div>
-                    <div class="section-content active">
-                        <form class="upload-form" action="../PAMO BACKEND CONTENT EDIT/upload-content-image.php" method="POST" enctype="multipart/form-data">
-                            <input type="hidden" name="section" value="new_arrival">
-                            <label>Image Title:
-                                <input type="text" name="title" required class="input-text">
-                            </label>
-                            <label class="file-label">
-                                <i class="material-icons">upload_file</i>
-                                <span id="arrivalFileName">Choose image...</span>
-                                <input type="file" name="image" accept="image/*" required class="custom-file-input" onchange="document.getElementById('arrivalFileName').textContent = this.files[0]?.name || 'Choose image...';">
-                            </label>
-                            <button type="submit" class="upload-btn">Upload to New Arrivals</button>
-                        </form>
-                        <h3>Current New Arrivals Images</h3>
-                        <div class="image-grid">
-                        <?php
-                        $sql = "SELECT * FROM homepage_content WHERE section='new_arrival' ORDER BY created_at DESC";
-                        $result = $conn->query($sql);
-                        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                            echo '<div class="image-card">';
-                            echo '<img src="../' . htmlspecialchars($row['image_path']) . '" alt="' . htmlspecialchars($row['title']) . '">';
-                            echo '<div class="image-overlay">';
-                            echo '<button class="overlay-btn" title="Edit" data-id="' . $row['id'] . '"><i class="material-icons">edit</i></button>';
-                            echo '<button class="overlay-btn" title="Delete" data-id="' . $row['id'] . '"><i class="material-icons">delete</i></button>';
-                            echo '</div>';
-                            echo '<span class="image-title-tooltip">' . htmlspecialchars($row['title']) . '</span>';
-                            echo '</div>';
-                        }
-                        ?>
-                        </div>
-                    </div>
-                </div>
+                
 
                 <!-- Pre-Order Request Section Upload Form -->
                 <div class="section-box">
                     <div class="section-header">
-                        <h2>Pre-Order Request Items</h2>
+                        <h2>Items Available to Request for Pre-Order</h2>
                         <i class="material-icons">shopping_cart</i>
                     </div>
                     <div class="section-content active">
