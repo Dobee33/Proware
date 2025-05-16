@@ -32,6 +32,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order_id'])) {
     $stmt = $conn->prepare("UPDATE pre_orders SET status = 'cancelled' WHERE id = ? AND user_id = ? AND status = 'pending'");
     $stmt->execute([$cancel_order_id, $_SESSION['user_id']]);
 
+    // Add strike and cooldown for cancellation (same as voided)
+    $strikeStmt = $conn->prepare("UPDATE account SET pre_order_strikes = pre_order_strikes + 1, last_strike_time = NOW() WHERE id = ?");
+    $strikeStmt->execute([$_SESSION['user_id']]);
+    $checkStrikeStmt = $conn->prepare("SELECT pre_order_strikes FROM account WHERE id = ?");
+    $checkStrikeStmt->execute([$_SESSION['user_id']]);
+    $strikes = $checkStrikeStmt->fetchColumn();
+    if ($strikes >= 3) {
+        $blockStmt = $conn->prepare("UPDATE account SET is_strike = 1 WHERE id = ?");
+        $blockStmt->execute([$_SESSION['user_id']]);
+    }
+
     // Log activity for each item in the cancelled order
     $order_stmt = $conn->prepare("SELECT * FROM pre_orders WHERE id = ? AND user_id = ?");
     $order_stmt->execute([$cancel_order_id, $_SESSION['user_id']]);

@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('Asia/Manila');
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -34,8 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $lastStrike = strtotime($userRow['last_strike_time']);
                         $now = time();
                         if ($now - $lastStrike < 300) { // 300 seconds = 5 minutes
-                            $response['message'] = 'You recently missed claiming a pre-order. Please try again after 5 minutes.';
+                            $response['message'] = 'You recently cancelled or failed to claim a pre-order. As a penalty, you cannot place a new pre-order for 5 minutes. Please try again later.';
                             break;
+                        } else {
+                            // Auto-clear last_strike_time after cooldown
+                            $clearStmt = $conn->prepare("UPDATE account SET last_strike_time = NULL WHERE id = ?");
+                            $clearStmt->execute([$user_id]);
                         }
                     }
                 }
