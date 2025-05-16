@@ -143,6 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Log activity for completed (Sales)
                 $activity_description = "Sales - Order #: {$order['order_number']}, Item: {$inventory['item_name']}, Quantity: {$item['quantity']}";
+                $activity_user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : $order['user_id'];
                 $activityStmt = $conn->prepare(
                     "INSERT INTO activities (
                         action_type,
@@ -156,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'Sales',
                     $activity_description,
                     $item['item_code'],
-                    $order['user_id']
+                    $activity_user_id
                 ])) {
                     throw new Exception('Failed to log activity for item: ' . $inventory['item_name']);
                 }
@@ -204,6 +205,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
                 $activity_description = "{$statusActionMap[$status]} - Order #: {$order['order_number']}, Item: {$item['item_name']}, Quantity: {$item['quantity']}";
+                // Determine user_id for activity
+                $activity_user_id = null;
+                if ($status === 'cancelled') {
+                    $activity_user_id = $order['user_id']; // student
+                } else if ($status === 'voided') {
+                    $activity_user_id = null; // system/voided
+                } else {
+                    $activity_user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : $order['user_id']; // admin/PAMO or fallback
+                }
                 $activityStmt = $conn->prepare(
                     "INSERT INTO activities (
                         action_type,
@@ -217,7 +227,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $statusActionMap[$status],
                     $activity_description,
                     $item['item_code'],
-                    $order['user_id']
+                    $activity_user_id
                 ]);
             }
         }

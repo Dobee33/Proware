@@ -52,7 +52,7 @@ foreach ($unpaid_orders as $order) {
                 'Voided',
                 $activity_description,
                 $item['item_code'],
-                $order['user_id']
+                null
             ]);
         }
 
