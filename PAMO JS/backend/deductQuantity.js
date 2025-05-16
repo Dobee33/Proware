@@ -11,11 +11,11 @@ function showDeductQuantityModal() {
   // Auto-fill Transaction Number
   const transactionInput = document.getElementById("transactionNumber");
   if (transactionInput) {
-    fetch("../PAMO Inventory backend/get_next_transaction_number.php")
+    fetch("../Backend/get_latest_transaction_number.php")
       .then((response) => response.json())
       .then((data) => {
-        if (data.success && data.next_transaction_number) {
-          transactionInput.value = data.next_transaction_number;
+        if (data.transaction_number) {
+          transactionInput.value = data.transaction_number;
         } else {
           transactionInput.value = "";
         }
