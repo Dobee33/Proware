@@ -69,9 +69,11 @@
             $result = $conn->query($sql);
             while($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $title = htmlspecialchars($row['title']);
-                echo '<div class="new-arrival-card" data-aos="fade-up">';
-                echo '  <div class="new-arrival-image">';
-                echo '    <img src="../' . htmlspecialchars($row['image_path']) . '" alt="' . $title . '" draggable="false" />';
+                echo '<div class="new-arrival-item">';
+                echo '  <div class="new-arrival-card" data-aos="fade-up">';
+                echo '    <div class="new-arrival-image">';
+                echo '      <img src="../' . htmlspecialchars($row['image_path']) . '" alt="' . $title . '" draggable="false" />';
+                echo '    </div>';
                 echo '  </div>';
                 echo '  <div class="new-arrival-title">' . $title . '</div>';
                 echo '</div>';
