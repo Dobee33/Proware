@@ -151,7 +151,7 @@
 <script>
     function logout() {
         if (confirm('Are you sure you want to logout?')) {
-            window.location.href = '../Pages/login.php';
+            window.location.href = '../logout.php';
         }
     }
 

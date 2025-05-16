@@ -78,13 +78,7 @@
             }
             ?>
         </div>
-        <div class="new-arrivals-order-btn-container">
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="ProItemList.php"><button class="shop-now-button">Order Now</button></a>
-            <?php else: ?>
-                <a href="login.php?redirect=ProItemList.php"><button class="shop-now-button">Order Now</button></a>
-            <?php endif; ?>
-        </div>
+        
     </section>
 
     <section class="Display">
