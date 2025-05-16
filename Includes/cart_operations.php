@@ -21,6 +21,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $size = isset($_POST['size']) && !empty($_POST['size']) ? $_POST['size'] : null;
                 $user_id = $_SESSION['user_id'];
 
+                // Check if user is blocked due to strikes or cooldown
+                $stmt = $conn->prepare("SELECT is_strike, last_strike_time FROM account WHERE id = ?");
+                $stmt->execute([$user_id]);
+                $userRow = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($userRow) {
+                    if ($userRow['is_strike']) {
+                        $response['message'] = 'You are temporarily blocked from pre-ordering due to repeated unclaimed orders. Please contact admin.';
+                        break;
+                    }
+                    if ($userRow['last_strike_time']) {
+                        $lastStrike = strtotime($userRow['last_strike_time']);
+                        $now = time();
+                        if ($now - $lastStrike < 300) { // 300 seconds = 5 minutes
+                            $response['message'] = 'You recently missed claiming a pre-order. Please try again after 5 minutes.';
+                            break;
+                        }
+                    }
+                }
+
                 // Get item details from inventory including available stock
                 $stmt = $conn->prepare("SELECT category, actual_quantity FROM inventory WHERE item_code = ? OR item_code LIKE ? LIMIT 1");
                 $stmt->execute([$item_code, $item_code . '-%']);
@@ -31,14 +50,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     break;
                 }
 
+                // Get reserved stock in pre_orders (pending/approved)
+                $reserved = 0;
+                $preOrderStmt = $conn->prepare("SELECT items FROM pre_orders WHERE status IN ('pending', 'approved')");
+                $preOrderStmt->execute();
+                while ($row = $preOrderStmt->fetch(PDO::FETCH_ASSOC)) {
+                    $orderItems = json_decode($row['items'], true);
+                    if (is_array($orderItems)) {
+                        foreach ($orderItems as $orderItem) {
+                            if ($orderItem['item_code'] === $item_code && ($size === null || $orderItem['size'] === $size)) {
+                                $reserved += intval($orderItem['quantity']);
+                            }
+                        }
+                    }
+                }
+
                 // Get current quantity in cart for this item
                 $stmt = $conn->prepare("SELECT SUM(quantity) as cart_quantity FROM cart WHERE user_id = ? AND item_code = ?");
                 $stmt->execute([$user_id, $item_code]);
                 $cart_quantity = $stmt->fetch(PDO::FETCH_ASSOC)['cart_quantity'] ?? 0;
 
-                // Check if adding this quantity would exceed available stock
-                if (($cart_quantity + $quantity) > $item['actual_quantity']) {
-                    $response['message'] = 'Adding this quantity would exceed available stock. Available: ' . $item['actual_quantity'];
+                // Check if adding this quantity would exceed available stock (minus reserved)
+                $available_stock = $item['actual_quantity'] - $reserved;
+                if (($cart_quantity + $quantity) > $available_stock) {
+                    $response['message'] = 'Adding this quantity would exceed available stock. Available: ' . $available_stock . ' (after reservation. Please come back ater 5 minutes)';
                     break;
                 }
 
