@@ -629,11 +629,11 @@ body {
 
 .close {
   position: absolute;
-  right: 15px;
+  right: 20px;
   top: 10px;
-  font-size: 28px;
+  font-size: 55px;
   font-weight: bold;
-  color: #666;
+  color: black;
   cursor: pointer;
   transition: color 0.3s ease;
 }

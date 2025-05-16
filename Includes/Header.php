@@ -1870,7 +1870,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     .drawer-header h3 {
         margin: 0;
-        font-size: 1.2rem;
+    font-size: 1.2rem;
+    font-weight: normal;
+    letter-spacing: .5px;
     }
 
     .close-drawer {
