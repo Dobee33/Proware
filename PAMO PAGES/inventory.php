@@ -709,10 +709,6 @@ function page_link($page, $query_string) {
             document.getElementById('addQuantityModal').style.display = 'block';
         }
 
-        function showDeductQuantityModal() {
-            document.getElementById('deductQuantityModal').style.display = 'block';
-        }
-
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
             // Reset the form if it's the Add Item Size modal
