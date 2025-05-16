@@ -31,6 +31,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order_id'])) {
     // Only allow cancel if the order is still pending and belongs to this user
     $stmt = $conn->prepare("UPDATE pre_orders SET status = 'cancelled' WHERE id = ? AND user_id = ? AND status = 'pending'");
     $stmt->execute([$cancel_order_id, $_SESSION['user_id']]);
+
+    // Log activity for each item in the cancelled order
+    $order_stmt = $conn->prepare("SELECT * FROM pre_orders WHERE id = ? AND user_id = ?");
+    $order_stmt->execute([$cancel_order_id, $_SESSION['user_id']]);
+    $order = $order_stmt->fetch(PDO::FETCH_ASSOC);
+    if ($order) {
+        $order_items = json_decode($order['items'], true);
+        if ($order_items && is_array($order_items)) {
+            foreach ($order_items as $item) {
+                $activity_description = "Cancelled - Order #: {$order['order_number']}, Item: {$item['item_name']}, Quantity: {$item['quantity']}";
+                $activityStmt = $conn->prepare(
+                    "INSERT INTO activities (
+                        action_type,
+                        description,
+                        item_code,
+                        user_id,
+                        timestamp
+                    ) VALUES (?, ?, ?, ?, NOW())"
+                );
+                $activityStmt->execute([
+                    'Cancelled',
+                    $activity_description,
+                    $item['item_code'],
+                    $_SESSION['user_id']
+                ]);
+            }
+        }
+    }
     // Optionally, add a notification or message here
     header("Location: MyOrders.php?status=" . urlencode($status_filter)); // Refresh page
     exit();

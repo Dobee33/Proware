@@ -36,21 +36,25 @@ foreach ($unpaid_orders as $order) {
         createNotification($conn, $order['user_id'], $message, $order['order_number'], 'voided');
 
         // Log the activity
-        $activityStmt = $conn->prepare(
-            "INSERT INTO activities (
-                action_type,
-                description,
-                user_id,
-                timestamp
-            ) VALUES (?, ?, ?, NOW())"
-        );
-        
-        $activity_description = "Order voided - Order #: {$order['order_number']} - Payment not made within 5 minutes";
-        $activityStmt->execute([
-            'order_voided',
-            $activity_description,
-            $order['user_id']
-        ]);
+        $order_items = json_decode($order['items'], true);
+        foreach ($order_items as $item) {
+            $activity_description = "Voided - Order #: {$order['order_number']}, Item: {$item['item_name']}, Quantity: {$item['quantity']}";
+            $activityStmt = $conn->prepare(
+                "INSERT INTO activities (
+                    action_type,
+                    description,
+                    item_code,
+                    user_id,
+                    timestamp
+                ) VALUES (?, ?, ?, ?, NOW())"
+            );
+            $activityStmt->execute([
+                'Voided',
+                $activity_description,
+                $item['item_code'],
+                $order['user_id']
+            ]);
+        }
 
         // Commit transaction
         $conn->commit();

@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Decode the items JSON
             $order_items = json_decode($order['items'], true);
-            if (!$order_items) {
+            if (!$order_items || !is_array($order_items)) {
                 throw new Exception('Invalid order items data');
             }
             
@@ -141,8 +141,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception('Failed to record sale for item: ' . $inventory['item_name']);
                 }
                 
-                // Log activity
-                $activity_description = "Order completed - Order #: {$order['order_number']}, Item: {$inventory['item_name']}, Quantity: {$item['quantity']}";
+                // Log activity for completed (Sales)
+                $activity_description = "Sales - Order #: {$order['order_number']}, Item: {$inventory['item_name']}, Quantity: {$item['quantity']}";
                 $activityStmt = $conn->prepare(
                     "INSERT INTO activities (
                         action_type,
@@ -152,9 +152,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         timestamp
                     ) VALUES (?, ?, ?, ?, NOW())"
                 );
-                
                 if (!$activityStmt->execute([
-                    'Order Completed',
+                    'Sales',
                     $activity_description,
                     $item['item_code'],
                     $order['user_id']
@@ -177,6 +176,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $paymentDateStmt = $conn->prepare("UPDATE pre_orders SET payment_date = NOW() WHERE id = ?");
             if (!$paymentDateStmt->execute([$order_id])) {
                 throw new Exception('Failed to record payment date');
+            }
+        }
+
+        // Log activities for status changes 
+        $statusActionMap = [
+            'approved'  => 'Order Accepted',
+            'rejected'  => 'Order Rejected',
+            'completed' => 'Sales',
+            'voided'    => 'Voided',
+            'cancelled' => 'Cancelled'
+        ];
+        if (isset($statusActionMap[$status])) {
+            $order_items = json_decode($order['items'], true);
+            if (!$order_items || !is_array($order_items)) {
+                throw new Exception('Order items are missing or invalid for status: ' . $status);
+            }
+            foreach ($order_items as $item) {
+                // Prevent duplicate 'Sales' activity logs
+                if ($status === 'completed') {
+                    $checkStmt = $conn->prepare("SELECT COUNT(*) FROM activities WHERE action_type = 'Sales' AND item_code = ? AND description LIKE ?");
+                    $descLike = "%Order #: {$order['order_number']}%";
+                    $checkStmt->execute([$item['item_code'], $descLike]);
+                    $alreadyLogged = $checkStmt->fetchColumn();
+                    if ($alreadyLogged) {
+                        continue; // Skip if already logged
+                    }
+                }
+                $activity_description = "{$statusActionMap[$status]} - Order #: {$order['order_number']}, Item: {$item['item_name']}, Quantity: {$item['quantity']}";
+                $activityStmt = $conn->prepare(
+                    "INSERT INTO activities (
+                        action_type,
+                        description,
+                        item_code,
+                        user_id,
+                        timestamp
+                    ) VALUES (?, ?, ?, ?, NOW())"
+                );
+                $activityStmt->execute([
+                    $statusActionMap[$status],
+                    $activity_description,
+                    $item['item_code'],
+                    $order['user_id']
+                ]);
             }
         }
 
